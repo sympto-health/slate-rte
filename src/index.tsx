@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import isHotkey from 'is-hotkey'
-import { ReactEditor, Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
-import { Editor, Node, createEditor } from 'slate'
+import { Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
+import { Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
@@ -10,18 +9,10 @@ import {
 import { Card } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { withLinks, LinkButton } from './Links';
-import FormatButton from './FormatButton';
+import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
+import ColorPicker from './ColorPicker';
 import './index.css';
-
-const HOTKEYS = {
-  'mod+b': 'bold',
-  'mod+i': 'italic',
-  'mod+u': 'underline',
-  'mod+`': 'code',
-}
-
-type FormatT = 'bold' | 'italic' | 'underline' | 'code' | 'heading-one' | 'heading-two' | 'block-quote' | 'numbered-list' | 'bulleted-list';
 
 const defaultInitialValue: Node[] = [
   {
@@ -68,42 +59,34 @@ const SlateRTE = () => {
     <div className="SlateRTE d-flex flex-column justify-content-start text-left p-3">
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
         <Card className="d-flex flex-row shadow-sm px-2 py-1 card mb-3 w-auto">
-          {
-            [
-              { format: 'bold', icon: faBold },
-              { format: 'italic', icon: faItalic },
-              { format: 'underline', icon: faUnderline },
-              { format: 'code', icon: faCode },
-            ].map((
-              { format, icon }: { format: FormatT, icon: IconDefinition },
-            ) => {
-              return (
-                <FormatButton 
-                  key={format}
-                  isActive={isMarkActive(editor, format)}
-                  icon={icon}
-                  onClick={() => {
-                    toggleMark(editor, format)
-                  }}
-                />
-              );
-            })
-          }
-          {
-            [
-              { format: 'heading-one', icon: faHeading },
-              { format: 'heading-two', icon: faFont },
-              { format: 'block-quote', icon: faQuoteLeft },
-              { format: 'numbered-list', icon: faListOl },
-              { format: 'bulleted-list', icon: faListUl},
-              { format: 'left-align', icon: faAlignLeft },
-              { format: 'center-align', icon: faAlignCenter },
-              { format: 'right-align', icon: faAlignRight },
-            ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
-              <FormatBlock format={format} icon={icon}  key={format}/>
-            ))
-           }
+          {[
+            { format: 'bold', icon: faBold },
+            { format: 'italic', icon: faItalic },
+            { format: 'underline', icon: faUnderline },
+            { format: 'code', icon: faCode },
+          ].map((
+            { format, icon }: { format: MarkFormats, icon: IconDefinition },
+          ) => (
+            <FormatMark 
+              key={format}
+              format={format}
+              icon={icon}
+            />
+          ))}
+          {[
+            { format: 'heading-one', icon: faHeading },
+            { format: 'heading-two', icon: faFont },
+            { format: 'block-quote', icon: faQuoteLeft },
+            { format: 'numbered-list', icon: faListOl },
+            { format: 'bulleted-list', icon: faListUl},
+            { format: 'left-align', icon: faAlignLeft },
+            { format: 'center-align', icon: faAlignCenter },
+            { format: 'right-align', icon: faAlignRight },
+          ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
+            <FormatBlock format={format} icon={icon}  key={format}/>
+          ))}
           <LinkButton />
+          <ColorPicker />
         </Card>
         <Editable
           renderElement={(props: RenderElementProps) => <Element {...props} />}
@@ -111,37 +94,14 @@ const SlateRTE = () => {
           placeholder="Enter some rich text…"
           spellCheck
           autoFocus
-          onKeyDown={(event) => {
-            for (const hotkey in HOTKEYS) {
-              // @ts-ignore
-              if (isHotkey(hotkey, event)) {
-                event.preventDefault()
-                const mark = HOTKEYS[hotkey]
-                toggleMark(editor, mark)
-              }
-            }
-          }}
+          // @ts-ignore
+          onKeyDown={(event: KeyboardEvent) => (HotKeyHandler({ event, editor }))}
         />
       </Slate>
     </div>
   );
 }
 
-const toggleMark = (editor: ReactEditor, format: FormatT) => {
-  const isActive = isMarkActive(editor, format)
-
-  if (isActive) {
-    Editor.removeMark(editor, format)
-  } else {
-    Editor.addMark(editor, format, true)
-  }
-}
-
-
-const isMarkActive = (editor: ReactEditor, format: FormatT) => {
-  const marks = Editor.marks(editor)
-  return marks ? marks[format] === true : false
-}
 
 const Element = ({ attributes, children, element }: RenderElementProps) => {
   switch (element.type) {
@@ -189,6 +149,11 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
 
   if (leaf.underline) {
     children = <u>{children}</u>
+  }
+  if (leaf['text-color']) {
+    // @ts-ignore
+    const color = leaf['text-color'].color;
+    children = <span style={{ color }} >{children}</span>
   }
 
   return <span {...attributes}>{children}</span>
