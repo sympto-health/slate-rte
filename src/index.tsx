@@ -19,7 +19,7 @@ import './index.css';
 const SlateRTE = ({ value, setValue, readOnlyMode, uploadImage }: {
   value: Node[],
   setValue:(value: Node[]) => void,
-  uploadImage?: () => Promise<null | string>,
+  uploadImage?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
   readOnlyMode: boolean,
 }) => {
   const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])

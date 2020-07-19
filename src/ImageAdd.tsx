@@ -1,25 +1,39 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Transforms, Range } from 'slate'
 import { useSlate,  ReactEditor } from 'slate-react'
 import { faImages } from '@fortawesome/free-solid-svg-icons'
 
 import FormatButton from './FormatButton';
-
+import AttachmentModal from './AttachmentModal';
 
 const ImageAdd = ({ uploadImage }: {
-  uploadImage: () => Promise<null | string>,
+  uploadImage: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
 }) => {
   const editor = useSlate();
+  const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   return (
-    <FormatButton 
-      isActive={false}
-      icon={faImages}
-      onClick={async () => {
-        const url = await uploadImage();
-        if (!url) return
-        insertImage(editor, url)
-      }}
-    />
+    <>
+      {
+        showAttachmentModal && (
+          <AttachmentModal 
+            closeModal={() => { setShowAttachmentModal(false); }}
+            onUpload={(file, progressCallBack) => {
+              return uploadImage(file, progressCallBack);
+            }}
+            onFinish={(url) => { 
+              insertImage(editor, url)
+            }}
+          />
+        )
+      }
+      <FormatButton 
+        isActive={false}
+        icon={faImages}
+        onClick={async () => {
+          setShowAttachmentModal(true);
+        }}
+      />
+    </>
   );
 }
 

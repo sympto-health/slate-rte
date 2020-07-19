@@ -41,7 +41,13 @@ const App = () => {
   return (
     <div>
       <SlateRTE 
-        uploadImage={() => (window.prompt('Enter the URL of the link:'))} 
+        uploadImage={(file, progress) => {
+          // progress is a callback to update progress indicator
+          // file contains file to uploaded
+          // returns url of image from server
+          console.log({ file, progress });
+          return '';
+        }} 
         readOnlyMode={false} 
         value={value} 
         setValue={setValue} 
