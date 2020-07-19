@@ -3,10 +3,14 @@ import isHotkey from 'is-hotkey'
 import { ReactEditor, Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
 import { Editor, Transforms, Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
+import cx from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCoffee, IconDefinition } from '@fortawesome/free-solid-svg-icons'
-
-import { Button } from 'react-bootstrap'
+import { 
+  faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
+} from '@fortawesome/free-solid-svg-icons'
+import { Card, Button } from 'react-bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './index.css';
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -15,7 +19,7 @@ const HOTKEYS = {
   'mod+`': 'code',
 }
 
-type FormatT = 'bold' | 'italic' | 'underline' | 'code';
+type FormatT = 'bold' | 'italic' | 'underline' | 'code' | 'heading-one' | 'heading-two' | 'block-quote' | 'numbered-list' | 'bulleted-list';
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
@@ -61,54 +65,68 @@ const SlateRTE = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-      <div>
-        {
-          [
-            { format: 'bold', icon: faCoffee, type: 'mark' },
-            { format: 'italic', icon: faCoffee, type: 'mark' },
-            { format: 'underline', icon: faCoffee, type: 'mark' },
-            { format: 'code', icon: faCoffee, type: 'mark' },
-            { format: 'heading-one', icon: faCoffee, type: 'block' },
-            { format: 'heading-two', icon: faCoffee, type: 'block' },
-            { format: 'block-quote', icon: faCoffee, type: 'block' },
-            { format: 'numbered-list', icon: faCoffee, type: 'block' },
-            { format: 'bulleted-list', icon: faCoffee, type: 'block' },
-          ].map(({ format, icon, type }: { format: FormatT, icon: IconDefinition, type: 'mark' | 'block' }) => (
-            <Button
-              active={type === 'mark' ? isMarkActive(editor, format) : isBlockActive(editor, format)}
-              onMouseDown={event => {
-                event.preventDefault()
-                if (type === 'mark') {
-                  toggleMark(editor, format)
-                } else {
-                  toggleBlock(editor, format)
-                }
-              }}
-            >
-              <FontAwesomeIcon icon={icon} />
-            </Button>
-          ))
-        }
-      </div>
-      <Editable
-        renderElement={(props: RenderElementProps) => <Element {...props} />}
-        renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />}
-        placeholder="Enter some rich text…"
-        spellCheck
-        autoFocus
-        onKeyDown={(event) => {
-          for (const hotkey in HOTKEYS) {
-            // @ts-ignore
-            if (isHotkey(hotkey, event)) {
-              event.preventDefault()
-              const mark = HOTKEYS[hotkey]
-              toggleMark(editor, mark)
-            }
+    <div className="SlackRTE d-flex flex-column justify-content-start text-left p-3">
+      <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+        <Card className="d-flex flex-row shadow-sm p-2 card mb-3 w-auto">
+          {
+            [
+              { format: 'bold', icon: faBold, type: 'mark' },
+              { format: 'italic', icon: faItalic, type: 'mark' },
+              { format: 'underline', icon: faUnderline, type: 'mark' },
+              { format: 'code', icon: faCode, type: 'mark' },
+              { format: 'heading-one', icon: faHeading, type: 'block' },
+              { format: 'heading-two', icon: faFont, type: 'block' },
+              { format: 'block-quote', icon: faQuoteLeft, type: 'block' },
+              { format: 'numbered-list', icon: faListOl, type: 'block' },
+              { format: 'bulleted-list', icon: faListUl, type: 'block' },
+            ].map((
+              { format, icon, type }: { format: FormatT, icon: IconDefinition, type: 'mark' | 'block' },
+              index: number,
+            ) => {
+              const isActive = type === 'mark' ? isMarkActive(editor, format) : isBlockActive(editor, format);
+              return (
+                <Button 
+                  key={format}
+                  variant="link"
+                  className={cx({
+                    'ml-2': index !== 0,
+                    'text-dark': !isActive,
+                    'text-primary': isActive,
+                  })}
+                  onMouseDown={event => {
+                    event.preventDefault()
+                    if (type === 'mark') {
+                      toggleMark(editor, format)
+                    } else {
+                      toggleBlock(editor, format)
+                    }
+                  }}
+                >
+                  <FontAwesomeIcon icon={icon} />
+                </Button>
+              );
+            })
           }
-        }}
-      />
-    </Slate>
+        </Card>
+        <Editable
+          renderElement={(props: RenderElementProps) => <Element {...props} />}
+          renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />}
+          placeholder="Enter some rich text…"
+          spellCheck
+          autoFocus
+          onKeyDown={(event) => {
+            for (const hotkey in HOTKEYS) {
+              // @ts-ignore
+              if (isHotkey(hotkey, event)) {
+                event.preventDefault()
+                const mark = HOTKEYS[hotkey]
+                toggleMark(editor, mark)
+              }
+            }
+          }}
+        />
+      </Slate>
+    </div>
   );
 }
 
