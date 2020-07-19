@@ -10,6 +10,10 @@
 	cursor: default;
 }
 
+.SlateRTE.read-only * {
+	display: inline;
+}
+
 .SlateRTE .image-item {
 	width: 100%;
 }
