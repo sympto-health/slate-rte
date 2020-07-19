@@ -4,7 +4,7 @@ import { Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
-  faAlignLeft, faAlignRight, faAlignCenter,
+  faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter,
 } from '@fortawesome/free-solid-svg-icons'
 import { Card } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -82,11 +82,13 @@ const SlateRTE = () => {
             { format: 'left-align', icon: faAlignLeft },
             { format: 'center-align', icon: faAlignCenter },
             { format: 'right-align', icon: faAlignRight },
+            { format: 'horizontal-line', icon: faGripLines },
           ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
             <FormatBlock format={format} icon={icon}  key={format}/>
           ))}
           <LinkButton />
-          <ColorPicker />
+          <ColorPicker icon={faTint} type="text-color" />
+          <ColorPicker icon={faHighlighter} type="highlight-color" />
         </Card>
         <Editable
           renderElement={(props: RenderElementProps) => <Element {...props} />}
@@ -123,6 +125,13 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
       return <div {...attributes} className="text-right">{children}</div>
     case 'center-align':
       return <div {...attributes} className="text-center">{children}</div>
+    case 'horizontal-line': 
+      return (
+        <div {...attributes}>
+          <hr />
+          {children}
+        </div>
+      )
     case 'link':
       return (
         <a {...attributes} href={String(element.url) || ''}>
@@ -152,9 +161,15 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   }
   if (leaf['text-color']) {
     // @ts-ignore
-    const color = leaf['text-color'].color;
+    const { color } = leaf['text-color'];
     children = <span style={{ color }} >{children}</span>
   }
+  if (leaf['highlight-color']) {
+    // @ts-ignore
+    const backgroundColor = leaf['highlight-color'].color;
+    children = <span style={{ backgroundColor }} >{children}</span>
+  }
+
 
   return <span {...attributes}>{children}</span>
 }

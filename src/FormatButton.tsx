@@ -5,22 +5,21 @@ import {
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
 import { Button } from 'react-bootstrap'
-import CSS from 'csstype';
 import './FormatButton.css'
 
-const FormatButton = ({ icon, isActive, onClick, className, style }: {
+const FormatButton = ({ icon, isActive, onClick, className,itemColor }: {
   icon: IconDefinition,
   isActive: boolean,
   className?: string,
-  style?: CSS.Properties,
+  itemColor?: null | string, // color of item (overrides default colors)
   onClick: () => void,
 }) => (
   <Button 
     variant="link"
-    style={style}
+    style={itemColor ? { color: itemColor } : {}}
     className={cx(className, 'SlateRTE-button mx-1', {
-      'text-dark': !isActive,
-      'text-primary': isActive,
+      'text-dark': !isActive && itemColor == null,
+      'text-primary': isActive && itemColor == null,
     })}
     onMouseDown={event => {
       event.preventDefault()
@@ -34,6 +33,7 @@ const FormatButton = ({ icon, isActive, onClick, className, style }: {
 FormatButton.defaultProps = {
   className: '',
   style: {},
+  itemColor: null,
 };
 
 export default FormatButton

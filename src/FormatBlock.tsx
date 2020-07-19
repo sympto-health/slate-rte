@@ -7,7 +7,7 @@ import './index.css';
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
-export type BlockFormats = 'heading-one' | 'heading-two' | 'block-quote' | 'numbered-list' | 'bulleted-list' | 'left-align' | 'center-align' | 'right-align';
+export type BlockFormats = 'heading-one' | 'heading-two' | 'block-quote' | 'numbered-list' | 'bulleted-list' | 'left-align' | 'center-align' | 'right-align' | 'horizontal-line';
 
 const FormatBlock = ({ format, icon }: {
   format: BlockFormats,
