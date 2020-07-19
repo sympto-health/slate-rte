@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
 import { ReactEditor, Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
-import { Editor, Transforms, Node, createEditor } from 'slate'
+import { Editor, Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
@@ -10,6 +10,7 @@ import { Card } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { withLinks, LinkButton } from './Links';
 import FormatButton from './FormatButton';
+import FormatBlock, { BlockFormats } from './FormatBlock';
 import './index.css';
 
 const HOTKEYS = {
@@ -20,8 +21,6 @@ const HOTKEYS = {
 }
 
 type FormatT = 'bold' | 'italic' | 'underline' | 'code' | 'heading-one' | 'heading-two' | 'block-quote' | 'numbered-list' | 'bulleted-list';
-
-const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
 const defaultInitialValue: Node[] = [
   {
@@ -70,34 +69,36 @@ const SlateRTE = () => {
         <Card className="d-flex flex-row shadow-sm px-2 py-1 card mb-3 w-auto">
           {
             [
-              { format: 'bold', icon: faBold, type: 'mark' },
-              { format: 'italic', icon: faItalic, type: 'mark' },
-              { format: 'underline', icon: faUnderline, type: 'mark' },
-              { format: 'code', icon: faCode, type: 'mark' },
-              { format: 'heading-one', icon: faHeading, type: 'block' },
-              { format: 'heading-two', icon: faFont, type: 'block' },
-              { format: 'block-quote', icon: faQuoteLeft, type: 'block' },
-              { format: 'numbered-list', icon: faListOl, type: 'block' },
-              { format: 'bulleted-list', icon: faListUl, type: 'block' },
+              { format: 'bold', icon: faBold },
+              { format: 'italic', icon: faItalic },
+              { format: 'underline', icon: faUnderline },
+              { format: 'code', icon: faCode },
             ].map((
-              { format, icon, type }: { format: FormatT, icon: IconDefinition, type: 'mark' | 'block' },
+              { format, icon }: { format: FormatT, icon: IconDefinition },
             ) => {
               return (
                 <FormatButton 
                   key={format}
-                  isActive={type === 'mark' ? isMarkActive(editor, format) : isBlockActive(editor, format)}
+                  isActive={isMarkActive(editor, format)}
                   icon={icon}
                   onClick={() => {
-                    if (type === 'mark') {
-                      toggleMark(editor, format)
-                    } else {
-                      toggleBlock(editor, format)
-                    }
+                    toggleMark(editor, format)
                   }}
                 />
               );
             })
           }
+          {
+            [
+              { format: 'heading-one', icon: faHeading },
+              { format: 'heading-two', icon: faFont },
+              { format: 'block-quote', icon: faQuoteLeft },
+              { format: 'numbered-list', icon: faListOl },
+              { format: 'bulleted-list', icon: faListUl},
+            ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
+              <FormatBlock format={format} icon={icon}  key={format}/>
+            ))
+           }
           <LinkButton />
         </Card>
         <Editable
@@ -122,25 +123,6 @@ const SlateRTE = () => {
   );
 }
 
-const toggleBlock = (editor: ReactEditor, format: FormatT) => {
-  const isActive = isBlockActive(editor, format)
-  const isList = LIST_TYPES.includes(format)
-
-  Transforms.unwrapNodes(editor, {
-    match: n => LIST_TYPES.includes(String(n.type)),
-    split: true,
-  })
-
-  Transforms.setNodes(editor, {
-    type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-  })
-
-  if (!isActive && isList) {
-    const block = { type: format, children: [] }
-    Transforms.wrapNodes(editor, block)
-  }
-}
-
 const toggleMark = (editor: ReactEditor, format: FormatT) => {
   const isActive = isMarkActive(editor, format)
 
@@ -151,13 +133,6 @@ const toggleMark = (editor: ReactEditor, format: FormatT) => {
   }
 }
 
-const isBlockActive = (editor: ReactEditor, format: FormatT) => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n.type === format,
-  })
-
-  return !!match
-}
 
 const isMarkActive = (editor: ReactEditor, format: FormatT) => {
   const marks = Editor.marks(editor)
