@@ -37,5 +37,18 @@
     "rollup-plugin-peer-deps-external": "^2.2.3",
     "rollup-plugin-typescript2": "^0.27.1",
     "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@fortawesome/react-fontawesome": "^0.1.11",
+    "@types/slate": "^0.47.7",
+    "@types/slate-react": "^0.22.9",
+    "bootstrap": "^4.5.0",
+    "is-hotkey": "^0.1.6",
+    "react-bootstrap": "^1.2.2",
+    "slate": "^0.58.4",
+    "slate-history": "^0.58.4",
+    "slate-react": "^0.58.4"
   }
 }

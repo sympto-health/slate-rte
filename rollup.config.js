@@ -38,6 +38,9 @@ export default {
           "PropTypes",
           "createElement"
         ],
+        "node_modules/esrever/esrever.js": [
+          "reverse",
+        ],
         "node_modules/react-dom/index.js": ["render"]
       }
     })
