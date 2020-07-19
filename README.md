@@ -23,3 +23,6 @@ Here's an example of basic usage:
     
     export default App;    
 
+
+### Development
+Run `npm run build` to build a local version of the package. Test using the demo CRA.

@@ -5,6 +5,7 @@ import { Editor, Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
+  faAlignLeft, faAlignRight, faAlignCenter,
 } from '@fortawesome/free-solid-svg-icons'
 import { Card } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -95,6 +96,9 @@ const SlateRTE = () => {
               { format: 'block-quote', icon: faQuoteLeft },
               { format: 'numbered-list', icon: faListOl },
               { format: 'bulleted-list', icon: faListUl},
+              { format: 'left-align', icon: faAlignLeft },
+              { format: 'center-align', icon: faAlignCenter },
+              { format: 'right-align', icon: faAlignRight },
             ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
               <FormatBlock format={format} icon={icon}  key={format}/>
             ))
@@ -153,6 +157,12 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
       return <li {...attributes}>{children}</li>
     case 'numbered-list':
       return <ol {...attributes}>{children}</ol>
+    case 'left-align':
+      return <div {...attributes} className="text-left">{children}</div>
+    case 'right-align':
+      return <div {...attributes} className="text-right">{children}</div>
+    case 'center-align':
+      return <div {...attributes} className="text-center">{children}</div>
     case 'link':
       return (
         <a {...attributes} href={String(element.url) || ''}>
