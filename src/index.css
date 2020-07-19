@@ -5,3 +5,11 @@
     padding-left: 10px;
     color: #aaa;
 }
+
+.SlateRTE.read-only {
+	cursor: default;
+}
+
+.SlateRTE .image-item {
+	width: 100%;
+}

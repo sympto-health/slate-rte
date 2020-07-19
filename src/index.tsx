@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 import { Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
 import { Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
@@ -7,90 +7,70 @@ import {
   faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter,
 } from '@fortawesome/free-solid-svg-icons'
 import { Card } from 'react-bootstrap'
+import cx from 'classnames';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { withLinks, LinkButton } from './Links';
 import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
+import ImageAdd from './ImageAdd';
 import ColorPicker from './ColorPicker';
 import './index.css';
 
-const defaultInitialValue: Node[] = [
-  {
-    type: 'paragraph',
-    children: [
-      { text: 'This is editable ' },
-      { text: 'rich', bold: true },
-      { text: ' text, ' },
-      { text: 'much', italic: true },
-      { text: ' better than a ' },
-      { text: '<textarea>', code: true },
-      { text: '!' },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text:
-          "Since it's rich text, you can do things like turn a selection of text ",
-      },
-      { text: 'bold', bold: true },
-      {
-        text:
-          ', or add a semantically rendered block quote in the middle of the page, like this:',
-      },
-    ],
-  },
-  {
-    type: 'block-quote',
-    children: [{ text: 'A wise quote.' }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Try it out for yourself!' }],
-  },
-];
-
-const SlateRTE = () => {
-  const [value, setValue] = useState(defaultInitialValue);
+const SlateRTE = ({ value, setValue, readOnlyMode, uploadImage }: {
+  value: Node[],
+  setValue:(value: Node[]) => void,
+  uploadImage?: () => Promise<null | string>,
+  readOnlyMode: boolean,
+}) => {
   const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
 
   return (
-    <div className="SlateRTE d-flex flex-column justify-content-start text-left p-3">
+    <div 
+      className={cx(
+        'SlateRTE d-flex flex-column justify-content-start text-left p-3',
+        {
+          'read-only': readOnlyMode,
+        }
+      )}
+    >
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-        <Card className="d-flex flex-row shadow-sm px-2 py-1 card mb-3 w-auto">
-          {[
-            { format: 'bold', icon: faBold },
-            { format: 'italic', icon: faItalic },
-            { format: 'underline', icon: faUnderline },
-            { format: 'code', icon: faCode },
-          ].map((
-            { format, icon }: { format: MarkFormats, icon: IconDefinition },
-          ) => (
-            <FormatMark 
-              key={format}
-              format={format}
-              icon={icon}
-            />
-          ))}
-          {[
-            { format: 'heading-one', icon: faHeading },
-            { format: 'heading-two', icon: faFont },
-            { format: 'block-quote', icon: faQuoteLeft },
-            { format: 'numbered-list', icon: faListOl },
-            { format: 'bulleted-list', icon: faListUl},
-            { format: 'left-align', icon: faAlignLeft },
-            { format: 'center-align', icon: faAlignCenter },
-            { format: 'right-align', icon: faAlignRight },
-            { format: 'horizontal-line', icon: faGripLines },
-          ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
-            <FormatBlock format={format} icon={icon}  key={format}/>
-          ))}
-          <LinkButton />
-          <ColorPicker icon={faTint} type="text-color" />
-          <ColorPicker icon={faHighlighter} type="highlight-color" />
-        </Card>
+        { !readOnlyMode && (
+          <Card className="d-flex flex-row flex-wrap shadow-sm px-2 py-1 card mb-3 w-auto">
+            {[
+              { format: 'bold', icon: faBold },
+              { format: 'italic', icon: faItalic },
+              { format: 'underline', icon: faUnderline },
+              { format: 'code', icon: faCode },
+            ].map((
+              { format, icon }: { format: MarkFormats, icon: IconDefinition },
+            ) => (
+              <FormatMark 
+                key={format}
+                format={format}
+                icon={icon}
+              />
+            ))}
+            {[
+              { format: 'heading-one', icon: faHeading },
+              { format: 'heading-two', icon: faFont },
+              { format: 'block-quote', icon: faQuoteLeft },
+              { format: 'numbered-list', icon: faListOl },
+              { format: 'bulleted-list', icon: faListUl},
+              { format: 'left-align', icon: faAlignLeft },
+              { format: 'center-align', icon: faAlignCenter },
+              { format: 'right-align', icon: faAlignRight },
+              { format: 'horizontal-line', icon: faGripLines },
+            ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
+              <FormatBlock format={format} icon={icon}  key={format}/>
+            ))}
+            <LinkButton />
+            <ColorPicker icon={faTint} type="text-color" />
+            <ColorPicker icon={faHighlighter} type="highlight-color" />
+            { uploadImage && (<ImageAdd uploadImage={uploadImage} />)}
+          </Card>
+        )}
         <Editable
+          readOnly={readOnlyMode}
           renderElement={(props: RenderElementProps) => <Element {...props} />}
           renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />}
           placeholder="Enter some rich text…"
@@ -137,6 +117,14 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
         <a {...attributes} href={String(element.url) || ''}>
           {children}
         </a>
+      )
+    case 'image':
+    console.log(element);
+      return (
+        <div {...attributes}>
+          <img alt="Uploaded Image" src={String(element.url) || ''} className="image-item" />
+          {children}
+        </div>
       )
     default:
       return <p {...attributes}>{children}</p>
