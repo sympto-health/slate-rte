@@ -3,13 +3,13 @@ import isHotkey from 'is-hotkey'
 import { ReactEditor, Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
 import { Editor, Transforms, Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import cx from 'classnames';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
-import { Card, Button } from 'react-bootstrap'
+import { Card } from 'react-bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { withLinks, LinkButton } from './Links';
+import FormatButton from './FormatButton';
 import './index.css';
 
 const HOTKEYS = {
@@ -62,12 +62,12 @@ const defaultInitialValue: Node[] = [
 
 const SlateRTE = () => {
   const [value, setValue] = useState(defaultInitialValue);
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
 
   return (
-    <div className="SlackRTE d-flex flex-column justify-content-start text-left p-3">
+    <div className="SlateRTE d-flex flex-column justify-content-start text-left p-3">
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-        <Card className="d-flex flex-row shadow-sm p-2 card mb-3 w-auto">
+        <Card className="d-flex flex-row shadow-sm px-2 py-1 card mb-3 w-auto">
           {
             [
               { format: 'bold', icon: faBold, type: 'mark' },
@@ -81,32 +81,24 @@ const SlateRTE = () => {
               { format: 'bulleted-list', icon: faListUl, type: 'block' },
             ].map((
               { format, icon, type }: { format: FormatT, icon: IconDefinition, type: 'mark' | 'block' },
-              index: number,
             ) => {
-              const isActive = type === 'mark' ? isMarkActive(editor, format) : isBlockActive(editor, format);
               return (
-                <Button 
+                <FormatButton 
                   key={format}
-                  variant="link"
-                  className={cx({
-                    'ml-2': index !== 0,
-                    'text-dark': !isActive,
-                    'text-primary': isActive,
-                  })}
-                  onMouseDown={event => {
-                    event.preventDefault()
+                  isActive={type === 'mark' ? isMarkActive(editor, format) : isBlockActive(editor, format)}
+                  icon={icon}
+                  onClick={() => {
                     if (type === 'mark') {
                       toggleMark(editor, format)
                     } else {
                       toggleBlock(editor, format)
                     }
                   }}
-                >
-                  <FontAwesomeIcon icon={icon} />
-                </Button>
+                />
               );
             })
           }
+          <LinkButton />
         </Card>
         <Editable
           renderElement={(props: RenderElementProps) => <Element {...props} />}
@@ -186,6 +178,12 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
       return <li {...attributes}>{children}</li>
     case 'numbered-list':
       return <ol {...attributes}>{children}</ol>
+    case 'link':
+      return (
+        <a {...attributes} href={String(element.url) || ''}>
+          {children}
+        </a>
+      )
     default:
       return <p {...attributes}>{children}</p>
   }
