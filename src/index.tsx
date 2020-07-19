@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
 import { ReactEditor, Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
-import { Editor, Transforms, createEditor } from 'slate'
+import { Editor, Transforms, Node, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCoffee, IconDefinition } from '@fortawesome/free-solid-svg-icons'
@@ -19,10 +19,45 @@ type FormatT = 'bold' | 'italic' | 'underline' | 'code';
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
+const defaultInitialValue: Node[] = [
+  {
+    type: 'paragraph',
+    children: [
+      { text: 'This is editable ' },
+      { text: 'rich', bold: true },
+      { text: ' text, ' },
+      { text: 'much', italic: true },
+      { text: ' better than a ' },
+      { text: '<textarea>', code: true },
+      { text: '!' },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          "Since it's rich text, you can do things like turn a selection of text ",
+      },
+      { text: 'bold', bold: true },
+      {
+        text:
+          ', or add a semantically rendered block quote in the middle of the page, like this:',
+      },
+    ],
+  },
+  {
+    type: 'block-quote',
+    children: [{ text: 'A wise quote.' }],
+  },
+  {
+    type: 'paragraph',
+    children: [{ text: 'Try it out for yourself!' }],
+  },
+];
+
 const SlateRTE = () => {
-  const [value, setValue] = useState(initialValue)
-  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
-  const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, [])
+  const [value, setValue] = useState(defaultInitialValue);
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
@@ -57,12 +92,12 @@ const SlateRTE = () => {
         }
       </div>
       <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
+        renderElement={(props: RenderElementProps) => <Element {...props} />}
+        renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />}
         placeholder="Enter some rich text…"
         spellCheck
         autoFocus
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           for (const hotkey in HOTKEYS) {
             // @ts-ignore
             if (isHotkey(hotkey, event)) {
@@ -74,7 +109,7 @@ const SlateRTE = () => {
         }}
       />
     </Slate>
-  )
+  );
 }
 
 const toggleBlock = (editor: ReactEditor, format: FormatT) => {
@@ -107,7 +142,6 @@ const toggleMark = (editor: ReactEditor, format: FormatT) => {
 }
 
 const isBlockActive = (editor: ReactEditor, format: FormatT) => {
-  // @ts-ignore
   const [match] = Editor.nodes(editor, {
     match: n => n.type === format,
   })
@@ -158,42 +192,5 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
 
   return <span {...attributes}>{children}</span>
 }
-
-const initialValue: Array<any> = [
-  {
-    type: 'paragraph',
-    children: [
-      { text: 'This is editable ' },
-      { text: 'rich', bold: true },
-      { text: ' text, ' },
-      { text: 'much', italic: true },
-      { text: ' better than a ' },
-      { text: '<textarea>', code: true },
-      { text: '!' },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text:
-          "Since it's rich text, you can do things like turn a selection of text ",
-      },
-      { text: 'bold', bold: true },
-      {
-        text:
-          ', or add a semantically rendered block quote in the middle of the page, like this:',
-      },
-    ],
-  },
-  {
-    type: 'block-quote',
-    children: [{ text: 'A wise quote.' }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Try it out for yourself!' }],
-  },
-]
 
 export default SlateRTE
