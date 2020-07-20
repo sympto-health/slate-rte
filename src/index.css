@@ -10,7 +10,7 @@
 	cursor: default;
 }
 
-.SlateRTE.read-only * {
+.SlateRTE.read-only span {
 	display: inline;
 }
 
