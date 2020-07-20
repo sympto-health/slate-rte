@@ -118,7 +118,6 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
         </a>
       )
     case 'image':
-    console.log(element);
       return (
         <div {...attributes}>
           <img alt="Uploaded Image" src={String(element.url) || ''} className="image-item" />

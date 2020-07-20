@@ -11,6 +11,7 @@ const ImageAdd = ({ uploadImage }: {
 }) => {
   const editor = useSlate();
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
+  const [selection, setSelection] = useState<Range | null>(null);
   return (
     <>
       {
@@ -21,7 +22,9 @@ const ImageAdd = ({ uploadImage }: {
               return uploadImage(file, progressCallBack);
             }}
             onFinish={(url) => { 
-              insertImage(editor, url)
+              console.log("FINISHED");
+              console.log(url);
+              insertImage(editor, url, selection)
             }}
           />
         )
@@ -30,6 +33,7 @@ const ImageAdd = ({ uploadImage }: {
         isActive={false}
         icon={faImages}
         onClick={async () => {
+          setSelection(editor.selection);
           setShowAttachmentModal(true);
         }}
       />
@@ -37,8 +41,7 @@ const ImageAdd = ({ uploadImage }: {
   );
 }
 
-const insertImage = (editor: ReactEditor, url: string) => {
-  const { selection } = editor
+const insertImage = (editor: ReactEditor, url: string, selection: Range | null) => {
   const isCollapsed = selection && Range.isCollapsed(selection)
   const image = {
     type: 'image',
