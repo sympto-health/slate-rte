@@ -31,7 +31,10 @@ export default {
       clean: true
     }),
     postcss({
-      plugins: []
+      plugins: [],
+      extract: false,
+      modules: true,
+      use: ['sass'],
     }),
     commonjs({
       include: ["node_modules/**"],

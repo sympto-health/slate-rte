@@ -6,6 +6,8 @@ Pre-built rich text editor for [Slate](https://www.slatejs.org/examples/richtext
 ### Installation
 Run `npm install slate-rte` or `yarn add slate-rte` to add the SlateJS Rich Text Editor into your project.
 
+Additionally, this project requires the installation of react-bootstrap.
+
 ### Usage
 Here's an example of basic usage:
 

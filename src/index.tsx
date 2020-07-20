@@ -8,7 +8,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { Card } from 'react-bootstrap'
 import cx from 'classnames';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { withLinks, LinkButton } from './Links';
 import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
