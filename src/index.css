@@ -11,7 +11,7 @@
 }
 
 .SlateRTE.read-only span {
-	display: inline;
+	display: inline-block;
 }
 
 .SlateRTE .image-item {
