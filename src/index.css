@@ -11,5 +11,9 @@
 }
 
 .SlateRTE .image-item {
-	width: 100%;
+	max-width: 100%;
+}
+
+.SlateRTE .video-item {
+	max-width: 100%;
 }

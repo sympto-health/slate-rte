@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { Transforms, Range } from 'slate'
 import { useSlate,  ReactEditor } from 'slate-react'
-import { faImages } from '@fortawesome/free-solid-svg-icons'
+import { faImages, faVideo } from '@fortawesome/free-solid-svg-icons'
 
 import FormatButton from './FormatButton';
 import AttachmentModal from './AttachmentModal';
 
-const ImageAdd = ({ uploadImage }: {
-  uploadImage: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
+const ImageAdd = ({ uploadFile, type }: {
+  uploadFile: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
+  type: 'video' | 'image',
 }) => {
   const editor = useSlate();
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
@@ -19,19 +20,19 @@ const ImageAdd = ({ uploadImage }: {
           <AttachmentModal 
             closeModal={() => { setShowAttachmentModal(false); }}
             onUpload={(file, progressCallBack) => {
-              return uploadImage(file, progressCallBack);
+              return uploadFile(file, progressCallBack);
             }}
+            type={type}
             onFinish={(url) => { 
-              console.log("FINISHED");
-              console.log(url);
-              insertImage(editor, url, selection)
+              insertFile(type, editor, url, selection)
+              setSelection(null)
             }}
           />
         )
       }
       <FormatButton 
         isActive={false}
-        icon={faImages}
+        icon={type === 'image' ? faImages : faVideo}
         onClick={async () => {
           setSelection(editor.selection);
           setShowAttachmentModal(true);
@@ -41,18 +42,18 @@ const ImageAdd = ({ uploadImage }: {
   );
 }
 
-const insertImage = (editor: ReactEditor, url: string, selection: Range | null) => {
+const insertFile = (type: 'image' | 'video', editor: ReactEditor, url: string, selection: Range | null) => {
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const image = {
-    type: 'image',
+  const file = {
+    type,
     url,
-    children: isCollapsed ? [{ text: '' }] : [],
+    children: [{ text: '' }],
   }
 
   if (isCollapsed) {
-    Transforms.insertNodes(editor, image)
+    Transforms.insertNodes(editor, file)
   } else {
-    Transforms.wrapNodes(editor, image, { split: true })
+    Transforms.wrapNodes(editor, file, { split: true })
     Transforms.collapse(editor, { edge: 'end' })
   }
 };

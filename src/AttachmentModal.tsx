@@ -5,11 +5,12 @@ import './AttachmentModal.css';
 
 
 const AttachmentModal = ({
-  closeModal, onUpload, onFinish,
+  closeModal, onUpload, onFinish, type,
 }: {
   closeModal: () => void,
   onUpload: (file: File, progress: (progressPercent: number) => void) => Promise<null | string>,
   onFinish: (url: string) => void,
+  type: 'video' | 'image',
 }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [currentState, setCurrentState] = useState('FileSelect');
@@ -20,7 +21,7 @@ const AttachmentModal = ({
       className="SlateRTE-AttachmentModal"
     >
       <Modal.Header closeButton>
-        <Modal.Title className="h5">Upload Attachment</Modal.Title>
+        <Modal.Title className="h5">{`Upload ${type}`}</Modal.Title>
       </Modal.Header>
       <Modal.Body className="p-3 d-flex">
         { currentState === 'Uploading' && (
@@ -34,6 +35,7 @@ const AttachmentModal = ({
         {
           currentState === 'FileSelect' && (
             <FileUpload
+              type={type}
               setFileToUpload={async (file: File) => {
                 setCurrentState('Uploading');
                 const url = await onUpload(file, (progress) => {

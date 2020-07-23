@@ -1,5 +1,20 @@
 import React, { useState } from "react";
 import SlateRTE from "slate-rte";
+import { Card } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+const fileToBase64 = (file) => (
+  new Promise(resolve => {
+    const reader = new FileReader();
+    // Read file content on file loaded event
+    reader.onload = (event) => {
+      resolve(event.target.result);
+    };
+    
+    // Convert data to base64 
+    reader.readAsDataURL(file);
+  }));
+
 
 const App = () => {
   const [value, setValue] = useState([
@@ -39,29 +54,38 @@ const App = () => {
     },
   ]);
   return (
-    <div>
-      <SlateRTE 
-        uploadImage={async (file, progress) => {
-          // progress is a callback to update progress indicator
-          // file contains file to uploaded
-          // returns url of image from server
+    <div className="bg-light h-100 p-4 pb-5">
+      <Card className="m-3 shadow-sm">
+        <SlateRTE 
+          uploadFile={async (file, progress) => {
 
-          // simulate an upload
-          await new Promise(r => setTimeout(r, 100));
-          await progress(30);
-          await new Promise(r => setTimeout(r, 100));
-          await progress(50);
-          await new Promise(r => setTimeout(r, 100));
-          await progress(70);
-          await new Promise(r => setTimeout(r, 100));
-          
-          return 'https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg';
-        }} 
-        readOnlyMode={false} 
-        value={value} 
-        setValue={setValue} 
-      />
-      <SlateRTE readOnlyMode value={value} setValue={setValue} />
+            // progress is a callback to update progress indicator
+            // file contains file to uploaded
+            // returns url of image from server
+
+            // simulate an upload
+            await new Promise(r => setTimeout(r, 100));
+            await progress(30);
+            await new Promise(r => setTimeout(r, 100));
+            await progress(50);
+            await new Promise(r => setTimeout(r, 100));
+            await progress(70);
+            await new Promise(r => setTimeout(r, 100));
+            
+            const [extension] = file.name.match(/\.[0-9a-z]+$/i);
+            if (extension === '.mp4') {
+              return 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4';
+            }
+            return fileToBase64(file);
+          }} 
+          readOnlyMode={false} 
+          value={value} 
+          setValue={setValue} 
+        />
+      </Card>
+      <Card className="m-3 shadow-sm">
+        <SlateRTE readOnlyMode value={value} setValue={setValue} />
+      </Card>
     </div>
   );
 }  

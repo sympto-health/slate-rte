@@ -11,10 +11,12 @@ const MAX_FILE_SIZE = 1048576 * 100; // 100 MBS
 
 type Props = {
   setFileToUpload: (file: File) => (void | Promise<void>),
+  type: 'video' | 'image',
 };
 
 const FileUpload = ({
   setFileToUpload,
+  type,
 }: Props) => {
   const [rejectFiles, setRejectFiles] = useState<FileRejection[]>([]);
   const onDrop = React.useCallback((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
@@ -26,14 +28,16 @@ const FileUpload = ({
       setFileToUpload(acceptedFiles[0]);
     }
   }, []);
-
+  const fileTypes = type === 'image'
+    ? 'image/png, image/gif, image/jpeg, image/tiff, image/webp'
+    : 'video/mpeg, video/mp4';
   const {
     getRootProps, getInputProps, isDragActive,
   } = useDropzone({
     onDrop,
     maxSize: MAX_FILE_SIZE,
     minSize: 0,
-    accept: 'image/png, image/gif, image/jpeg, image/tiff, image/webp, application/pdf, video/mpeg, video/mp4',
+    accept: fileTypes,
   });
 
   return (
@@ -46,7 +50,7 @@ const FileUpload = ({
       <input {...getInputProps()} />
       <div className={cx('file-children', { 'd-none': isDragActive })}>
         <div className="border p-4 attachment-upload-modal text-center text-large font-weight-light">
-          Drag or click here to upload an image or video.
+          {`Drag or click here to upload an ${type}.`}
         </div>     
       </div>
       {

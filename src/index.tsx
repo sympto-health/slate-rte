@@ -7,6 +7,7 @@ import {
   faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter,
 } from '@fortawesome/free-solid-svg-icons'
 import { Card } from 'react-bootstrap'
+import ReactPlayer from 'react-player';
 import cx from 'classnames';
 import { withLinks, LinkButton } from './Links';
 import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
@@ -15,10 +16,10 @@ import ImageAdd from './ImageAdd';
 import ColorPicker from './ColorPicker';
 import './index.css';
 
-const SlateRTE = ({ value, setValue, readOnlyMode, uploadImage }: {
+const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
   value: Node[],
   setValue:(value: Node[]) => void,
-  uploadImage?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
+  uploadFile?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
   readOnlyMode: boolean,
 }) => {
   const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
@@ -65,7 +66,8 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadImage }: {
             <LinkButton />
             <ColorPicker icon={faTint} type="text-color" />
             <ColorPicker icon={faHighlighter} type="highlight-color" />
-            { uploadImage && (<ImageAdd uploadImage={uploadImage} />)}
+            { uploadFile && (<ImageAdd type="image" uploadFile={uploadFile} />)}
+            { uploadFile && (<ImageAdd type="video" uploadFile={uploadFile} />)}
           </Card>
         )}
         <Editable
@@ -119,8 +121,24 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
       )
     case 'image':
       return (
-        <div {...attributes}>
-          <img alt="Uploaded Image" src={String(element.url) || ''} className="image-item" />
+        <div className="d-inline-block" {...attributes}>
+          <div className="d-inline-block" contentEditable={false}>
+            <img alt="Uploaded Image" src={String(element.url) || ''} className="image-item" />
+          </div>
+          {children}
+        </div>
+      )
+    case 'video':
+      return (
+        <div className="d-inline-block" {...attributes}>
+          <div className="d-inline" contentEditable={false}>
+            <ReactPlayer
+              url={String(element.url)}
+              playing
+              className="px-3"
+              controls
+            />
+          </div>
           {children}
         </div>
       )

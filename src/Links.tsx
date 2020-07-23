@@ -10,7 +10,11 @@ export const withLinks = (editor: ReactEditor) => {
   const { insertData, insertText, isInline } = editor
 
   editor.isInline = element => {
-    return element.type === 'link' ? true : isInline(element)
+    return element.type === 'link' 
+      || element.type === 'video' 
+      || element.type === 'image' 
+        ? true 
+        : isInline(element)
   }
 
   editor.insertText = text => {
