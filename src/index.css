@@ -16,4 +16,9 @@
 
 .SlateRTE .video-item {
 	max-width: 100%;
+	height: auto;
+}
+
+.SlateRTE .video-item-cont {
+	max-width: 100%;
 }
