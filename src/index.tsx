@@ -143,7 +143,7 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
         </div>
       )
     default:
-      return <p {...attributes}>{children}</p>
+      return <div className="pb-3" {...attributes}>{children}</div>
   }
 }
 
