@@ -130,12 +130,12 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
       )
     case 'video':
       return (
-        <div className="d-inline-block" {...attributes}>
+        <div className="d-inline-block video-item-cont" {...attributes}>
           <div className="d-inline" contentEditable={false}>
             <ReactPlayer
               url={String(element.url)}
               playing
-              className="px-3"
+              className="px-3 video-item"
               controls
             />
           </div>
