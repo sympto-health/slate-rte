@@ -135,7 +135,7 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
             <ReactPlayer
               url={String(element.url)}
               playing
-              className="px-3 video-item"
+              className="video-item"
               controls
             />
           </div>
