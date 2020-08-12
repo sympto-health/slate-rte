@@ -137,6 +137,7 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
               playing
               className="video-item"
               controls
+              playsinline
             />
           </div>
           {children}
