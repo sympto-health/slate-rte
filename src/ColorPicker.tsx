@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 import { useSlate, ReactEditor } from 'slate-react'
-import { Editor, Range } from 'slate'
+import { Editor, Range, Transforms } from 'slate'
 import { TwitterPicker } from 'react-color';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import FormatButton from './FormatButton';
 
 const ColorPicker = ({ type, icon }: { 
-  icon: IconDefinition, type: 'text-color' | 'highlight-color',
+  icon: IconDefinition, type: 'text-color' | 'highlight-color' | 'background-color',
 }) => {
   const editor = useSlate();
   const [showColorPicker, setColorPicker] = useState(false);
@@ -42,10 +42,29 @@ const toggleColor = (
   editor: ReactEditor, 
   selectedText: Range | null, 
   color: string, 
-  type: 'text-color' | 'highlight-color',
+  type: 'text-color' | 'highlight-color' | 'background-color',
 ) => {
-  const currentColor = getActiveColor(editor, type)
+  if (type === 'background-color') {
+    const point = Editor.start(editor, [0, 0])
+    const node = {
+      type: 'background-color',
+      color,
+      children: [],
+    };
 
+    if (editor.children[0].type !== 'background-color') {
+      Transforms.insertNodes(editor, node, { at: point });
+    } else {
+      Transforms.setNodes(editor, {
+        type: 'background-color',
+        color,
+        children: [],
+      }, { at: point });
+    }
+    return;
+  }
+
+  const currentColor = getActiveColor(editor, type)
   if (currentColor === color) {
     Editor.removeMark(editor, type)
   } else {
@@ -55,7 +74,7 @@ const toggleColor = (
   }
 }
 
-export const getActiveColor = (editor: ReactEditor, type: 'text-color' | 'highlight-color',): null | string => {
+export const getActiveColor = (editor: ReactEditor, type: 'text-color' | 'highlight-color' | 'background-color'): null | string => {
   const marks = Editor.marks(editor)
   return marks && marks[type] ? marks[type].color : null;
 }

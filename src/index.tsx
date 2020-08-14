@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react'
-import { Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
+import { Editable, ReactEditor, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
 import { Node, createEditor } from 'slate'
+import _ from 'lodash';
 import { withHistory } from 'slate-history'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
-  faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter,
+  faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter, faFillDrip,
 } from '@fortawesome/free-solid-svg-icons'
 import { Card } from 'react-bootstrap'
 import ReactPlayer from 'react-player';
@@ -14,7 +15,15 @@ import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
 import ImageAdd from './ImageAdd';
 import ColorPicker from './ColorPicker';
+import FontFormatter from './FontFormatter';
 import './index.css';
+
+const getBackgroundColor = (editor: ReactEditor): string => {
+  const firstNode = _.head(editor.children);
+  return firstNode && firstNode.type === 'background-color' && firstNode.color != null  
+    ? String(firstNode.color)
+    : '#FFFFFF';
+}
 
 const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
   value: Node[],
@@ -23,7 +32,7 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
   readOnlyMode: boolean,
 }) => {
   const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
-
+  const backgroundColor = getBackgroundColor(editor);
   return (
     <div 
       className={cx(
@@ -32,6 +41,9 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
           'read-only': readOnlyMode,
         }
       )}
+      style={{
+        backgroundColor,
+      }}
     >
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
         { !readOnlyMode && (
@@ -66,8 +78,11 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
             <LinkButton />
             <ColorPicker icon={faTint} type="text-color" />
             <ColorPicker icon={faHighlighter} type="highlight-color" />
+            <ColorPicker icon={faFillDrip} type="background-color" />
             { uploadFile && (<ImageAdd type="image" uploadFile={uploadFile} />)}
             { uploadFile && (<ImageAdd type="video" uploadFile={uploadFile} />)}
+            <FontFormatter options={[300, 400, 600]} type="font-weight" defaultVal={400} />
+            <FontFormatter options={_.range(8, 60)} type="font-size" defaultVal={16} />
           </Card>
         )}
         <Editable
@@ -143,12 +158,15 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
           {children}
         </div>
       )
+    case 'background-color':
+      return (<div />);
     default:
       return <div className="pb-3" {...attributes}>{children}</div>
   }
 }
 
 const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
+  console.log(leaf);
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -163,6 +181,16 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
 
   if (leaf.underline) {
     children = <u>{children}</u>
+  }
+  if (leaf['font-size']) {
+    // @ts-ignore
+    const { value: fontSize } = leaf['font-size'];
+    children = <span style={{ fontSize: `${fontSize / (16.00)}em` }} >{children}</span>
+  }
+  if (leaf['font-weight']) {
+    // @ts-ignore
+    const { value: fontWeight } = leaf['font-weight'];
+    children = <span style={{ fontWeight }} >{children}</span>
   }
   if (leaf['text-color']) {
     // @ts-ignore

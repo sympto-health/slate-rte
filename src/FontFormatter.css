@@ -1,0 +1,11 @@
+.FontFormatter {
+    width: 7em;
+    font-size: 0.8em;
+    display: flex;
+    align-items: center;
+}
+
+.FontFormatter .select-dropdown {
+	font-size: 0.9em;
+    width: 4.5em;
+}
