@@ -18,11 +18,11 @@ import ColorPicker from './ColorPicker';
 import FontFormatter from './FontFormatter';
 import './index.css';
 
-const getBackgroundColor = (editor: ReactEditor): string => {
+const getBackgroundColor = (editor: ReactEditor): null | string => {
   const firstNode = _.head(editor.children);
   return firstNode && firstNode.type === 'background-color' && firstNode.color != null  
     ? String(firstNode.color)
-    : '#FFFFFF';
+    : null;
 }
 
 const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
@@ -41,9 +41,9 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
           'read-only': readOnlyMode,
         }
       )}
-      style={{
+      style={backgroundColor ? {
         backgroundColor,
-      }}
+      } : {}}
     >
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
         { !readOnlyMode && (
@@ -166,7 +166,6 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
 }
 
 const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
-  console.log(leaf);
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }

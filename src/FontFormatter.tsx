@@ -21,7 +21,6 @@ const FontFormatter = ({ type, defaultVal, options }: {
         custom 
         className="select-dropdown"
         onChange={(e) => {
-          console.log(e);
           toggleFontStyle(editor, editor.selection, e.target.value, type);
         }}
       >
