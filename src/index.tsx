@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Editable, ReactEditor, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
+import { Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
 import { Node, createEditor } from 'slate'
 import _ from 'lodash';
 import { withHistory } from 'slate-history'
@@ -18,8 +18,8 @@ import ColorPicker from './ColorPicker';
 import FontFormatter from './FontFormatter';
 import './index.css';
 
-const getBackgroundColor = (editor: ReactEditor): null | string => {
-  const firstNode = _.head(editor.children);
+const getBackgroundColor = (value: Node[]): null | string => {
+  const firstNode = _.head(value);
   return firstNode && firstNode.type === 'background-color' && firstNode.color != null  
     ? String(firstNode.color)
     : null;
@@ -32,7 +32,7 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
   readOnlyMode: boolean,
 }) => {
   const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
-  const backgroundColor = getBackgroundColor(editor);
+  const backgroundColor = getBackgroundColor(value);
   return (
     <div 
       className={cx(
