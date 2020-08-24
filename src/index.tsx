@@ -18,7 +18,7 @@ import ColorPicker from './ColorPicker';
 import FontFormatter from './FontFormatter';
 import './index.css';
 
-const getBackgroundColor = (value: Node[]): null | string => {
+export const getBackgroundColor = (value: Node[]): null | string => {
   const firstNode = _.head(value);
   return firstNode && firstNode.type === 'background-color' && firstNode.color != null  
     ? String(firstNode.color)

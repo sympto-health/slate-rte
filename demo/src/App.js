@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SlateRTE from "slate-rte";
+import SlateRTE, { getBackgroundColor }  from "slate-rte";
 import { Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -55,6 +55,12 @@ const App = () => {
   ]);
   return (
     <div className="bg-light h-100 p-4 pb-5">
+      <div 
+        className="pt-1 mx-4 rounded-pill w-25" 
+        style={{
+          backgroundColor: getBackgroundColor(value),
+        }} 
+      />
       <Card className="m-3 shadow-sm">
         <SlateRTE 
           uploadFile={async (file, progress) => {
