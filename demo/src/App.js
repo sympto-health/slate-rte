@@ -63,6 +63,7 @@ const App = () => {
       />
       <Card className="m-3 shadow-sm">
         <SlateRTE 
+          toolbarClassName="w-50"
           uploadFile={async (file, progress) => {
 
             // progress is a callback to update progress indicator

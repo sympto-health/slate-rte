@@ -25,11 +25,16 @@ export const getBackgroundColor = (value: Node[]): null | string => {
     : null;
 }
 
-const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
+const SlateRTE = ({ 
+  value, setValue, readOnlyMode, uploadFile, toolbarClassName, className, inputClassName,
+}: {
   value: Node[],
   setValue:(value: Node[]) => void,
   uploadFile?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
   readOnlyMode: boolean,
+  toolbarClassName?: string,
+  className?: string,
+  inputClassName?: string,
 }) => {
   const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
   const backgroundColor = getBackgroundColor(value);
@@ -39,7 +44,8 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
         'SlateRTE d-flex flex-column justify-content-start text-left p-3',
         {
           'read-only': readOnlyMode,
-        }
+        },
+        className,
       )}
       style={backgroundColor ? {
         backgroundColor,
@@ -47,7 +53,9 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
     >
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
         { !readOnlyMode && (
-          <Card className="d-flex flex-row flex-wrap shadow-sm px-2 py-1 card mb-3 w-auto">
+          <Card 
+            className={cx('d-flex flex-row flex-wrap shadow-sm px-2 py-1 card mb-3 w-auto', toolbarClassName)}
+          >
             {[
               { format: 'bold', icon: faBold },
               { format: 'italic', icon: faItalic },
@@ -92,6 +100,7 @@ const SlateRTE = ({ value, setValue, readOnlyMode, uploadFile }: {
           placeholder="Enter some rich text…"
           spellCheck
           autoFocus
+          className={inputClassName}
           // @ts-ignore
           onKeyDown={(event: KeyboardEvent) => (HotKeyHandler({ event, editor }))}
         />
