@@ -63,6 +63,7 @@ const App = () => {
       />
       <Card className="m-3 shadow-sm">
         <SlateRTE 
+          mode="Edit"
           toolbarClassName="w-50"
           uploadFile={async (file, progress) => {
 
@@ -85,13 +86,15 @@ const App = () => {
             }
             return fileToBase64(file);
           }} 
-          readOnlyMode={false} 
           value={value} 
           setValue={setValue} 
         />
       </Card>
       <Card className="m-3 shadow-sm">
-        <SlateRTE readOnlyMode value={value} setValue={setValue} />
+        <SlateRTE mode="Read-Only" value={value} setValue={setValue} />
+      </Card>
+      <Card className="m-3 shadow-sm">
+        <SlateRTE mode="Minimal Read-Only" value={value} setValue={setValue} />
       </Card>
     </div>
   );

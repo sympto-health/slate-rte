@@ -25,34 +25,46 @@ export const getBackgroundColor = (value: Node[]): null | string => {
     : null;
 }
 
+
+/* Modes:
+    Read only - full formatting, not editable
+    Edit - ability to edit text, with full formatting
+    Minimal read only - read only mode w/ no background colors, no alignment formatting, 
+      no text colors (background color becomes text color if applicable)
+ */
 const SlateRTE = ({ 
-  value, setValue, readOnlyMode, uploadFile, toolbarClassName, className, inputClassName,
+  value, setValue, mode, uploadFile, toolbarClassName, className, inputClassName,
 }: {
   value: Node[],
   setValue:(value: Node[]) => void,
   uploadFile?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
-  readOnlyMode: boolean,
+  mode: 'Read-Only' | 'Edit' | 'Minimal Read-Only',
   toolbarClassName?: string,
   className?: string,
   inputClassName?: string,
 }) => {
   const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
   const backgroundColor = getBackgroundColor(value);
+  const calculateStyles = () => {
+    if (backgroundColor == null) return {};
+    if (mode === 'Minimal Read-Only') return { color: backgroundColor };
+    return { backgroundColor };
+  };
+
   return (
     <div 
       className={cx(
-        'SlateRTE d-flex flex-column justify-content-start text-left p-3',
+        'SlateRTE d-flex flex-column justify-content-start text-left',
         {
-          'read-only': readOnlyMode,
+          'read-only': mode === 'Read-Only' || mode === 'Minimal Read-Only',
+          'p-3': mode !== 'Minimal Read-Only',
         },
         className,
       )}
-      style={backgroundColor ? {
-        backgroundColor,
-      } : {}}
+      style={calculateStyles()}
     >
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-        { !readOnlyMode && (
+        { mode === 'Edit' && (
           <Card 
             className={cx('d-flex flex-row flex-wrap shadow-sm px-2 py-1 card mb-3 w-auto', toolbarClassName)}
           >
@@ -94,9 +106,9 @@ const SlateRTE = ({
           </Card>
         )}
         <Editable
-          readOnly={readOnlyMode}
-          renderElement={(props: RenderElementProps) => <Element {...props} />}
-          renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />}
+          readOnly={mode === 'Read-Only' || mode === 'Minimal Read-Only'}
+          renderElement={(props: RenderElementProps) => <Element minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}
+          renderLeaf={(props: RenderLeafProps) => <Leaf minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}
           placeholder="Enter some rich text…"
           spellCheck
           autoFocus
@@ -110,7 +122,7 @@ const SlateRTE = ({
 }
 
 
-const Element = ({ attributes, children, element }: RenderElementProps) => {
+const Element = ({ attributes, children, element, minimalFormatting }: RenderElementProps & { minimalFormatting: boolean }) => {
   switch (element.type) {
     case 'block-quote':
       return <blockquote {...attributes}>{children}</blockquote>
@@ -125,18 +137,26 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
     case 'numbered-list':
       return <ol {...attributes}>{children}</ol>
     case 'left-align':
-      return <div {...attributes} className="text-left">{children}</div>
+      return minimalFormatting 
+        ? <div>{children}</div> 
+        : <div {...attributes} className="text-left">{children}</div>
     case 'right-align':
-      return <div {...attributes} className="text-right">{children}</div>
+      return minimalFormatting 
+        ? <div>{children}</div>
+        : <div {...attributes} className="text-right">{children}</div>
     case 'center-align':
-      return <div {...attributes} className="text-center">{children}</div>
+      return minimalFormatting
+        ? <div>{children}</div> 
+        : <div {...attributes} className="text-center">{children}</div>
     case 'horizontal-line': 
-      return (
-        <div {...attributes}>
-          <hr />
-          {children}
-        </div>
-      )
+      return minimalFormatting
+        ? <div>{children}</div> 
+        : (
+          <div {...attributes}>
+            <hr />
+            {children}
+          </div>
+        )
     case 'link':
       return (
         <a {...attributes} href={String(element.url) || ''}>
@@ -174,7 +194,7 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
   }
 }
 
-const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
+const Leaf = ({ attributes, children, leaf, minimalFormatting }: RenderLeafProps & { minimalFormatting: boolean }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -203,12 +223,12 @@ const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   if (leaf['text-color']) {
     // @ts-ignore
     const { color } = leaf['text-color'];
-    children = <span style={{ color }} >{children}</span>
+    children = minimalFormatting ? children : (<span style={{ color }} >{children}</span>)
   }
   if (leaf['highlight-color']) {
     // @ts-ignore
-    const backgroundColor = leaf['highlight-color'].color;
-    children = <span style={{ backgroundColor }} >{children}</span>
+    const highlightBackgroundColor = leaf['highlight-color'].color;
+    children = <span style={{ backgroundColor: highlightBackgroundColor }} >{children}</span>
   }
 
 
