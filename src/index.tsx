@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
 import { Node, createEditor } from 'slate'
 import _ from 'lodash';
 import { withHistory } from 'slate-history'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
-  faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter, faFillDrip,
+  faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter, faFillDrip, faEllipsisH, 
 } from '@fortawesome/free-solid-svg-icons'
 import { Card } from 'react-bootstrap'
 import ReactPlayer from 'react-player';
@@ -13,6 +13,7 @@ import cx from 'classnames';
 import { withLinks, LinkButton } from './Links';
 import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
+import FormatButton from './FormatButton';
 import ImageAdd from './ImageAdd';
 import ColorPicker from './ColorPicker';
 import FontFormatter from './FontFormatter';
@@ -50,6 +51,7 @@ const SlateRTE = ({
     if (mode === 'Minimal Read-Only') return { color: backgroundColor };
     return { backgroundColor };
   };
+  const [showAllOptions, setShowAllOptions] = useState(false);
 
   return (
     <div 
@@ -82,27 +84,38 @@ const SlateRTE = ({
                 icon={icon}
               />
             ))}
-            {[
-              { format: 'heading-one', icon: faHeading },
-              { format: 'heading-two', icon: faFont },
-              { format: 'block-quote', icon: faQuoteLeft },
-              { format: 'numbered-list', icon: faListOl },
-              { format: 'bulleted-list', icon: faListUl},
-              { format: 'left-align', icon: faAlignLeft },
-              { format: 'center-align', icon: faAlignCenter },
-              { format: 'right-align', icon: faAlignRight },
-              { format: 'horizontal-line', icon: faGripLines },
-            ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
-              <FormatBlock format={format} icon={icon}  key={format}/>
-            ))}
-            <LinkButton />
-            <ColorPicker icon={faTint} type="text-color" />
-            <ColorPicker icon={faHighlighter} type="highlight-color" />
-            <ColorPicker icon={faFillDrip} type="background-color" />
-            { uploadFile && (<ImageAdd type="image" uploadFile={uploadFile} />)}
-            { uploadFile && (<ImageAdd type="video" uploadFile={uploadFile} />)}
-            <FontFormatter options={[300, 400, 600]} type="font-weight" defaultVal={400} />
-            <FontFormatter options={_.range(8, 60)} type="font-size" defaultVal={16} />
+            <FormatButton
+              icon={faEllipsisH}
+              isActive={showAllOptions}
+              onClick={() => {
+                setShowAllOptions((curOption) => !curOption);
+              }}
+            />
+            { showAllOptions && (
+              <>
+                {[
+                  { format: 'heading-one', icon: faHeading },
+                  { format: 'heading-two', icon: faFont },
+                  { format: 'block-quote', icon: faQuoteLeft },
+                  { format: 'numbered-list', icon: faListOl },
+                  { format: 'bulleted-list', icon: faListUl},
+                  { format: 'left-align', icon: faAlignLeft },
+                  { format: 'center-align', icon: faAlignCenter },
+                  { format: 'right-align', icon: faAlignRight },
+                  { format: 'horizontal-line', icon: faGripLines },
+                ].map(({ format, icon }: { icon: IconDefinition, format: BlockFormats }) => (
+                  <FormatBlock format={format} icon={icon}  key={format}/>
+                ))}
+                <LinkButton />
+                <ColorPicker icon={faTint} type="text-color" />
+                <ColorPicker icon={faHighlighter} type="highlight-color" />
+                <ColorPicker icon={faFillDrip} type="background-color" />
+                { uploadFile && (<ImageAdd type="image" uploadFile={uploadFile} />)}
+                { uploadFile && (<ImageAdd type="video" uploadFile={uploadFile} />)}
+                <FontFormatter options={[300, 400, 600]} type="font-weight" defaultVal={400} />
+                <FontFormatter options={_.range(8, 60)} type="font-size" defaultVal={16} />
+              </>
+            )}
           </Card>
         )}
         <Editable

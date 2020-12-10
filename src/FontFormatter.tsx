@@ -13,7 +13,7 @@ const FontFormatter = ({ type, defaultVal, options }: {
 }) => {
   const editor = useSlate();
   return (
-    <Form.Group className="FontFormatter">
+    <Form.Group className="FontFormatter m-0">
       <Form.Control 
         value={getActiveValue(editor, type) || String(defaultVal)} 
         as="select" 

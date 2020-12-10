@@ -7,7 +7,7 @@ import {
 import { Button } from 'react-bootstrap'
 import './FormatButton.css'
 
-const FormatButton = ({ icon, isActive, onClick, className,itemColor }: {
+const FormatButton = ({ icon, isActive, onClick, className, itemColor }: {
   icon: IconDefinition,
   isActive: boolean,
   className?: string,
