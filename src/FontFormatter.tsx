@@ -28,7 +28,7 @@ const FontFormatter = ({ type, defaultVal, options }: {
           <option key={option}>{option}</option>
         ))}
       </Form.Control>
-      <span>{ type === 'font-weight' ? 'weight' : 'em'}</span>
+      <div>{ type === 'font-weight' ? 'weight' : 'em'}</div>
     </Form.Group>
   );
 }

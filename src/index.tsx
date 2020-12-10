@@ -124,7 +124,6 @@ const SlateRTE = ({
           renderLeaf={(props: RenderLeafProps) => <Leaf minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}
           placeholder="Enter some rich text…"
           spellCheck
-          autoFocus
           className={inputClassName}
           // @ts-ignore
           onKeyDown={(event: KeyboardEvent) => (HotKeyHandler({ event, editor }))}

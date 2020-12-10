@@ -1,8 +1,8 @@
 .FontFormatter {
-    display: flex;
-    flex-direction: column;
+    display: inline-block;
     font-size: 0.8em;
     padding: 0.5em;
+    width: auto;
     text-align: center;
 }
 
