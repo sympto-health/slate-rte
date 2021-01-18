@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
 import { Node, createEditor } from 'slate'
 import _ from 'lodash';
+import { renderToStaticMarkup } from 'react-dom/server'
 import { withHistory } from 'slate-history'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
@@ -26,6 +27,9 @@ export const getBackgroundColor = (value: Node[]): null | string => {
     : null;
 }
 
+export const parseAsHTML = (slateContent: Node[]): string => (renderToStaticMarkup(
+    <SlateRTE mode="Read-Only" value={slateContent} setValue={() => {}} />
+  ).replace(/data\-slate\-[^"]*="[^"]*"/g, ""));
 
 /* Modes:
     Read only - full formatting, not editable

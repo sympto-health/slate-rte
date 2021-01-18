@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SlateRTE, { getBackgroundColor }  from "slate-rte";
+import SlateRTE, { parseAsHTML, getBackgroundColor }  from "slate-rte";
 import { Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -95,6 +95,13 @@ const App = () => {
       </Card>
       <Card className="m-3 shadow-sm">
         <SlateRTE mode="Minimal Read-Only" value={value} setValue={setValue} />
+      </Card>
+      <Card className="m-3 shadow-sm">
+        <div
+          dangerouslySetInnerHTML={{
+            __html: parseAsHTML(value),
+          }}
+        />
       </Card>
     </div>
   );
