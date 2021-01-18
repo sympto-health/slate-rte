@@ -161,15 +161,15 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
     case 'left-align':
       return minimalFormatting 
         ? <div>{children}</div> 
-        : <div {...attributes} className="text-left">{children}</div>
+        : <div {...attributes} style={{ textAlign: 'left' }}>{children}</div>
     case 'right-align':
       return minimalFormatting 
         ? <div>{children}</div>
-        : <div {...attributes} className="text-right">{children}</div>
+        : <div {...attributes} style={{ textAlign: 'right' }}>{children}</div>
     case 'center-align':
       return minimalFormatting
         ? <div>{children}</div> 
-        : <div {...attributes} className="text-center">{children}</div>
+        : <div {...attributes} style={{ textAlign: 'center' }}>{children}</div>
     case 'horizontal-line': 
       return minimalFormatting
         ? <div>{children}</div> 
@@ -212,7 +212,7 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
     case 'background-color':
       return (<div style={{ backgroundColor: String(element.color) }} />);
     default:
-      return <div className="pb-3" {...attributes}>{children}</div>
+      return <div style={element.noPadding ? { paddingBottom: '0.01rem' } : { paddingBottom: '1rem' }} {...attributes}>{children}</div>
   }
 }
 

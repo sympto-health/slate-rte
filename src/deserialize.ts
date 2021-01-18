@@ -84,17 +84,20 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (BLOCK_TYPES[el.nodeName]) {
     return jsx('element', { type: BLOCK_TYPES[el.nodeName] }, children);
   }
-  if (el.nodeName === 'DIV' && el.className.includes('text-left')) {
+  if (el.nodeName === 'DIV' && el.style.textAlign === 'left') {
     return jsx('element', { type: 'left-align' }, children);
   }
-  if (el.nodeName === 'DIV' && el.className.includes('text-right')) {
+  if (el.nodeName === 'DIV' && el.style.textAlign === 'right') {
     return jsx('element', { type: 'right-align' }, children);
   }
-  if (el.nodeName === 'DIV' && el.className.includes('text-center')) {
+  if (el.nodeName === 'DIV' && el.style.textAlign === 'center') {
     return jsx('element', { type: 'center-align' }, children);
   }
-  if (el.nodeName === 'DIV' && el.className.includes('pb-3')) {
+  if (el.nodeName === 'DIV' && el.style.paddingBottom === '1rem') {
     return jsx('element', { type: 'paragraph' }, children);
+  }
+  if (el.nodeName === 'DIV' && el.style.paddingBottom === '0.01rem') {
+    return jsx('element', { type: 'paragraph', noPadding: true }, children);
   }
   if (el.nodeName === 'DIV' && el.className.length === 0 && el.childNodes.length === 0) {
     return jsx('element', { type: 'background-color', color: el.style.backgroundColor }, children);
@@ -129,7 +132,7 @@ const deserialize = (el: HTMLElement): Descendant[] => {
 const deserializeBody = (el: HTMLElement): Descendant[] => {
   const deserializedHTML = deserialize(el);
   return deserializedHTML.length === 0 || deserializedHTML[0].type == null 
-    ? [{ type: 'paragraph', children: deserializedHTML }]
+    ? [{ type: 'paragraph', noPadding: true, children: deserializedHTML }]
     : deserializedHTML;
 };
 
