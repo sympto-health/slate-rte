@@ -1,6 +1,6 @@
 {
   "name": "slate-rte",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "Rich text editor for slatejs editor",
   "main": "build/index.js",
   "module": "build/index.es.js",
@@ -60,13 +60,12 @@
     "is-url": "^1.2.4",
     "lodash": "^4.17.20",
     "react-color": "^2.18.1",
-    "react-dom": "^17.0.1",
     "react-dropzone": "^11.0.2",
     "react-player": "^2.5.0",
-    "slate": "^0.58.4",
+    "slate": "^0.59.0",
     "slate-history": "^0.58.4",
     "slate-hyperscript": "^0.59.0",
-    "slate-react": "^0.58.4",
+    "slate-react": "^0.59.0",
     "sweetalert": "^2.1.2"
   }
 }

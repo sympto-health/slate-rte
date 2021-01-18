@@ -15,14 +15,15 @@ const BLOCK_TYPES = {
   OL: 'numbered-list',
 };
 
-const fetchChildren = (el: HTMLElement) => {
-  const childNodes = _.flatten(Array.from(el.childNodes).map(deserialize));
+const parseChildren = (childNodes: Array<HTMLElement>) => {
+  const childNodes = _.flatten(Array.from(childNodes)
+    .map(deserialize));
   return childNodes.length === 0 ? [''] : childNodes;
 };
 
 const parseLeaf = (el: HTMLElement) => {
   const { style } = el;
-  const children = fetchChildren(el);
+  const children = parseChildren(el.childNodes);
   const fetchAttr = () => {
     if (el.nodeName === 'SPAN' && style.fontSize) {
       const fontSizePx = Number(style.fontSize.replace('em', '')) * 16.00;
@@ -69,7 +70,7 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'BR') {
     return '\n'
   }
-  const children = fetchChildren(el);
+  const children = parseChildren(el.childNodes);
 
   // main divs
   if (el.nodeName === 'BODY' || el.className.includes('SlateRTE') || el.getAttribute('data-gramm') != null) {
@@ -95,11 +96,37 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'DIV' && el.className.includes('pb-3')) {
     return jsx('element', { type: 'paragraph' }, children);
   }
-  if (el.nodeName === 'DIV' && el.className.length === 0) {
+  if (el.nodeName === 'DIV' && el.className.length === 0 && el.childNodes.length === 0) {
     return jsx('element', { type: 'background-color', color: el.style.backgroundColor }, children);
   }
   if (el.nodeName === 'A') {
     return jsx('element', { type: 'link', url: el.getAttribute('href') }, children);
+  }
+  console.log({
+    el,
+    childNodes: el.childNodes,
+  })
+
+  const matchFirstChildNode = (curEl, matchProperties) => {
+    if (curEl.childNodes.length > 0) {
+      const childNode = curEl.childNodes[0];
+      return _.toPairs(matchProperties).every(([property, value]) => (
+        childNode[property] === value
+      ));
+    }
+    return false;
+  }
+  if (el.nodeName === 'DIV' && matchFirstChildNode(el, { nodeName: 'HR' })) {
+     console.log(parseChildren(_.tail(el.childNodes)));
+    return jsx('element', { type: 'horizontal-line' }, parseChildren(_.tail(el.childNodes)) );
+  }
+  
+  if (el.nodeName === 'DIV' && el.className === 'd-inline-block'
+    && matchFirstChildNode(el, { nodeName: 'DIV', className: 'd-inline-block' })
+    && matchFirstChildNode(el.childNodes[0], { nodeName: 'IMG' })) {
+    const imgCont = el.childNodes[0];
+    const img = el.childNodes[0].childNodes[0];
+    return jsx('element', { type: 'image', url: img.src }, parseChildren(_.tail(imgCont)) );
   }
 
   return jsx('element', { type: 'paragraph' }, children);
