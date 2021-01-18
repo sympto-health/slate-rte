@@ -68,7 +68,7 @@ const deserialize = (el: HTMLElement): Descendant[] => {
     return null 
   }  
   if (el.nodeName === 'BR') {
-    return '\n'
+    return ''
   }
   const children = parseChildren(el.childNodes);
 

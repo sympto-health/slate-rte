@@ -120,6 +120,11 @@ const App = () => {
       <Card className="m-3 shadow-sm">
         <SlateRTE mode="Read-Only" value={deserializedValue} setValue={setValue} />
       </Card>
+      <div className="m-3 text-large text-center font-weight-light">
+        Slate Compared
+      </div>
+      <div>{JSON.stringify(deserializedValue)}</div>
+      <div className="mt-3">{JSON.stringify(value)}</div>
     </div>
   );
 }  
