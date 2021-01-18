@@ -102,11 +102,6 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'A') {
     return jsx('element', { type: 'link', url: el.getAttribute('href') }, children);
   }
-  console.log({
-    el,
-    childNodes: el.childNodes,
-  })
-
   const matchFirstChildNode = (curEl, matchProperties) => {
     if (curEl.childNodes.length > 0) {
       const childNode = curEl.childNodes[0];
@@ -117,7 +112,6 @@ const deserialize = (el: HTMLElement): Descendant[] => {
     return false;
   }
   if (el.nodeName === 'DIV' && matchFirstChildNode(el, { nodeName: 'HR' })) {
-     console.log(parseChildren(_.tail(el.childNodes)));
     return jsx('element', { type: 'horizontal-line' }, parseChildren(_.tail(el.childNodes)) );
   }
   
