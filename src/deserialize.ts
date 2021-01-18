@@ -126,4 +126,11 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   return jsx('element', { type: 'paragraph' }, children);
 }
 
-export default deserialize;
+const deserializeBody = (el: HTMLElement): Descendant[] => {
+  const deserializedHTML = deserialize(el);
+  return deserializedHTML.length === 0 || deserializedHTML[0].type == null 
+    ? [{ type: 'paragraph', children: deserializedHTML }]
+    : deserializedHTML;
+};
+
+export default deserializeBody;
