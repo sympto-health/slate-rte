@@ -1,0 +1,108 @@
+// @ts-nocheck
+// TODO: Unit tests for this file
+import { Descendant } from 'slate'
+import _ from 'lodash';
+import { jsx } from 'slate-hyperscript'
+
+// https://github.com/ianstormtaylor/slate/blob/master/site/examples/paste-html.tsx#L42-L80
+
+const BLOCK_TYPES = {
+  BLOCKQUOTE: 'block-quote',
+  UL: 'bulleted-list',
+  H1: 'heading-one',
+  H2: 'heading-two',
+  LI: 'list-item',
+  OL: 'numbered-list',
+};
+
+const fetchChildren = (el: HTMLElement) => {
+  const childNodes = _.flatten(Array.from(el.childNodes).map(deserialize));
+  return childNodes.length === 0 ? [''] : childNodes;
+};
+
+const parseLeaf = (el: HTMLElement) => {
+  const { style } = el;
+  const children = fetchChildren(el);
+  const fetchAttr = () => {
+    if (el.nodeName === 'SPAN' && style.fontSize) {
+      const fontSizePx = Number(style.fontSize.replace('em', '')) * 16.00;
+      return { 'font-size': { value: fontSizePx } };
+    }
+    if (el.nodeName === 'SPAN' && style.fontWeight) {
+      return { 'font-weight': { value: style.fontWeight } };
+    }
+    if (el.nodeName === 'SPAN' && style.color) {
+      return { 'text-color': { color: style.color } };
+    }
+    if (el.nodeName === 'SPAN' && style.backgroundColor) {
+      return { 'highlight-color': { color: style.backgroundColor } };
+    }
+    if (el.nodeName === 'SPAN') {
+      return {};
+    }
+    if (el.nodeName === 'STRONG') {
+      return { bold: true };
+    }
+    if (el.nodeName === 'CODE') {
+      return { code: true };
+    }
+    if (el.nodeName === 'EM') {
+      return { italic: true };
+    }
+    if (el.nodeName === 'U') {
+      return { underline: true };
+    }
+    return null;
+  };
+  const attrs = fetchAttr();
+  return attrs ? children.map(child => jsx('text', attrs, child)) : null;
+
+};
+
+const deserialize = (el: HTMLElement): Descendant[] => {
+  if (el.nodeType === 3) {
+    return el.textContent
+  } 
+  if (el.nodeType !== 1) {
+    return null 
+  }  
+  if (el.nodeName === 'BR') {
+    return '\n'
+  }
+  const children = fetchChildren(el);
+
+  // main divs
+  if (el.nodeName === 'BODY' || el.className.includes('SlateRTE') || el.getAttribute('data-gramm') != null) {
+    return jsx('fragment', {}, children)
+  }
+  const leafParse = parseLeaf(el);
+  if (leafParse) {
+    return leafParse;
+  }
+
+  if (BLOCK_TYPES[el.nodeName]) {
+    return jsx('element', { type: BLOCK_TYPES[el.nodeName] }, children);
+  }
+  if (el.nodeName === 'DIV' && el.className.includes('text-left')) {
+    return jsx('element', { type: 'left-align' }, children);
+  }
+  if (el.nodeName === 'DIV' && el.className.includes('text-right')) {
+    return jsx('element', { type: 'right-align' }, children);
+  }
+  if (el.nodeName === 'DIV' && el.className.includes('text-center')) {
+    return jsx('element', { type: 'center-align' }, children);
+  }
+  if (el.nodeName === 'DIV' && el.className.includes('pb-3')) {
+    return jsx('element', { type: 'paragraph' }, children);
+  }
+  if (el.nodeName === 'DIV' && el.className.length === 0) {
+    return jsx('element', { type: 'background-color', color: el.style.backgroundColor }, children);
+  }
+  if (el.nodeName === 'A') {
+    return jsx('element', { type: 'link', url: el.getAttribute('href') }, children);
+  }
+
+  return jsx('element', { type: 'paragraph' }, children);
+}
+
+export default deserialize;
