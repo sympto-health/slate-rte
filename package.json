@@ -65,6 +65,7 @@
     "react-player": "^2.5.0",
     "slate": "^0.58.4",
     "slate-history": "^0.58.4",
+    "slate-hyperscript": "^0.59.0",
     "slate-react": "^0.58.4",
     "sweetalert": "^2.1.2"
   }

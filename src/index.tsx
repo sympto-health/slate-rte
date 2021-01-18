@@ -16,6 +16,7 @@ import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
 import FormatButton from './FormatButton';
 import ImageAdd from './ImageAdd';
+import deserialize from './deserialize';
 import ColorPicker from './ColorPicker';
 import FontFormatter from './FontFormatter';
 import './index.css';
@@ -30,6 +31,11 @@ export const getBackgroundColor = (value: Node[]): null | string => {
 export const parseAsHTML = (slateContent: Node[]): string => (renderToStaticMarkup(
     <SlateRTE mode="Read-Only" value={slateContent} setValue={() => {}} />
   ).replace(/data\-slate\-[^"]*="[^"]*"/g, ""));
+
+export const deserializeHTMLString = (htmlString: string) => {
+  const domData = new DOMParser().parseFromString(htmlString, 'text/html')
+  return deserialize(domData.body);
+};
 
 /* Modes:
     Read only - full formatting, not editable
@@ -204,7 +210,7 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
         </div>
       )
     case 'background-color':
-      return (<div />);
+      return (<div style={{ backgroundColor: String(element.color) }} />);
     default:
       return <div className="pb-3" {...attributes}>{children}</div>
   }
