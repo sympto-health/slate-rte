@@ -88,7 +88,7 @@ const SlateRTE = ({
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
         { mode === 'Edit' && (
           <Card 
-            className={cx('d-flex flex-row flex-wrap shadow-sm px-2 py-1 card mb-3 w-auto', toolbarClassName)}
+            className={cx('toolbar-item d-flex flex-row flex-wrap shadow-sm px-2 py-1 card mb-3 w-auto', toolbarClassName)}
           >
             {[
               { format: 'bold', icon: faBold },

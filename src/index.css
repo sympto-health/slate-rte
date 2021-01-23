@@ -6,6 +6,10 @@
     color: #aaa;
 }
 
+.SlateRTE .toolbar-item {
+	font-size: 1rem;
+}
+
 .SlateRTE.read-only {
 	cursor: default;
 }
