@@ -111,6 +111,9 @@ const App = () => {
         <SlateRTE mode="Read-Only" value={value} setValue={setValue} />
       </Card>
       <Card className="m-3 shadow-sm">
+        <SlateRTE options={{ defaultFontSizePx: 30 }} mode="Read-Only" value={value} setValue={setValue} />
+      </Card>
+      <Card className="m-3 shadow-sm">
         <SlateRTE mode="Minimal Read-Only" value={value} setValue={setValue} />
       </Card>
       <div className="m-3 text-large text-center font-weight-light">

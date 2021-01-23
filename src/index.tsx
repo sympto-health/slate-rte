@@ -37,6 +37,9 @@ export const deserializeHTMLString = (htmlString: string) => {
   return deserialize(domData.body);
 };
 
+// default size in px for font-size of 1em
+const DEFAULT_EM_SIZE = 16;
+
 /* Modes:
     Read only - full formatting, not editable
     Edit - ability to edit text, with full formatting
@@ -44,7 +47,7 @@ export const deserializeHTMLString = (htmlString: string) => {
       no text colors (background color becomes text color if applicable)
  */
 const SlateRTE = ({ 
-  value, setValue, mode, uploadFile, toolbarClassName, className, inputClassName,
+  value, setValue, mode, uploadFile, toolbarClassName, className, inputClassName, options,
 }: {
   value: Node[],
   setValue:(value: Node[]) => void,
@@ -53,16 +56,20 @@ const SlateRTE = ({
   toolbarClassName?: string,
   className?: string,
   inputClassName?: string,
+  options?: {
+    // effectively specifies what 1em is equal to, based on the font-size
+    // optional, defaults 1em = 16px
+    defaultFontSizePx: number, 
+  },
 }) => {
   const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
   const backgroundColor = getBackgroundColor(value);
-  const calculateStyles = () => {
+  const calculateColorStyles = () => {
     if (backgroundColor == null) return {};
     if (mode === 'Minimal Read-Only') return { color: backgroundColor };
     return { backgroundColor };
   };
   const [showAllOptions, setShowAllOptions] = useState(false);
-
   return (
     <div 
       className={cx(
@@ -73,7 +80,10 @@ const SlateRTE = ({
         },
         className,
       )}
-      style={calculateStyles()}
+      style={{
+        ...calculateColorStyles(),
+        fontSize: options ? `${DEFAULT_EM_SIZE / options.defaultFontSizePx}em` : '1em',
+      }}
     >
       <Slate editor={editor} value={value} onChange={value => setValue(value)}>
         { mode === 'Edit' && (
@@ -131,8 +141,7 @@ const SlateRTE = ({
         <Editable
           readOnly={mode === 'Read-Only' || mode === 'Minimal Read-Only'}
           renderElement={(props: RenderElementProps) => <Element minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}
-          renderLeaf={(props: RenderLeafProps) => <Leaf minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}
-          placeholder="Enter some rich text…"
+          renderLeaf={(props: RenderLeafProps) => <Leaf minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}          placeholder="Enter some rich text…"
           spellCheck
           className={inputClassName}
           // @ts-ignore
@@ -235,7 +244,8 @@ const Leaf = ({ attributes, children, leaf, minimalFormatting }: RenderLeafProps
   if (leaf['font-size']) {
     // @ts-ignore
     const { value: fontSize } = leaf['font-size'];
-    children = <span style={{ fontSize: `${fontSize / (16.00)}em` }} >{children}</span>
+    // note that em is relative, so base em size will still be relevant here
+    children = <span style={{ fontSize: `${fontSize / DEFAULT_EM_SIZE}em` }} >{children}</span>
   }
   if (leaf['font-weight']) {
     // @ts-ignore
