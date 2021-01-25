@@ -37,6 +37,15 @@ export const deserializeHTMLString = (htmlString: string) => {
   return deserialize(domData.body);
 };
 
+// iterates through every single slate item and children and stringifies everything by extracting
+// all teh text
+export const extractText = (slateContent: null | Node[]): string => (_.compact(_.flatten((slateContent || [])
+  .map((contentItem: Node) => ([
+    (contentItem.text ? String(contentItem.text) : ' '),
+    ...(contentItem.children ? extractText((contentItem.children as null | Node[])) : []),
+  ]))))).join('');
+
+export const isEmpty = (slateContent: null | Node[]): boolean => (extractText(slateContent).trim().length === 0);
 // default size in px for font-size of 1em
 const DEFAULT_EM_SIZE = 16;
 
@@ -141,7 +150,8 @@ const SlateRTE = ({
         <Editable
           readOnly={mode === 'Read-Only' || mode === 'Minimal Read-Only'}
           renderElement={(props: RenderElementProps) => <Element minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}
-          renderLeaf={(props: RenderLeafProps) => <Leaf minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}          placeholder="Enter some rich text…"
+          renderLeaf={(props: RenderLeafProps) => <Leaf minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}         
+          placeholder="Enter some rich text…"
           spellCheck
           className={inputClassName}
           // @ts-ignore

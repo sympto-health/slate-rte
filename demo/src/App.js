@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SlateRTE, { deserializeHTMLString, parseAsHTML, getBackgroundColor }  from "slate-rte";
+import SlateRTE, { extractText, deserializeHTMLString, parseAsHTML, getBackgroundColor }  from "slate-rte";
 import { Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -78,6 +78,7 @@ const App = () => {
           backgroundColor: getBackgroundColor(value),
         }} 
       />
+      <div>{extractText(value)}</div>
       <Card className="m-3 shadow-sm">
         <SlateRTE 
           mode="Edit"
