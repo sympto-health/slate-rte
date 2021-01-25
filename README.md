@@ -28,3 +28,15 @@ Here's an example of basic usage:
 
 ### Development
 Run `npm run build` to build a local version of the package. Test using the demo CRA.
+
+### Available methods
+Pass in the value (generated from SlateRTE) into the following helpers
+
+1) extractText(slateContent) returns a string representing all the text within your current slate editor
+
+2) deserializeHTMLString(slateContent) converts slate content into HTML that can be rendered without the slate editor
+
+3) parseAsHTML(htmlCode) takes html and converts it into slate content, returning an object that can be  passed into the slate editor
+
+4) getBackgroundColor(slateContent) takes slate content adn returns the background color of the content (if any)
+
