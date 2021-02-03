@@ -200,7 +200,7 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
         )
     case 'link':
       return (
-        <a {...attributes} href={String(element.url) || ''}>
+        <a target="_blank" {...attributes} href={String(element.url) || ''}>
           {children}
         </a>
       )
