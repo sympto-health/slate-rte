@@ -223,7 +223,7 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
               config={{
                 file: {
                   hlsOptions: {
-                    xhrSetup: (xhr) => {
+                    xhrSetup: (xhr: any) => {
                       // eslint-disable-next-line
                       xhr.withCredentials = true; // send cookies
                     },
