@@ -220,6 +220,16 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
             <ReactPlayer
               url={String(element.url)}
               playing
+              config={{
+                file: {
+                  hlsOptions: {
+                    xhrSetup: (xhr) => {
+                      // eslint-disable-next-line
+                      xhr.withCredentials = true; // send cookies
+                    },
+                  },
+                },
+              }}
               className="video-item"
               controls
               playsinline
