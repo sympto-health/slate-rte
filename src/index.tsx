@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react'
 import { Node, createEditor } from 'slate'
 import _ from 'lodash';
+import { isSafari, isIOS } from 'react-device-detect';
 import { renderToStaticMarkup } from 'react-dom/server'
 import { withHistory } from 'slate-history'
 import { 
@@ -220,8 +221,9 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
             <ReactPlayer
               url={String(element.url)}
               playing
-              config={{
+              config={String(element.url).includes('.m3u8') ? {
                 file: {
+                  forceHLS: !isSafari && !isIOS,
                   hlsOptions: {
                     xhrSetup: (xhr: any) => {
                       // eslint-disable-next-line
@@ -229,7 +231,7 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
                     },
                   },
                 },
-              }}
+              } : {}}
               className="video-item"
               controls
               playsinline
