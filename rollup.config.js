@@ -11,6 +11,13 @@ export default {
   input: "src/index.tsx",
   output: [
     {
+      file: pkg.main,
+      format: "cjs",
+      exports: "named",
+      compact: true,
+      sourcemap: false
+    },
+    {
       file: pkg.module,
       format: "esm",
       exports: "named",
