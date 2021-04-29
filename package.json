@@ -1,6 +1,6 @@
 {
   "name": "slate-rte",
-  "version": "1.0.40",
+  "version": "1.0.42",
   "description": "Rich text editor for slatejs editor",
   "main": "build/index.js",
   "module": "build/index.es.js",
@@ -48,6 +48,7 @@
     "rollup-plugin-peer-deps-external": "^2.2.3",
     "rollup-plugin-postcss": "^3.1.3",
     "rollup-plugin-typescript2": "^0.27.1",
+    "rollup-plugin-uglify": "^6.0.4",
     "typescript": "^3.9.7"
   },
   "dependencies": {
