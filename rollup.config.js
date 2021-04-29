@@ -12,9 +12,10 @@ export default {
   output: [
     {
       file: pkg.main,
-      format: "cjs",
+      format: "umd",
       exports: "named",
       compact: true,
+      name: "slate-rte",
       sourcemap: false
     },
     {
