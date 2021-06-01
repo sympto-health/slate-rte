@@ -1,6 +1,6 @@
 {
   "name": "slate-rte",
-  "version": "1.0.46",
+  "version": "1.0.47",
   "description": "Rich text editor for slatejs editor",
   "main": "build/index.js",
   "module": "build/index.es.js",
