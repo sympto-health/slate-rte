@@ -3,21 +3,30 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   View, Text, Image, Link,
 } from '@react-pdf/renderer';
+import _ from 'lodash';
 import { RenderLeafProps, RenderElementProps } from 'slate-react';
 import getBackgroundColor from './getBackgroundColor';
-import { SlateNode, BaseElementProps, BaseLeafProps } from './SlateNode';
+import { SlateNode, BaseElementProps, BaseLeafProps, ASCIIColor } from './SlateNode';
 
 const DEFAULT_EM_SIZE = 16;
 
+type ParentStyles = { 
+  fontSize: number, 
+  backgroundColor?: ASCIIColor,
+};
+
 type ElementProps = { 
   attributes: RenderElementProps['attributes'], 
+  styles: ParentStyles,
   fontRatio: number,
-} & BaseElementProps;
+  children: (curStyles: ParentStyles) => (JSX.Element),
+} & Omit<BaseElementProps, 'children'>;
 
 type LeafProps = {
   attributes: RenderLeafProps['attributes'], 
-  fontRatio: number,
-} & BaseLeafProps;
+  styles: ParentStyles,
+  children: (curStyles: ParentStyles) => (JSX.Element),
+} & Omit<BaseLeafProps, 'children'>;
 
 const SlatePDF = ({ 
   value, options, minimalFormatting,
@@ -32,40 +41,69 @@ const SlatePDF = ({
 }) => {
   const fontRatio = options ?  DEFAULT_EM_SIZE / options.defaultFontSizePx : 1;
   const backgroundColor = getBackgroundColor(value);
-  const renderSlateItems = (slateContent: SlateNode[]) => (slateContent.map(({ children, ...metadata }) => (
-    metadata.type 
-      ? (
-        // @ts-ignore
-        <Element key={uuidv4()} fontRatio={fontRatio} minimalFormatting={minimalFormatting} element={metadata}>
-          <>{children  && renderSlateItems(children)}</>
-        </Element>
-      )
-      : (
-        // @ts-ignore
-        <Leaf key={uuidv4()} fontRatio={fontRatio} leaf={metadata} minimalFormatting={minimalFormatting}>
-          <>{children && renderSlateItems(children)}</>
-        </Leaf>
-      )
-  )));
+  const renderSlateItems = (slateContent: SlateNode[], styles: ParentStyles) => (slateContent
+    .map((metadata) => (
+      metadata.type 
+        ? (
+          // @ts-ignore
+          <SlateElement 
+            key={uuidv4()} 
+            styles={styles} 
+            minimalFormatting={minimalFormatting} 
+            element={metadata}
+            fontRatio={fontRatio}
+           >
+            {(curStyles: ParentStyles) => (
+              <>
+                {renderSlateItems(metadata.children || [], curStyles)}
+              </>
+            )}
+          </SlateElement>
+        )
+        : (
+          <SlateLeaf 
+            key={uuidv4()} 
+            // @ts-ignore
+            leaf={metadata} 
+            minimalFormatting={minimalFormatting}
+            styles={styles} 
+          >
+            {(curStyles: ParentStyles) => (
+              <>
+                {renderSlateItems(metadata.children || [], curStyles)}
+              </>
+            )}
+          </SlateLeaf>
+        )
+    )));
+
   return (
     <View 
       style={{
-        color: backgroundColor && minimalFormatting ? backgroundColor : undefined,
         backgroundColor: backgroundColor && !minimalFormatting ? backgroundColor : undefined,
-
-        fontSize: fontRatio * DEFAULT_EM_SIZE,
+        fontWeight: 400,
+        color: backgroundColor && minimalFormatting ? backgroundColor : undefined,
+        fontSize: fontRatio * DEFAULT_EM_SIZE, 
       }}
     >
-      {renderSlateItems(value)} 
+      {renderSlateItems(
+        value, 
+        { 
+          fontSize: fontRatio * DEFAULT_EM_SIZE, 
+        },
+      )} 
     </View>
   );
 }
 
-const Element = ({ minimalFormatting, children, element }: ElementProps) => {
-  const childComponents = [
-    <Text key={uuidv4()}>{element.text}</Text>, 
-    <View key={uuidv4()}>{children}</View>,
-  ];
+const SlateElement = ({ 
+  minimalFormatting, children, element, styles, fontRatio,
+}: ElementProps): JSX.Element => {
+  const childComponents = (curStyles: ParentStyles) => (_.compact([
+    element.text ? <Text key={uuidv4()}>{element.text}</Text> : null,
+    <Text key={uuidv4()}>{children(curStyles)}</Text>,
+  ]));
+
   switch (element.type) {
     case 'block-quote':
       return (
@@ -76,39 +114,45 @@ const Element = ({ minimalFormatting, children, element }: ElementProps) => {
             marginRight: 0,
             paddingLeft: 10,
             marginBottom: 10,
-            color: '#aaa',
+            color: '#aaa'
           }}
         >
-          {childComponents}
+          {childComponents(styles)}
         </Text>
       );
     case 'bulleted-list':
       return <View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>{childComponents}</View>
     case 'heading-one':
-      return <Text style={{ fontSize: 40 }}>{childComponents}</Text>
+      return <Text style={{ fontSize: 40 * fontRatio }}>{childComponents({ ...styles, fontSize: 40 * fontRatio })}</Text>;
     case 'heading-two':
-      return <Text style={{ fontSize: 28 }}>{childComponents}</Text>
+      return <Text style={{ fontSize: 28 * fontRatio }}>{childComponents({ ...styles, fontSize: 28 * fontRatio })}</Text>;
     case 'list-item': case 'numbered-list':
       return (
         <Text style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-          {[<Text key={uuidv4()}> • </Text>, ...childComponents]}
+          {[<Text key={uuidv4()}> • </Text>, ...childComponents(styles)]}
         </Text>
       );
-        case 'left-align':
-      return minimalFormatting 
-        ? <Text>{childComponents}</Text> 
-        : <Text style={{ textAlign: 'left' }}>{childComponents}</Text>
+    case 'left-align':
+      return (
+        <Text style={{ textAlign: !minimalFormatting ? 'left' : undefined }}>
+          {childComponents(styles)}
+        </Text>
+      );
     case 'right-align':
-      return minimalFormatting 
-        ? <Text>{childComponents}</Text>
-        : <Text style={{ textAlign: 'right' }}>{childComponents}</Text>
+      return (
+        <Text style={{ textAlign: !minimalFormatting ? 'right' : undefined }}>
+          {childComponents(styles)}
+        </Text>
+      );
     case 'center-align':
-      return minimalFormatting
-        ? <Text>{childComponents}</Text> 
-        : <Text style={{ textAlign: 'center' }}>{childComponents}</Text>
+      return (
+        <Text style={{ textAlign: !minimalFormatting ? 'center' : undefined }}>
+          {childComponents(styles)}
+        </Text>
+      );
     case 'horizontal-line': 
       return minimalFormatting
-        ? <Text>{childComponents}</Text> 
+        ? <>{childComponents(styles)}</>
         : (
           <View>
             <View 
@@ -117,20 +161,22 @@ const Element = ({ minimalFormatting, children, element }: ElementProps) => {
                 borderTop: '1px solid rgba(0,0,0,.1)',
               }}
             />
-            {childComponents}
+            {childComponents(styles)}
           </View>
         )
     case 'link':
       return (
         <Link src={element.url}>
-          {childComponents}
+          {childComponents(styles)}
         </Link>
       )
     case 'image': case 'video':
       return (
-        <View >
-          <Image style={{ width: '100%' }} src={element.url} />
-          {childComponents}
+        <View>
+          <View style={{ width: '100%', height: '100%' }}>
+            <Image style={{ width: '50vw', objectFit: 'cover' }} src={element.url} />
+          </View>
+          {childComponents(styles)}
         </View>
       )
     case 'background-color':
@@ -140,68 +186,85 @@ const Element = ({ minimalFormatting, children, element }: ElementProps) => {
         <Text 
           style={element.noPadding ? { paddingBottom: 1 } : { paddingBottom: 10 }} 
         >
-          {childComponents}
+          {childComponents(styles)}
         </Text>
       );
   }
 }
 
-const Leaf = ({ children, leaf, minimalFormatting, fontRatio }: LeafProps) => {
-  const childComponents = [leaf.text || '', ...(children || [])];
-  if (leaf.bold) {
-    return (<Text style={{ fontWeight: 700 }}>{childComponents}</Text>);
-  }
 
-  if (leaf.code) {
-    return (
-      <Text 
-        style={{ 
-          fontFamily: 'monospace',
-          fontSize: fontRatio * DEFAULT_EM_SIZE * 0.875,
-          color: '#e83e8c',
-        }}
-      >
-        {childComponents}
-      </Text>
-    )
-  }
+const SlateLeaf = ({ 
+  children, leaf, minimalFormatting, styles, 
+}: LeafProps): JSX.Element => {
+  const newStyles = _.compact([
+    // bold
+    leaf.bold ? { fontWeight: 700, type: 'Text' } : null,
 
-  if (leaf.italic) {
-    return (<Text style={{ fontStyle: 'italic' }}>{childComponents}</Text>)
-  }
+    // code
+    leaf.code ? {  
+      color: '#e83e8c', fontFamily: 'monospace', fontSize: styles.fontSize * 0.875, type: 'Text'
+    } : null,
 
-  if (leaf.underline) {
-    return (<Text style={{ textDecoration: 'underline' }}>{childComponents}</Text>)
-  }
+    // italic
+    leaf.italic ? { fontStyle: 'italic', type: 'Text' } : null,
 
-  if (leaf['font-size']) {
-    // @ts-ignore
-    const { value: fontSize } = leaf['font-size'];
-    // note that em is relative, so base em size will still be relevant here
-    return <Text style={{ fontSize: fontRatio * fontSize }} >{childComponents}</Text>
-  }
-  if (leaf['font-weight']) {
-    // @ts-ignore
-    const { value: fontWeight } = leaf['font-weight'];
-    return <Text style={{ fontWeight }} >{childComponents}</Text>
-  }
-  if (leaf['text-color']) {
-    // @ts-ignore
-    const { color } = leaf['text-color'];
-    return (<Text style={minimalFormatting ? {} : { color }} >{childComponents}</Text>)
-  }
-  if (leaf['highlight-color']) {
-    // @ts-ignore
-    const highlightBackgroundColor = leaf['highlight-color'].color;
-    return (
-      <Text style={{ backgroundColor: highlightBackgroundColor }} >
-        {childComponents}
-      </Text>
-    );
-  }
+    // underline
+    leaf.underline ? { fontStyle: 'underline', type: 'Text' } : null,
 
+    // font-size
+    leaf['font-size'] ? { type: 'Text', fontSize: styles.fontSize * (leaf['font-size'].value / DEFAULT_EM_SIZE) } : null,
 
-  return <Text>{childComponents}</Text>
+    // font-weight
+    leaf['font-weight'] ? { type: 'Text', fontWeight: leaf['font-weight'].value } : null,
+
+    // text-color
+    leaf['text-color'] ? { type: 'Text', color: minimalFormatting ? undefined : leaf['text-color'].color } : null,
+
+    // highlight-color
+    leaf['highlight-color'] ? { type: 'View', backgroundColor: leaf['highlight-color'].color } : null,
+  ]);
+  console.log({
+    newStyles, leaf,
+  });
+  const finalFontSize: number = newStyles.reduce(
+    (fontSize, currentStyle) => (currentStyle.fontSize != null ? currentStyle.fontSize : fontSize), 
+    styles.fontSize,
+  );
+  const finalBackgroundColor: undefined | string = newStyles.reduce(
+    (backgroundColor, currentStyle) => (currentStyle.backgroundColor != null ? currentStyle.backgroundColor : backgroundColor), 
+    styles.backgroundColor,
+  );
+
+  const baseChildComponents = (
+    <>
+      {_.compact([
+        leaf.text 
+        ? (
+          <Text 
+            style={{ backgroundColor: finalBackgroundColor }} 
+            key={uuidv4()}
+          >
+            {leaf.text}
+          </Text> 
+        )
+        : null,
+        <Text 
+          style={{ backgroundColor: finalBackgroundColor }} 
+          key={uuidv4()}
+        >
+          {children({ backgroundColor: finalBackgroundColor, fontSize: finalFontSize })}
+        </Text>,
+      ])}
+    </>
+  );
+
+  const styledContent: JSX.Element = newStyles.reduce((currentChild: JSX.Element, { type, ...currentStyle }) => (
+    type === 'Text' 
+      ? <Text style={currentStyle}>{currentChild}</Text>
+      : <View style={currentStyle}>{currentChild}</View>
+  ), baseChildComponents);
+
+  return styledContent;
 }
 
 export default SlatePDF;

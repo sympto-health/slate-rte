@@ -1,12 +1,33 @@
 import { Node, BaseEditor } from 'slate';
 import { ReactEditor } from 'slate-react';
 
-type ASCIIColor = string;
+export type ASCIIColor = string;
 
 type BaseNode = {
   children?: undefined | SlateNode[],
   text: null | string,
 };
+
+type LeafStyles = {
+  bold: boolean,
+  'font-size': {
+    value: number,
+  },
+  type: undefined,
+  code: boolean,
+  italic: boolean,
+  underline: boolean,
+  'font-weight': {
+    value: number,
+  },
+  'text-color': {
+    color: ASCIIColor,
+  },
+  'highlight-color': {
+    color: ASCIIColor,
+  },
+};
+
 
 type BaseLeafNode = {
   bold: undefined,
@@ -23,36 +44,28 @@ type BaseLeafNode = {
 export type EmptySlateNode = ({ text: string, children?: SlateNode[] } & BaseLeafNode);
 export type SlateLeafNode = (
   {
-    'font-size': {
-      value: number,
-    },
+    'font-size': LeafStyles['font-size'],
   } & Omit<BaseLeafNode, 'font-size'>) 
   | ({
-    bold: boolean,
+    bold: LeafStyles['bold'],
   } & Omit<BaseLeafNode, 'bold'>) 
   | ({
-    code: boolean,
+    code: LeafStyles['code'],
   } & Omit<BaseLeafNode, 'code'>) 
   | ({
-    italic: boolean,
+    italic: LeafStyles['italic'],
   } & Omit<BaseLeafNode, 'italic'>) 
   | ({
-    underline: boolean,
+    underline: LeafStyles['underline'],
   } & Omit<BaseLeafNode, 'underline'>) 
   | ({
-    'font-weight': {
-      value: number,
-    },
+    'font-weight': LeafStyles['font-weight'],
   } & Omit<BaseLeafNode, 'font-weight'>)
   | ({
-    'text-color': {
-      color: ASCIIColor,
-    },
+    'text-color': LeafStyles['text-color'],
   } & Omit<BaseLeafNode, 'text-color'>)
   | ({
-    'highlight-color': {
-      color: ASCIIColor,
-    },
+    'highlight-color': LeafStyles['highlight-color'],
   } & Omit<BaseLeafNode, 'highlight-color'>)
   | EmptySlateNode;
 
