@@ -1,5 +1,6 @@
 import { Node } from 'slate';
 import React from 'react'
+import { v4 as uuidv4 } from 'uuid';
 import {
   View, Text,
 } from '@react-pdf/renderer';
@@ -25,7 +26,7 @@ const SlatePDF = ({
     metadata.type 
       ? (
         // @ts-ignore
-        <Element fontRatio={fontRatio} minimalFormatting={minimalFormatting} element={metadata}>
+        <Element key={uuidv4()} fontRatio={fontRatio} minimalFormatting={minimalFormatting} element={metadata}>
           {children 
             // @ts-ignore
             && renderSlateItems(children)}
@@ -33,7 +34,7 @@ const SlatePDF = ({
       )
       : (
         // @ts-ignore
-        <Leaf fontRatio={fontRatio} leaf={metadata} minimalFormatting={minimalFormatting}>
+        <Leaf key={uuidv4()} fontRatio={fontRatio} leaf={metadata} minimalFormatting={minimalFormatting}>
           {children 
             // @ts-ignore
             && renderSlateItems(children)}
