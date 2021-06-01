@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
-import { useSlate, ReactEditor } from 'slate-react'
+import { useSlate } from 'slate-react'
 import { Editor, Range, Transforms } from 'slate'
 import { TwitterPicker } from 'react-color';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { SlateEditorT, BackgroundColorNode, convertSlateEditor } from './SlateNode';
 import FormatButton from './FormatButton';
 
 const ColorPicker = ({ type, icon }: { 
   icon: IconDefinition, type: 'text-color' | 'highlight-color' | 'background-color',
 }) => {
-  const editor = useSlate();
+  // @ts-ignore
+  const editor: SlateEditorT = useSlate();
   const [showColorPicker, setColorPicker] = useState(false);
   const [selectedText, setSelectedText] = useState<Range | null>(null);
   const currentColor = getActiveColor(editor, type);
@@ -39,43 +41,40 @@ const ColorPicker = ({ type, icon }: {
 
 // color is a hexcode
 const toggleColor = (
-  editor: ReactEditor, 
+  editor: SlateEditorT, 
   selectedText: Range | null, 
   color: string, 
   type: 'text-color' | 'highlight-color' | 'background-color',
 ) => {
   if (type === 'background-color') {
-    const point = Editor.start(editor, [0, 0])
-    const node = {
+    const point = Editor.start(convertSlateEditor(editor), [0, 0])
+    const node: BackgroundColorNode = {
       type: 'background-color',
       color,
+      text: null,
       children: [],
     };
 
     if (editor.children[0].type !== 'background-color') {
-      Transforms.insertNodes(editor, node, { at: point });
+      Transforms.insertNodes(convertSlateEditor(editor), (node as any), { at: point });
     } else {
-      Transforms.setNodes(editor, {
-        type: 'background-color',
-        color,
-        children: [],
-      }, { at: point });
+      Transforms.setNodes(convertSlateEditor(editor), (node as any), { at: point });
     }
     return;
   }
 
   const currentColor = getActiveColor(editor, type)
   if (currentColor === color) {
-    Editor.removeMark(editor, type)
+    Editor.removeMark(convertSlateEditor(editor), type)
   } else {
     // TODO: figure out a way to do this without mutating the editor properties
     editor.selection = selectedText;
-    Editor.addMark(editor, type, { color });
+    Editor.addMark(convertSlateEditor(editor), type, { color });
   }
 }
 
-export const getActiveColor = (editor: ReactEditor, type: 'text-color' | 'highlight-color' | 'background-color'): null | string => {
-  const marks = Editor.marks(editor)
+export const getActiveColor = (editor: SlateEditorT, type: 'text-color' | 'highlight-color' | 'background-color'): null | string => {
+  const marks = Editor.marks(convertSlateEditor(editor));
   return marks && marks[type] ? marks[type].color : null;
 }
 

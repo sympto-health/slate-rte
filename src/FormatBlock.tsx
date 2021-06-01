@@ -1,8 +1,9 @@
 import React from 'react'
-import { ReactEditor, useSlate } from 'slate-react'
+import { useSlate } from 'slate-react'
 import { Editor, Transforms } from 'slate'
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import FormatButton from './FormatButton';
+import { SlateEditorT, convertSlateEditor, SlateNode } from './SlateNode';
 import './index.css';
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
@@ -13,7 +14,8 @@ const FormatBlock = ({ format, icon }: {
   format: BlockFormats,
   icon: IconDefinition,
 }) => {
-  const editor = useSlate();
+  // @ts-ignore
+  const editor: SlateEditorT = useSlate();
   return (
     <FormatButton 
       isActive={isBlockActive(editor, format)}
@@ -25,28 +27,29 @@ const FormatBlock = ({ format, icon }: {
   );
 }
 
-const toggleBlock = (editor: ReactEditor, format: BlockFormats) => {
+const toggleBlock = (editor: SlateEditorT, format: BlockFormats) => {
   const isActive = isBlockActive(editor, format)
   const isList = LIST_TYPES.includes(format)
 
-  Transforms.unwrapNodes(editor, {
-    match: n => LIST_TYPES.includes(String(n.type)),
+  Transforms.unwrapNodes(convertSlateEditor(editor), {
+    match: (n: SlateNode)  => (n.type ? LIST_TYPES.includes(n.type) : false),
     split: true,
   })
 
-  Transforms.setNodes(editor, {
+  Transforms.setNodes(convertSlateEditor(editor), {
+    // @ts-ignore
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
   })
 
   if (!isActive && isList) {
     const block = { type: format, children: [] }
-    Transforms.wrapNodes(editor, block)
+    Transforms.wrapNodes(convertSlateEditor(editor), block)
   }
 }
 
-const isBlockActive = (editor: ReactEditor, format: BlockFormats) => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n.type === format,
+const isBlockActive = (editor: SlateEditorT, format: BlockFormats) => {
+  const [match] = Editor.nodes(convertSlateEditor(editor), {
+    match: (n: SlateNode) => n.type === format,
   })
 
   return !!match

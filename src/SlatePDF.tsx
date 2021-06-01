@@ -1,18 +1,28 @@
-import { Node } from 'slate';
 import React from 'react'
 import { v4 as uuidv4 } from 'uuid';
 import {
-  View, Text,
+  View, Text, Image, Link,
 } from '@react-pdf/renderer';
 import { RenderLeafProps, RenderElementProps } from 'slate-react';
 import getBackgroundColor from './getBackgroundColor';
+import { SlateNode, BaseElementProps, BaseLeafProps } from './SlateNode';
 
 const DEFAULT_EM_SIZE = 16;
+
+type ElementProps = { 
+  attributes: RenderElementProps['attributes'], 
+  fontRatio: number,
+} & BaseElementProps;
+
+type LeafProps = {
+  attributes: RenderLeafProps['attributes'], 
+  fontRatio: number,
+} & BaseLeafProps;
 
 const SlatePDF = ({ 
   value, options, minimalFormatting,
 }: {
-  value: Node[],
+  value: SlateNode[],
   minimalFormatting: boolean,
   options?: {
     // effectively specifies what 1em is equal to, based on the font-size
@@ -20,24 +30,21 @@ const SlatePDF = ({
     defaultFontSizePx: number, 
   },
 }) => {
+  console.log(value);
   const fontRatio = options ?  DEFAULT_EM_SIZE / options.defaultFontSizePx : 1;
   const backgroundColor = getBackgroundColor(value);
-  const renderSlateItems = (slateContent: Node[]) => (slateContent.map(({ children, ...metadata }) => (
+  const renderSlateItems = (slateContent: SlateNode[]) => (slateContent.map(({ children, ...metadata }) => (
     metadata.type 
       ? (
         // @ts-ignore
         <Element key={uuidv4()} fontRatio={fontRatio} minimalFormatting={minimalFormatting} element={metadata}>
-          {children 
-            // @ts-ignore
-            && renderSlateItems(children)}
+          <>{children  && renderSlateItems(children)}</>
         </Element>
       )
       : (
         // @ts-ignore
         <Leaf key={uuidv4()} fontRatio={fontRatio} leaf={metadata} minimalFormatting={minimalFormatting}>
-          {children 
-            // @ts-ignore
-            && renderSlateItems(children)}
+          <>{children && renderSlateItems(children)}</>
         </Leaf>
       )
   )));
@@ -55,7 +62,11 @@ const SlatePDF = ({
   );
 }
 
-const Element = ({ minimalFormatting, children, element }: RenderElementProps & { fontRatio: number, minimalFormatting: boolean }) => {
+const Element = ({ minimalFormatting, children, element }: ElementProps) => {
+  const childComponents = [
+    <Text>{element.text}</Text>, 
+    <View>{children}</View>,
+  ];
   switch (element.type) {
     case 'block-quote':
       return (
@@ -69,52 +80,36 @@ const Element = ({ minimalFormatting, children, element }: RenderElementProps & 
             color: '#aaa',
           }}
         >
-          {children}
+          {childComponents}
         </Text>
       );
     case 'bulleted-list':
-      return <View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>{children}</View>
+      return <View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>{childComponents}</View>
     case 'heading-one':
-      return <Text style={{ fontSize: 40 }}>{children}</Text>
+      return <Text style={{ fontSize: 40 }}>{childComponents}</Text>
     case 'heading-two':
-      return <Text style={{ fontSize: 28 }}>{children}</Text>
-    case 'list-item':
+      return <Text style={{ fontSize: 28 }}>{childComponents}</Text>
+    case 'list-item': case 'numbered-list':
       return (
-        <View>
-          <View 
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              flexWrap: 'wrap',
-              flex: 1
-            }}
-          >
-            <View style={{ width: 10 }}>
-                <Text>{`\u2022 `}</Text>
-            </View>
-            <View style={{ flex: 1 }}>
-              {children}
-            </View>
-          </View>
-        </View>
+        <Text style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+          {[<Text>•</Text>, ...childComponents]}
+        </Text>
       );
-    case 'numbered-list':
-      return <ol>{children}</ol>
-    case 'left-align':
+        case 'left-align':
       return minimalFormatting 
-        ? <Text>{children}</Text> 
-        : <Text style={{ textAlign: 'left' }}>{children}</Text>
+        ? <Text>{childComponents}</Text> 
+        : <Text style={{ textAlign: 'left' }}>{childComponents}</Text>
     case 'right-align':
       return minimalFormatting 
-        ? <Text>{children}</Text>
-        : <Text style={{ textAlign: 'right' }}>{children}</Text>
+        ? <Text>{childComponents}</Text>
+        : <Text style={{ textAlign: 'right' }}>{childComponents}</Text>
     case 'center-align':
       return minimalFormatting
-        ? <Text>{children}</Text> 
-        : <Text style={{ textAlign: 'center' }}>{children}</Text>
+        ? <Text>{childComponents}</Text> 
+        : <Text style={{ textAlign: 'center' }}>{childComponents}</Text>
     case 'horizontal-line': 
       return minimalFormatting
-        ? <Text>{children}</Text> 
+        ? <Text>{childComponents}</Text> 
         : (
           <View>
             <View 
@@ -123,38 +118,36 @@ const Element = ({ minimalFormatting, children, element }: RenderElementProps & 
                 borderTop: '1px solid rgba(0,0,0,.1)',
               }}
             />
-            {children}
+            {childComponents}
           </View>
         )
     case 'link':
       return (
-        <a target="_blank" href={String(element.url) || ''}>
-          {children}
-        </a>
+        <Link src={element.url}>
+          {childComponents}
+        </Link>
       )
-    case 'image':
+    case 'image': case 'video':
       return (
-        <div className="d-inline-block">
-          <div className="d-inline-block" contentEditable={false}>
-            <img alt="Uploaded Image" src={String(element.url) || ''} className="image-item" />
-          </div>
-          {children}
-        </div>
+        <View >
+          <Image style={{ width: '100%' }} src={element.url} />
+          {childComponents}
+        </View>
       )
     case 'background-color':
-      return (<View style={{ backgroundColor: String(element.color) }} />);
+      return (<View style={{ backgroundColor: element.color }} />);
     default:
       return (
         <Text 
           style={element.noPadding ? { paddingBottom: 1 } : { paddingBottom: 10 }} 
         >
-          {children}
+          {childComponents}
         </Text>
       );
   }
 }
 
-const Leaf = ({ children, leaf, minimalFormatting, fontRatio }: RenderLeafProps & { minimalFormatting: boolean, fontRatio: number }) => {
+const Leaf = ({ children, leaf, minimalFormatting, fontRatio }: LeafProps) => {
   const childComponents = [leaf.text || '', ...(children || [])];
   if (leaf.bold) {
     return (<Text style={{ fontWeight: 700 }}>{childComponents}</Text>);

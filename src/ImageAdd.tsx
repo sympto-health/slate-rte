@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Transforms, Range } from 'slate'
 import { useSlate,  ReactEditor } from 'slate-react'
 import { faImages, faVideo } from '@fortawesome/free-solid-svg-icons'
-
+import { LinkNode, EmptySlateNode, convertSlateEditor } from './SlateNode';
 import FormatButton from './FormatButton';
 import AttachmentModal from './AttachmentModal';
 
@@ -10,7 +10,8 @@ const ImageAdd = ({ uploadFile, type }: {
   uploadFile: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
   type: 'video' | 'image',
 }) => {
-  const editor = useSlate();
+  // @ts-ignore
+  const editor: ReactEditor = useSlate();
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const [selection, setSelection] = useState<Range | null>(null);
   return (
@@ -44,17 +45,21 @@ const ImageAdd = ({ uploadFile, type }: {
 
 const insertFile = (type: 'image' | 'video', editor: ReactEditor, url: string, selection: Range | null) => {
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const file = {
+  const file: LinkNode = {
     type,
     url,
-    children: [{ text: '' }],
-  }
+    text: null,
+    children: [({ text: '' } as EmptySlateNode)],
+  };
 
   if (isCollapsed) {
-    Transforms.insertNodes(editor, file)
+    // @ts-ignore
+    Transforms.insertNodes(convertSlateEditor(editor), file)
   } else {
-    Transforms.wrapNodes(editor, file, { split: true })
-    Transforms.collapse(editor, { edge: 'end' })
+    // @ts-ignore
+    Transforms.wrapNodes(convertSlateEditor(editor), file, { split: true })
+    // @ts-ignore
+    Transforms.collapse(convertSlateEditor(editor), { edge: 'end' })
   }
 };
 

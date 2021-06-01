@@ -1,36 +1,42 @@
 import React from 'react'
-import { ReactEditor, useSlate } from 'slate-react'
+import { useSlate } from 'slate-react'
 import isUrl from 'is-url'
 import { Editor, Transforms, Range } from 'slate'
 import { faLink } from '@fortawesome/free-solid-svg-icons'
-
+import { LinkNode, EmptySlateNode, SlateNode, SlateEditorT, convertSlateEditor } from './SlateNode';
 import FormatButton from './FormatButton';
 
-export const withLinks = (editor: ReactEditor) => {
+export const withLinks = (editor: SlateEditorT) => {
   const { insertData, insertText, isInline } = editor
 
-  editor.isInline = element => {
-    return element.type === 'link' 
+  // @ts-ignore
+  editor.isInline = (element: SlateNode) => {
+    return (element.type === 'link' 
       || element.type === 'video' 
-      || element.type === 'image' 
+      || element.type === 'image')
         ? true 
+        // @ts-ignore
         : isInline(element)
   }
 
-  editor.insertText = text => {
+  // @ts-ignore
+  editor.insertText = (text: string | null) => {
     if (text && isUrl(text)) {
       wrapLink(editor, text)
     } else {
+      // @ts-ignore
       insertText(text)
     }
   }
 
-  editor.insertData = data => {
+  // @ts-ignore
+  editor.insertData = (data: { getData: (dataType: string) => string }) => {
     const text = data.getData('text/plain')
 
     if (text && isUrl(text)) {
       wrapLink(editor, text)
     } else {
+      // @ts-ignore
       insertData(data)
     }
   }
@@ -39,7 +45,8 @@ export const withLinks = (editor: ReactEditor) => {
 }
 
 export const LinkButton = () => {
-  const editor = useSlate()
+  // @ts-ignore
+  const editor: SlateEditorT = useSlate()
   return (
     <FormatButton 
       isActive={isLinkActive(editor)}
@@ -53,38 +60,44 @@ export const LinkButton = () => {
   );
 }
 
-const insertLink = (editor: ReactEditor, url: string) => {
+const insertLink = (editor: SlateEditorT, url: string) => {
   if (editor.selection) {
     wrapLink(editor, url)
   }
 }
 
-const isLinkActive = (editor: ReactEditor) => {
-  const [link] = Editor.nodes(editor, { match: n => n.type === 'link' })
+const isLinkActive = (editor: SlateEditorT) => {
+  // @ts-ignore
+  const [link] = Editor.nodes(convertSlateEditor(editor), { match: n => n.type === 'link' })
   return !!link
 }
 
-const unwrapLink = (editor: ReactEditor) => {
-  Transforms.unwrapNodes(editor, { match: n => n.type === 'link' })
+const unwrapLink = (editor: SlateEditorT) => {
+  // @ts-ignore
+  Transforms.unwrapNodes(convertSlateEditor(editor), { match: n => n.type === 'link' })
 }
 
-const wrapLink = (editor: ReactEditor, url: string) => {
+const wrapLink = (editor: SlateEditorT, url: string) => {
   if (isLinkActive(editor)) {
     unwrapLink(editor)
   }
 
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const link = {
+  const children: SlateNode[] = isCollapsed ? [({ text: url, children: undefined } as EmptySlateNode)] : [];
+  const link: LinkNode = {
     type: 'link',
     url,
-    children: isCollapsed ? [{ text: url }] : [],
+    children,
+    text: null,
   }
 
   if (isCollapsed) {
-    Transforms.insertNodes(editor, link)
+    // @ts-ignore
+    Transforms.insertNodes(convertSlateEditor(editor), link)
   } else {
-    Transforms.wrapNodes(editor, link, { split: true })
-    Transforms.collapse(editor, { edge: 'end' })
+    // @ts-ignore
+    Transforms.wrapNodes(convertSlateEditor(editor), link, { split: true })
+    Transforms.collapse(convertSlateEditor(editor), { edge: 'end' })
   }
 }

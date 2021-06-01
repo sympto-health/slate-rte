@@ -34,7 +34,7 @@ const PDFPreview = ({ value, mode }: { value: any[], mode: 'Minimal PDF' | 'PDF 
     <PDFViewer>
       <Document>
         <Page style={{ fontFamily: 'Nunito' }}>
-          <SlateRTE key={JSON.stringify(value)} options={{ defaultFontSizePx: 20 }} mode={mode} value={value} />
+          <SlateRTE options={{ defaultFontSizePx: 20 }} mode={mode} value={value} />
         </Page>
       </Document>
     </PDFViewer>

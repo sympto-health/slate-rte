@@ -8,9 +8,9 @@ import { Card } from 'react-bootstrap'
 import ReactPlayer from 'react-player';
 import cx from 'classnames';
 import { isSafari, isIOS } from 'react-device-detect';
-import { Node, createEditor } from 'slate';
+import { createEditor } from 'slate';
 import _ from 'lodash';
-import { Editable, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react';
+import { Editable, ReactEditor, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react';
 import ColorPicker from './ColorPicker';
 import FontFormatter from './FontFormatter';
 import { withLinks, LinkButton } from './Links';
@@ -18,8 +18,23 @@ import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
 import FormatButton from './FormatButton';
 import ImageAdd from './ImageAdd';
+import { SlateNode, SlateElementNode, SlateLeafNode } from './SlateNode';
 import getBackgroundColor from './getBackgroundColor';
 import SlatePDF from './SlatePDF';
+
+type ElementProps = { 
+  attributes: RenderElementProps['attributes'], 
+  children: JSX.Element,
+  minimalFormatting: boolean,
+  element: SlateElementNode,
+};
+
+type LeafProps = {
+  attributes: RenderLeafProps['attributes'], 
+  children: JSX.Element,
+  minimalFormatting: boolean,
+  leaf: SlateLeafNode,
+};
 
 // default size in px for font-size of 1em
 const DEFAULT_EM_SIZE = 16;
@@ -33,8 +48,8 @@ const DEFAULT_EM_SIZE = 16;
 const SlateRTE = ({ 
   value, setValue, mode, uploadFile, toolbarClassName, className, inputClassName, options,
 }: {
-  value: Node[],
-  setValue:(value: Node[]) => void,
+  value: SlateNode[],
+  setValue:(value: SlateNode[]) => void,
   uploadFile?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
   mode: 'Read-Only' | 'Edit' | 'Minimal Read-Only' | 'PDF' | 'Minimal PDF',
   toolbarClassName?: string,
@@ -46,7 +61,8 @@ const SlateRTE = ({
     defaultFontSizePx: number, 
   },
 }) => {
-  const editor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
+  // @ts-ignore
+  const editor: ReactEditor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
   const backgroundColor = getBackgroundColor(value);
   const calculateColorStyles = () => {
     if (backgroundColor == null) return {};
@@ -79,7 +95,7 @@ const SlateRTE = ({
         fontSize: options ? `${DEFAULT_EM_SIZE / options.defaultFontSizePx}em` : '1em',
       }}
     >
-      <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+      <Slate editor={editor} value={value as any[]} onChange={value => setValue(value as SlateNode[])}>
         { mode === 'Edit' && (
           <Card 
             className={cx('toolbar-item d-flex flex-row flex-wrap shadow-sm px-2 py-1 card mb-3 w-auto', toolbarClassName)}
@@ -134,8 +150,18 @@ const SlateRTE = ({
         )}
         <Editable
           readOnly={mode === 'Read-Only' || mode === 'Minimal Read-Only'}
-          renderElement={(props: RenderElementProps) => <Element minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}
-          renderLeaf={(props: RenderLeafProps) => <Leaf minimalFormatting={mode === 'Minimal Read-Only'} {...props} />}         
+          renderElement={(props: any) => (
+            <Element 
+              {...(props as ElementProps)}
+              minimalFormatting={mode === 'Minimal Read-Only'}
+            />
+          )}
+          renderLeaf={(props: any) => (
+            <Leaf 
+              {...(props as LeafProps)}
+              minimalFormatting={mode === 'Minimal Read-Only'} 
+            />
+           )}         
           placeholder="Enter some rich text…"
           spellCheck
           className={inputClassName}
@@ -148,10 +174,12 @@ const SlateRTE = ({
 }
 
 
-const Element = ({ attributes, children, element, minimalFormatting }: RenderElementProps & { minimalFormatting: boolean }) => {
+const Element = ({ 
+  attributes, children, element, minimalFormatting,
+}: ElementProps) => {
   switch (element.type) {
-    case 'block-quote':
-      return <blockquote {...attributes}>{children}</blockquote>
+    case 'block-quote': 
+      return (<blockquote {...attributes}>{children}</blockquote>);
     case 'bulleted-list':
       return <ul {...attributes}>{children}</ul>
     case 'heading-one':
@@ -174,7 +202,7 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
       return minimalFormatting
         ? <div>{children}</div> 
         : <div {...attributes} style={{ textAlign: 'center' }}>{children}</div>
-    case 'horizontal-line': 
+    case 'horizontal-line':
       return minimalFormatting
         ? <div>{children}</div> 
         : (
@@ -185,19 +213,19 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
         )
     case 'link':
       return (
-        <a target="_blank" {...attributes} href={String(element.url) || ''}>
+        <a target="_blank" {...attributes} href={element.url}>
           {children}
         </a>
-      )
+      );
     case 'image':
       return (
         <div className="d-inline-block" {...attributes}>
           <div className="d-inline-block" contentEditable={false}>
-            <img alt="Uploaded Image" src={String(element.url) || ''} className="image-item" />
+            <img alt="Uploaded Image" src={element.url} className="image-item" />
           </div>
           {children}
         </div>
-      )
+      );
     case 'video':
       return (
         <div className="d-inline-block video-item-cont" {...attributes}>
@@ -223,15 +251,17 @@ const Element = ({ attributes, children, element, minimalFormatting }: RenderEle
           </div>
           {children}
         </div>
-      )
+      );
     case 'background-color':
       return (<div style={{ backgroundColor: String(element.color) }} />);
-    default:
+    default: 
       return <div style={element.noPadding ? { paddingBottom: '0.01rem' } : { paddingBottom: '1rem' }} {...attributes}>{children}</div>
   }
 }
 
-const Leaf = ({ attributes, children, leaf, minimalFormatting }: RenderLeafProps & { minimalFormatting: boolean }) => {
+const Leaf = ({ 
+  attributes, children, leaf, minimalFormatting,
+}: LeafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -248,23 +278,19 @@ const Leaf = ({ attributes, children, leaf, minimalFormatting }: RenderLeafProps
     children = <u>{children}</u>
   }
   if (leaf['font-size']) {
-    // @ts-ignore
     const { value: fontSize } = leaf['font-size'];
     // note that em is relative, so base em size will still be relevant here
     children = <span style={{ fontSize: `${fontSize / DEFAULT_EM_SIZE}em` }} >{children}</span>
   }
   if (leaf['font-weight']) {
-    // @ts-ignore
     const { value: fontWeight } = leaf['font-weight'];
     children = <span style={{ fontWeight }} >{children}</span>
   }
   if (leaf['text-color']) {
-    // @ts-ignore
     const { color } = leaf['text-color'];
     children = minimalFormatting ? children : (<span style={{ color }} >{children}</span>)
   }
   if (leaf['highlight-color']) {
-    // @ts-ignore
     const highlightBackgroundColor = leaf['highlight-color'].color;
     children = <span style={{ backgroundColor: highlightBackgroundColor }} >{children}</span>
   }

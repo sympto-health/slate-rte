@@ -1,7 +1,8 @@
 import React from 'react'
-import { ReactEditor, useSlate } from 'slate-react'
+import { useSlate } from 'slate-react'
 import { Editor, Range } from 'slate'
 import { Form } from 'react-bootstrap';
+import { SlateEditorT, convertSlateEditor } from './SlateNode';
 import './FontFormatter.css';
 
 type FontFormats = 'font-weight' | 'font-size';
@@ -11,7 +12,8 @@ const FontFormatter = ({ type, defaultVal, options }: {
   defaultVal: number,
   options: Array<number>,
 }) => {
-  const editor = useSlate();
+  // @ts-ignore
+  const editor: SlateEditorT = useSlate();
   return (
     <Form.Group className="FontFormatter m-0">
       <Form.Control 
@@ -35,21 +37,21 @@ const FontFormatter = ({ type, defaultVal, options }: {
 
 
 
-const getActiveValue = (editor: ReactEditor, type: 'font-weight' | 'font-size'): null | string => {
-  const marks = Editor.marks(editor)
+const getActiveValue = (editor: SlateEditorT, type: 'font-weight' | 'font-size'): null | string => {
+  const marks = Editor.marks(convertSlateEditor(editor))
   return marks && marks[type] ? marks[type].value : null;
 }
 
 
 const toggleFontStyle = (
-  editor: ReactEditor, 
+  editor: SlateEditorT, 
   selectedText: Range | null, 
   fontValue: string, 
   type: FontFormats,
 ) => {
   // TODO: figure out a way to do this without mutating the editor properties
   editor.selection = selectedText;
-  Editor.addMark(editor, type, { value: Number(fontValue) });
+  Editor.addMark(convertSlateEditor(editor), type, { value: Number(fontValue) });
 }
 
 

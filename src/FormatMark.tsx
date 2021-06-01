@@ -11,7 +11,8 @@ const FormatMark = ({ format, icon }: {
   format: MarkFormats,
   icon: IconDefinition,
 }) => {
-  const editor = useSlate();
+  // @ts-ignore
+  const editor: ReactEditor = useSlate();
   return (
     <FormatButton 
       isActive={isMarkActive(editor, format)}
