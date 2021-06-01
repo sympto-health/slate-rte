@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import SlateRTE, { extractText, deserializeHTMLString, parseAsHTML, getBackgroundColor }  from "slate-rte";
 import { Card } from 'react-bootstrap';
+import {
+  Document, Page, PDFViewer, Font,
+} from '@react-pdf/renderer';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Nunito300 from './fonts/NunitoSans_300.ttf';
+import Nunito300Italic from './fonts/NunitoSans_300_italic.ttf';
+import Nunito400 from './fonts/NunitoSans_400.ttf';
+import Nunito400Italic from './fonts/NunitoSans_400_italic.ttf';
+import Nunito700 from './fonts/NunitoSans_700.ttf';
+import Nunito700Italic from './fonts/NunitoSans_700_italic.ttf';
+import RobotoMono from './fonts/RobotoMono.ttf';
 
 const fileToBase64 = (file) => (
   new Promise(resolve => {
@@ -15,6 +25,22 @@ const fileToBase64 = (file) => (
     reader.readAsDataURL(file);
   }));
 
+Font.register({
+  family: 'Nunito',
+  fonts: [
+    { src: Nunito400 }, // font-style: normal, font-weight: normal
+    { src: Nunito400Italic, fontStyle: 'italic' },
+    { src: Nunito300, fontWeight: 300 },
+    { src: Nunito300Italic, fontWeight: 300, fontStyle: 'italic' },
+    { src: Nunito700, fontWeight: 700 },
+    { src: Nunito700Italic, fontWeight: 700, fontStyle: 'italic' },
+  ],
+});
+
+Font.register({
+  family: 'monospace',
+  src: RobotoMono,
+});
 
 const App = () => {
   const [value, setValue] = useState([
@@ -79,6 +105,9 @@ const App = () => {
         }} 
       />
       <div>{extractText(value)}</div>
+      <div className="m-3 text-large text-center font-weight-light">
+        Editable
+      </div>
       <Card className="m-3 shadow-sm">
         <SlateRTE 
           mode="Edit"
@@ -108,14 +137,35 @@ const App = () => {
           setValue={setValue} 
         />
       </Card>
+      <div className="m-3 text-large text-center font-weight-light">
+        Read Only
+      </div>
       <Card className="m-3 shadow-sm">
         <SlateRTE mode="Read-Only" value={value} setValue={setValue} />
       </Card>
+      <div className="m-3 text-large text-center font-weight-light">
+        Editable with Adjusted Font Size
+      </div>
       <Card className="m-3 shadow-sm">
         <SlateRTE options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={setValue} />
       </Card>
+      <div className="m-3 text-large text-center font-weight-light">
+        Minimal Read Only
+      </div>
       <Card className="m-3 shadow-sm">
         <SlateRTE mode="Minimal Read-Only" value={value} setValue={setValue} />
+      </Card>
+      <div className="m-3 text-large text-center font-weight-light">
+        PDF
+      </div>
+      <Card className="m-3 shadow-sm">
+        <PDFViewer>
+          <Document>
+            <Page style={{ fontFamily: 'Nunito' }}>
+              <SlateRTE options={{ defaultFontSizePx: 20 }} mode="PDF" value={value} />
+            </Page>
+          </Document>
+        </PDFViewer>
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
         HTML Parse Testing

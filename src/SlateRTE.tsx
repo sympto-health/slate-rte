@@ -19,7 +19,7 @@ import FormatBlock, { BlockFormats } from './FormatBlock';
 import FormatButton from './FormatButton';
 import ImageAdd from './ImageAdd';
 import getBackgroundColor from './getBackgroundColor';
-
+import SlatePDF from './SlatePDF';
 
 // default size in px for font-size of 1em
 const DEFAULT_EM_SIZE = 16;
@@ -36,7 +36,7 @@ const SlateRTE = ({
   value: Node[],
   setValue:(value: Node[]) => void,
   uploadFile?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
-  mode: 'Read-Only' | 'Edit' | 'Minimal Read-Only',
+  mode: 'Read-Only' | 'Edit' | 'Minimal Read-Only' | 'PDF' | 'Minimal PDF',
   toolbarClassName?: string,
   className?: string,
   inputClassName?: string,
@@ -50,10 +50,20 @@ const SlateRTE = ({
   const backgroundColor = getBackgroundColor(value);
   const calculateColorStyles = () => {
     if (backgroundColor == null) return {};
-    if (mode === 'Minimal Read-Only') return { color: backgroundColor };
+    if (mode === 'Minimal Read-Only' || mode === 'PDF') return { color: backgroundColor };
     return { backgroundColor };
   };
   const [showAllOptions, setShowAllOptions] = useState(false);
+
+  if (mode === 'PDF' || mode === 'Minimal PDF') {
+    return (
+      <SlatePDF 
+        options={options} 
+        minimalFormatting={mode === 'Minimal PDF'} 
+        value={value} 
+      />
+    );
+  }
   return (
     <div 
       className={cx(
