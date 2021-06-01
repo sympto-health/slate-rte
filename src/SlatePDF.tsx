@@ -30,7 +30,6 @@ const SlatePDF = ({
     defaultFontSizePx: number, 
   },
 }) => {
-  console.log(value);
   const fontRatio = options ?  DEFAULT_EM_SIZE / options.defaultFontSizePx : 1;
   const backgroundColor = getBackgroundColor(value);
   const renderSlateItems = (slateContent: SlateNode[]) => (slateContent.map(({ children, ...metadata }) => (
@@ -64,8 +63,8 @@ const SlatePDF = ({
 
 const Element = ({ minimalFormatting, children, element }: ElementProps) => {
   const childComponents = [
-    <Text>{element.text}</Text>, 
-    <View>{children}</View>,
+    <Text key={uuidv4()}>{element.text}</Text>, 
+    <View key={uuidv4()}>{children}</View>,
   ];
   switch (element.type) {
     case 'block-quote':
@@ -92,7 +91,7 @@ const Element = ({ minimalFormatting, children, element }: ElementProps) => {
     case 'list-item': case 'numbered-list':
       return (
         <Text style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
-          {[<Text>•</Text>, ...childComponents]}
+          {[<Text key={uuidv4()}> • </Text>, ...childComponents]}
         </Text>
       );
         case 'left-align':
