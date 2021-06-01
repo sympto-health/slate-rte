@@ -162,7 +162,23 @@ const App = () => {
         <PDFViewer>
           <Document>
             <Page style={{ fontFamily: 'Nunito' }}>
-              <SlateRTE options={{ defaultFontSizePx: 20 }} mode="PDF" value={value} />
+              <SlateRTE key={JSON.stringify(value)} options={{ defaultFontSizePx: 20 }} mode="PDF" value={value} />
+            </Page>
+          </Document>
+        </PDFViewer>
+      </Card>
+      <div className="m-3 text-large text-center font-weight-light">
+        Minimal PDF
+      </div>
+      <Card className="m-3 shadow-sm">
+        <PDFViewer>
+          <Document>
+            <Page style={{ fontFamily: 'Nunito' }}>
+              <SlateRTE 
+                key={JSON.stringify(value)} options={{ defaultFontSizePx: 20 }} 
+                mode="Minimal PDF" 
+                value={value}
+              />
             </Page>
           </Document>
         </PDFViewer>
