@@ -142,7 +142,7 @@ const SlateRTE = ({
                 <ColorPicker icon={faFillDrip} type="background-color" />
                 { uploadFile && (<ImageAdd type="image" uploadFile={uploadFile} />)}
                 { uploadFile && (<ImageAdd type="video" uploadFile={uploadFile} />)}
-                <FontFormatter options={[300, 400, 600]} type="font-weight" defaultVal={400} />
+                <FontFormatter options={[300, 400, 700, 800]} type="font-weight" defaultVal={400} />
                 <FontFormatter options={_.range(8, 60)} type="font-size" defaultVal={16} />
               </>
             )}
@@ -263,7 +263,7 @@ const Leaf = ({
   attributes, children, leaf, minimalFormatting,
 }: LeafProps) => {
   if (leaf.bold) {
-    children = <strong>{children}</strong>
+    children = <span style= {{ fontWeight: 700 }}>{children}</span>
   }
 
   if (leaf.code) {

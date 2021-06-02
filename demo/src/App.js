@@ -18,41 +18,62 @@ const fileToBase64 = (file) => (
 
 const App = () => {
   const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [
-        { text: 'This is editable ' },
-        { text: 'rich', bold: true },
-        { text: ' text, ' },
-        { text: 'much', italic: true },
-        { text: ' better than a ' },
-        { text: '<textarea>', code: true },
-        { text: '!' },
-      ],
-    },
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            "Since it's rich text, you can do things like turn a selection of text ",
-        },
-        { text: 'bold', bold: true },
-        {
-          text:
-            ', or add a semantically rendered block quote in the middle of the page, like this:',
-        },
-      ],
-    },
-    {
-      type: 'block-quote',
-      children: [{ text: 'A wise quote.' }],
-    },
-    {
-      type: 'paragraph',
-      children: [{ text: 'Try it out for yourself!' }],
-    },
-  ]);
+      {
+        "type": "background-color",
+        "color": "#ecf0f1",
+        "children": [
+          {
+            "text": ""
+          }
+        ]
+      },
+      {
+        "type": "center-align",
+        "children": [
+          {
+            "text": "DASH DISABILITY ",
+            "font-size": {
+              "value": 16
+            },
+            "font-weight": {
+              "value": 300
+            }
+          }
+        ]
+      },
+      {
+        "type": "center-align",
+        "children": [
+          {
+            "text": "& SYMPTOM SCORE",
+            "font-size": {
+              "value": 16
+            },
+            "font-weight": {
+              "value": 300
+            }
+          }
+        ]
+      },
+      {
+        "type": "center-align",
+        "children": [
+          {
+            "bold": true,
+            "text": "0.83",
+            "font-size": {
+              "value": 22
+            },
+            "text-color": {
+              "color": "#2980b9"
+            },
+            "font-weight": {
+              "value": 600
+            }
+          }
+        ]
+      }
+    ]);
   const htmlValue = (() => {
     try {
       return parseAsHTML(value)
