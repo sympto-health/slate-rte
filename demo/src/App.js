@@ -144,20 +144,37 @@ const App = () => {
       <Card className="m-3 shadow-sm">
         <SlateRTE options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={setValue} />
       </Card>
-      <div className="m-3 text-large text-center font-weight-light">
-        Minimal Read Only
+      <div className="d-flex align-items-center w-100">
+        <div className="w-100">
+          <div className="m-3 text-large text-center font-weight-light">
+            Minimal Read Only
+          </div>
+          <Card className="m-3 shadow-sm">
+            <SlateRTE mode="Minimal Read-Only" value={value} setValue={setValue} />
+          </Card>
+        </div>
+        <div className="w-100">
+          <div className="m-3 text-large text-center font-weight-light">
+            Minimal PDF
+          </div>
+          <PDFPreview value={value} mode="Minimal PDF" />
+        </div>
       </div>
-      <Card className="m-3 shadow-sm">
-        <SlateRTE mode="Minimal Read-Only" value={value} setValue={setValue} />
-      </Card>
-      <div className="m-3 text-large text-center font-weight-light">
-        PDF
+
+      <div className="d-flex align-items-center w-100">
+        <div className="w-100">
+          <div className="m-3 text-large text-center font-weight-light">
+            PDF
+          </div>
+          <PDFPreview value={value} mode="PDF" />
+        </div>
+        <div className="w-100">
+          <div className="m-3 text-large text-center font-weight-light">
+            PDF (adjusted Font size)
+          </div>
+          <PDFPreview defaultFontSize={30} value={value} mode="PDF" />
+        </div>
       </div>
-      <PDFPreview value={value} mode="PDF" />
-      <div className="m-3 text-large text-center font-weight-light">
-        Minimal PDF
-      </div>
-      <PDFPreview value={value} mode="Minimal PDF" />
       <div className="m-3 text-large text-center font-weight-light">
         HTML Parse Testing
       </div>
