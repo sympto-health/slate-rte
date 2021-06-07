@@ -223,9 +223,6 @@ const SlateLeaf = ({
     // highlight-color
     leaf['highlight-color'] ? { type: 'View', backgroundColor: leaf['highlight-color'].color } : null,
   ]);
-  console.log({
-    newStyles, leaf,
-  });
   const finalFontSize: number = newStyles.reduce(
     (fontSize, currentStyle) => (currentStyle.fontSize != null ? currentStyle.fontSize : fontSize), 
     styles.fontSize,
