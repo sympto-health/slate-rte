@@ -209,7 +209,7 @@ const SlateLeaf = ({
     leaf.italic ? { fontStyle: 'italic', type: 'Text' } : null,
 
     // underline
-    leaf.underline ? { fontStyle: 'underline', type: 'Text' } : null,
+    leaf.underline ? ({ textDecoration: 'underline', type: 'Text' } as any) : null,
 
     // font-size
     leaf['font-size'] ? { type: 'Text', fontSize: styles.fontSize * (leaf['font-size'].value / DEFAULT_EM_SIZE) } : null,

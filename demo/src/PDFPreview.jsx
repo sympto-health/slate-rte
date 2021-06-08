@@ -1,8 +1,8 @@
 import React from "react";
 import SlateRTE  from "slate-rte";
 import { Card } from 'react-bootstrap';
-import {
-  Document, Page, PDFViewer, Font, View,
+import { 
+  Document, Page, PDFViewer, Font, View, Text,
 } from '@react-pdf/renderer';
 import Nunito300 from './fonts/NunitoSans_300.ttf';
 import Nunito300Italic from './fonts/NunitoSans_300_italic.ttf';
