@@ -76,6 +76,7 @@ const SlateRTE = ({
         options={options} 
         minimalFormatting={mode === 'Minimal PDF'} 
         value={value} 
+        onFileLoad={onFileLoad}
       />
     );
   }
