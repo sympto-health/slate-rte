@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import SlateRTE, { extractText, deserializeHTMLString, parseAsHTML, getBackgroundColor }  from "slate-rte";
 import { Card } from 'react-bootstrap';
+import uuid from 'uuid/v4';
+import swal from 'sweetalert';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PDFPreview from './PDFPreview';
 
@@ -74,6 +76,7 @@ const App = () => {
         ]
       }
     ]);
+  const [fileMapping, setFileMapping] = useState({});
   const htmlValue = (() => {
     try {
       return parseAsHTML(value)
@@ -91,6 +94,7 @@ const App = () => {
       return [];
     }
   })();
+  const onFileLoad = async ({ id }) => ({ url: fileMapping[id] });
   return (
     <div className="bg-light h-100 p-4 pb-5">
       <div 
@@ -106,6 +110,7 @@ const App = () => {
       <Card className="m-3 shadow-sm">
         <SlateRTE 
           mode="Edit"
+          onFileLoad={onFileLoad}
           toolbarClassName="w-50"
           uploadFile={async (file, progress) => {
 
@@ -124,9 +129,34 @@ const App = () => {
             
             const [extension] = file.name.match(/\.[0-9a-z]+$/i);
             if (extension === '.mp4') {
-              return 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4';
+              return {
+                type: 'URL',
+                url: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
+              };
             }
-            return fileToBase64(file);
+            const uploadFileDirectly = await swal(
+              `How would you like to upload file?`,
+              {
+                dangerMode: true,
+                buttons: ['Upload File Id', 'Upload File Directly'],
+              },
+            );
+            const fileData = await fileToBase64(file);
+            const saveFileData = () => {
+              const fileId = uuid();
+              setFileMapping({
+                [fileId]: fileData,
+              });
+              return fileId;
+            };
+            return uploadFileDirectly
+              ? {
+                type: 'URL',
+                url: fileData,
+              } : {
+                type: 'Image ID',
+                id: saveFileData(fileData),
+              };
           }} 
           value={value} 
           setValue={setValue} 
@@ -136,13 +166,13 @@ const App = () => {
         Read Only
       </div>
       <Card className="m-3 shadow-sm">
-        <SlateRTE mode="Read-Only" value={value} setValue={setValue} />
+        <SlateRTE onFileLoad={onFileLoad} mode="Read-Only" value={value} setValue={setValue} />
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
         Editable with Adjusted Font Size
       </div>
       <Card className="m-3 shadow-sm">
-        <SlateRTE options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={setValue} />
+        <SlateRTE onFileLoad={onFileLoad} options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={setValue} />
       </Card>
       <div className="d-flex align-items-center w-100">
         <div className="w-100">
@@ -150,29 +180,28 @@ const App = () => {
             Minimal Read Only
           </div>
           <Card className="m-3 shadow-sm">
-            <SlateRTE mode="Minimal Read-Only" value={value} setValue={setValue} />
+            <SlateRTE onFileLoad={onFileLoad} mode="Minimal Read-Only" value={value} setValue={setValue} />
           </Card>
         </div>
         <div className="w-100">
           <div className="m-3 text-large text-center font-weight-light">
             Minimal PDF
           </div>
-          <PDFPreview value={value} mode="Minimal PDF" />
+          <PDFPreview onFileLoad={onFileLoad} value={value} mode="Minimal PDF" />
         </div>
       </div>
-
       <div className="d-flex align-items-center w-100">
         <div className="w-100">
           <div className="m-3 text-large text-center font-weight-light">
             PDF
           </div>
-          <PDFPreview value={value} mode="PDF" />
+          <PDFPreview onFileLoad={onFileLoad} value={value} mode="PDF" />
         </div>
         <div className="w-100">
           <div className="m-3 text-large text-center font-weight-light">
             PDF (adjusted Font size)
           </div>
-          <PDFPreview defaultFontSize={30} value={value} mode="PDF" />
+          <PDFPreview onFileLoad={onFileLoad} defaultFontSize={30} value={value} mode="PDF" />
         </div>
       </div>
       <div className="m-3 text-large text-center font-weight-light">
@@ -180,7 +209,7 @@ const App = () => {
       </div>
       <code className="m-3 card p-4 shadow-sm">{htmlValue}</code>
       <Card className="m-3 shadow-sm">
-        <SlateRTE mode="Read-Only" value={deserializedValue} setValue={setValue} />
+        <SlateRTE onFileLoad={onFileLoad} mode="Read-Only" value={deserializedValue} setValue={setValue} />
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
         Slate Compared

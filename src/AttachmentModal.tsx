@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Modal, ProgressBar } from 'react-bootstrap';
 import FileUpload from './FileUpload';
+import { FileT } from './SlateNode';
 import './AttachmentModal.css';
-
 
 const AttachmentModal = ({
   closeModal, onUpload, onFinish, type,
 }: {
   closeModal: () => void,
-  onUpload: (file: File, progress: (progressPercent: number) => void) => Promise<null | string>,
-  onFinish: (url: string) => void,
+  onUpload: (file: File, progress: (progressPercent: number) => void) => Promise<null | FileT>,
+  onFinish: (data: FileT) => void,
   type: 'video' | 'image',
 }) => {
   const [uploadProgress, setUploadProgress] = useState(0);

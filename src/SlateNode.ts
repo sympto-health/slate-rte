@@ -41,6 +41,8 @@ type BaseLeafNode = {
   'highlight-color': undefined,
 } & BaseNode;
 
+export type FileT = { type: 'URL', url: string } | { type: 'Image ID', id: string };
+
 export type EmptySlateNode = ({ text: string, children?: SlateNode[] } & BaseLeafNode);
 export type SlateLeafNode = (
   {
@@ -69,10 +71,18 @@ export type SlateLeafNode = (
   } & Omit<BaseLeafNode, 'highlight-color'>)
   | EmptySlateNode;
 
-export type LinkNode = {
-  type: 'link' | 'image' | 'video',
+export type LinkNode = ({
+  type: 'link',
   url: string,
-} & BaseNode;
+}) & BaseNode;
+
+export type ImageVideoNode = ({
+  type: 'image' | 'video',
+  url: string,
+} | {
+  type: 'image' | 'video',
+  fileData: { type: 'Image ID', id: string },
+}) & BaseNode;
 
 export type BackgroundColorNode = ({
   type: 'background-color',
@@ -93,6 +103,7 @@ export type SlateElementNode = (
      | 'horizontal-line',
   } & BaseNode) 
   | LinkNode
+  | ImageVideoNode 
   | BackgroundColorNode
   | ({
     noPadding?: boolean;
@@ -112,6 +123,7 @@ export type BaseElementProps = {
   children: Array<JSX.Element>,
   minimalFormatting: boolean,
   element: SlateElementNode,
+  onFileLoad?: (opts: { id: string }) => Promise<{ url: string }>,
 };
 
 export type BaseLeafProps = {

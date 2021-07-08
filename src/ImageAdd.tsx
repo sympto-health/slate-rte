@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { Transforms, Range } from 'slate'
 import { useSlate,  ReactEditor } from 'slate-react'
 import { faImages, faVideo } from '@fortawesome/free-solid-svg-icons'
-import { LinkNode, EmptySlateNode, convertSlateEditor } from './SlateNode';
+import { ImageVideoNode, EmptySlateNode, convertSlateEditor, FileT } from './SlateNode';
 import FormatButton from './FormatButton';
 import AttachmentModal from './AttachmentModal';
 
 const ImageAdd = ({ uploadFile, type }: {
-  uploadFile: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
+  uploadFile: (file: File, progressCallBack: (progress: number) => void) => Promise<null | FileT>,
   type: 'video' | 'image',
 }) => {
   // @ts-ignore
@@ -20,9 +20,7 @@ const ImageAdd = ({ uploadFile, type }: {
         showAttachmentModal && (
           <AttachmentModal 
             closeModal={() => { setShowAttachmentModal(false); }}
-            onUpload={(file, progressCallBack) => {
-              return uploadFile(file, progressCallBack);
-            }}
+            onUpload={uploadFile}
             type={type}
             onFinish={(url) => { 
               insertFile(type, editor, url, selection)
@@ -43,13 +41,19 @@ const ImageAdd = ({ uploadFile, type }: {
   );
 }
 
-const insertFile = (type: 'image' | 'video', editor: ReactEditor, url: string, selection: Range | null) => {
+const insertFile = (type: 'image' | 'video', editor: ReactEditor, fileData: FileT, selection: Range | null) => {
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const file: LinkNode = {
+  const file: ImageVideoNode = {
     type,
-    url,
     text: null,
     children: [({ text: '' } as EmptySlateNode)],
+    ...(fileData.type === 'URL' 
+       ? {
+         url: fileData.url,
+       }
+       : { 
+         fileData,
+        })
   };
 
   if (isCollapsed) {

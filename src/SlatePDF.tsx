@@ -7,6 +7,7 @@ import _ from 'lodash';
 import { RenderLeafProps, RenderElementProps } from 'slate-react';
 import getBackgroundColor from './getBackgroundColor';
 import { SlateNode, BaseElementProps, BaseLeafProps, ASCIIColor } from './SlateNode';
+import AsyncFileLoad from './AsyncFileLoad';
 
 const DEFAULT_EM_SIZE = 16;
 
@@ -29,10 +30,11 @@ type LeafProps = {
 } & Omit<BaseLeafProps, 'children'>;
 
 const SlatePDF = ({ 
-  value, options, minimalFormatting,
+  value, options, minimalFormatting, onFileLoad,
 }: {
   value: SlateNode[],
   minimalFormatting: boolean,
+  onFileLoad?: (opts: { id: string }) => Promise<{ url: string }>,
   options?: {
     // effectively specifies what 1em is equal to, based on the font-size
     // optional, defaults 1em = 16px
@@ -52,6 +54,7 @@ const SlatePDF = ({
             minimalFormatting={minimalFormatting} 
             element={metadata}
             fontRatio={fontRatio}
+            onFileLoad={onFileLoad}
            >
             {(curStyles: ParentStyles) => (
               <>
@@ -97,7 +100,7 @@ const SlatePDF = ({
 }
 
 const SlateElement = ({ 
-  minimalFormatting, children, element, styles, fontRatio,
+  minimalFormatting, children, element, styles, fontRatio, onFileLoad,
 }: ElementProps): JSX.Element => {
   const childComponents = (curStyles: ParentStyles) => (_.compact([
     element.text ? <Text key={uuidv4()}>{element.text}</Text> : null,
@@ -174,7 +177,11 @@ const SlateElement = ({
       return (
         <View>
           <View style={{ width: '100%', height: '100%' }}>
-            <Image style={{ width: '50vw', objectFit: 'cover' }} src={element.url} />
+            <AsyncFileLoad onFileLoad={onFileLoad} nodeData={element}>
+              {({ url }) => (
+                <Image style={{ width: '50vw', objectFit: 'cover' }} src={url} />
+              )}
+            </AsyncFileLoad>
           </View>
           {childComponents(styles)}
         </View>

@@ -37,13 +37,15 @@ Font.register({
   src: RobotoMono,
 });
 
-const PDFPreview = ({ defaultFontSize, value, mode }: { defaultFontSize: null | number, value: any[], mode: 'Minimal PDF' | 'PDF '}) => (
+const PDFPreview = ({ 
+  defaultFontSize, value, mode, onFileLoad,
+}) => (
   <Card className="m-3 shadow-sm">
     <PDFViewer>
       <Document>
         <Page style={{ fontFamily: 'Nunito' }}>
           <View style={{ padding: 10 }}> 
-            <SlateRTE options={{ defaultFontSizePx: defaultFontSize || 20 }} mode={mode} value={value} />
+            <SlateRTE onFileLoad={onFileLoad} options={{ defaultFontSizePx: defaultFontSize || 20 }} mode={mode} value={value} />
           </View>
         </Page>
       </Document>

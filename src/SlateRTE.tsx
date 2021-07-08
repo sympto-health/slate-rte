@@ -18,16 +18,14 @@ import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
 import FormatButton from './FormatButton';
 import ImageAdd from './ImageAdd';
-import { SlateNode, SlateElementNode, SlateLeafNode } from './SlateNode';
+import { FileT, SlateNode, BaseElementProps, SlateLeafNode } from './SlateNode';
 import getBackgroundColor from './getBackgroundColor';
 import SlatePDF from './SlatePDF';
+import AsyncFileLoad from './AsyncFileLoad';
 
 type ElementProps = { 
   attributes: RenderElementProps['attributes'], 
-  children: JSX.Element,
-  minimalFormatting: boolean,
-  element: SlateElementNode,
-};
+} & BaseElementProps;
 
 type LeafProps = {
   attributes: RenderLeafProps['attributes'], 
@@ -46,13 +44,14 @@ const DEFAULT_EM_SIZE = 16;
       no text colors (background color becomes text color if applicable)
  */
 const SlateRTE = ({ 
-  value, setValue, mode, uploadFile, toolbarClassName, className, inputClassName, options,
+  value, setValue, mode, uploadFile, toolbarClassName, className, inputClassName, options, onFileLoad,
 }: {
   value: SlateNode[],
   setValue:(value: SlateNode[]) => void,
-  uploadFile?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | string>,
+  uploadFile?: (file: File, progressCallBack: (progress: number) => void) => Promise<null | FileT>,
   mode: 'Read-Only' | 'Edit' | 'Minimal Read-Only' | 'PDF' | 'Minimal PDF',
   toolbarClassName?: string,
+  onFileLoad?: (opts: { id: string }) => Promise<{ url: string }>,
   className?: string,
   inputClassName?: string,
   options?: {
@@ -153,6 +152,7 @@ const SlateRTE = ({
           renderElement={(props: any) => (
             <Element 
               {...(props as ElementProps)}
+              onFileLoad={onFileLoad}
               minimalFormatting={mode === 'Minimal Read-Only'}
             />
           )}
@@ -175,7 +175,7 @@ const SlateRTE = ({
 
 
 const Element = ({ 
-  attributes, children, element, minimalFormatting,
+  attributes, children, element, minimalFormatting, onFileLoad,
 }: ElementProps) => {
   switch (element.type) {
     case 'block-quote': 
@@ -221,7 +221,11 @@ const Element = ({
       return (
         <div className="d-inline-block" {...attributes}>
           <div className="d-inline-block" contentEditable={false}>
-            <img alt="Uploaded Image" src={element.url} className="image-item" />
+            <AsyncFileLoad nodeData={element} onFileLoad={onFileLoad}> 
+              {({ url }) => (
+                <img alt="Uploaded Image" src={url} className="image-item" />
+              )}
+            </AsyncFileLoad>
           </div>
           {children}
         </div>
@@ -230,24 +234,28 @@ const Element = ({
       return (
         <div className="d-inline-block video-item-cont" {...attributes}>
           <div className="d-inline" contentEditable={false}>
-            <ReactPlayer
-              url={String(element.url)}
-              playing
-              config={String(element.url).includes('.m3u8') ? {
-                file: {
-                  forceHLS: !isSafari && !isIOS,
-                  hlsOptions: {
-                    xhrSetup: (xhr: any) => {
-                      // eslint-disable-next-line
-                      xhr.withCredentials = true; // send cookies
+            <AsyncFileLoad nodeData={element} onFileLoad={onFileLoad}> 
+              {({ url }) => (
+                <ReactPlayer
+                  url={String(url)}
+                  playing
+                  config={String(url).includes('.m3u8') ? {
+                    file: {
+                      forceHLS: !isSafari && !isIOS,
+                      hlsOptions: {
+                        xhrSetup: (xhr: any) => {
+                          // eslint-disable-next-line
+                          xhr.withCredentials = true; // send cookies
+                        },
+                      },
                     },
-                  },
-                },
-              } : {}}
-              className="video-item"
-              controls
-              playsinline
-            />
+                  } : {}}
+                  className="video-item"
+                  controls
+                  playsinline
+                />
+              )}
+            </AsyncFileLoad>
           </div>
           {children}
         </div>
