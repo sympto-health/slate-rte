@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
-import { ImageVideoNode } from './SlateNode';
+import { SlateNode } from './SlateNode';
+import { ImageVideoNode } from './SlateTypes';
 
 const AsyncFileLoad = ({
   onFileLoad, nodeData, children,
 }: { 
   onFileLoad?: (fileData: { id: string }) => Promise<{ url: string }>,
-  nodeData: ImageVideoNode,
+  nodeData: ImageVideoNode<SlateNode>,
   children: (urlData: { url: string }) => (JSX.Element),
 }) => {
   const [loadedFileURL, setLoadedFileURL] = useState<{ url: string } | null>(null);

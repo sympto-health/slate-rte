@@ -3,7 +3,8 @@ import { useSlate } from 'slate-react'
 import isUrl from 'is-url'
 import { Editor, Transforms, Range } from 'slate'
 import { faLink } from '@fortawesome/free-solid-svg-icons'
-import { LinkNode, EmptySlateNode, SlateNode, SlateEditorT, convertSlateEditor } from './SlateNode';
+import { LinkNode, EmptySlateNode } from './SlateTypes';
+import { SlateNode, SlateEditorT, convertSlateEditor } from './SlateNode';
 import FormatButton from './FormatButton';
 
 export const withLinks = (editor: SlateEditorT) => {
@@ -84,8 +85,8 @@ const wrapLink = (editor: SlateEditorT, url: string) => {
 
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const children: SlateNode[] = isCollapsed ? [({ text: url, children: undefined } as EmptySlateNode)] : [];
-  const link: LinkNode = {
+  const children: SlateNode[] = isCollapsed ? [({ text: url, children: undefined } as EmptySlateNode<SlateNode>)] : [];
+  const link: LinkNode<SlateNode> = {
     type: 'link',
     url,
     children,

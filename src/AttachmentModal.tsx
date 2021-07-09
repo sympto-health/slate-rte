@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Modal, ProgressBar } from 'react-bootstrap';
 import FileUpload from './FileUpload';
-import { FileT } from './SlateNode';
+import { FileT } from './SlateTypes';
 import './AttachmentModal.css';
 
 const AttachmentModal = ({

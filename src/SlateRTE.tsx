@@ -18,7 +18,8 @@ import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
 import FormatButton from './FormatButton';
 import ImageAdd from './ImageAdd';
-import { FileT, SlateNode, BaseElementProps, SlateLeafNode } from './SlateNode';
+import { FileT, SlateLeafNode } from './SlateTypes';
+import { SlateNode, BaseElementProps } from './SlateNode';
 import getBackgroundColor from './getBackgroundColor';
 import SlatePDF from './SlatePDF';
 import AsyncFileLoad from './AsyncFileLoad';
@@ -31,7 +32,7 @@ type LeafProps = {
   attributes: RenderLeafProps['attributes'], 
   children: JSX.Element,
   minimalFormatting: boolean,
-  leaf: SlateLeafNode,
+  leaf: SlateLeafNode<SlateNode>,
 };
 
 // default size in px for font-size of 1em

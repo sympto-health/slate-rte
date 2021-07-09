@@ -3,7 +3,8 @@ import { useSlate } from 'slate-react'
 import { Editor, Range, Transforms } from 'slate'
 import { TwitterPicker } from 'react-color';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
-import { SlateEditorT, BackgroundColorNode, convertSlateEditor } from './SlateNode';
+import { BackgroundColorNode } from './SlateTypes';
+import { SlateEditorT, SlateNode, convertSlateEditor } from './SlateNode';
 import FormatButton from './FormatButton';
 
 const ColorPicker = ({ type, icon }: { 
@@ -48,7 +49,7 @@ const toggleColor = (
 ) => {
   if (type === 'background-color') {
     const point = Editor.start(convertSlateEditor(editor), [0, 0])
-    const node: BackgroundColorNode = {
+    const node: BackgroundColorNode<SlateNode> = {
       type: 'background-color',
       color,
       text: null,

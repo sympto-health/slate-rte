@@ -2,7 +2,8 @@ import React, { useState } from 'react'
 import { Transforms, Range } from 'slate'
 import { useSlate,  ReactEditor } from 'slate-react'
 import { faImages, faVideo } from '@fortawesome/free-solid-svg-icons'
-import { ImageVideoNode, EmptySlateNode, convertSlateEditor, FileT } from './SlateNode';
+import { ImageVideoNode, EmptySlateNode, FileT } from './SlateTypes';
+import { convertSlateEditor, SlateNode } from './SlateNode';
 import FormatButton from './FormatButton';
 import AttachmentModal from './AttachmentModal';
 
@@ -43,10 +44,10 @@ const ImageAdd = ({ uploadFile, type }: {
 
 const insertFile = (type: 'image' | 'video', editor: ReactEditor, fileData: FileT, selection: Range | null) => {
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const file: ImageVideoNode = {
+  const file: ImageVideoNode<SlateNode> = {
     type,
     text: null,
-    children: [({ text: '' } as EmptySlateNode)],
+    children: [({ text: '' } as EmptySlateNode<SlateNode>)],
     ...(fileData.type === 'URL' 
        ? {
          url: fileData.url,

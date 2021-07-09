@@ -6,7 +6,8 @@ import {
 import _ from 'lodash';
 import { RenderLeafProps, RenderElementProps } from 'slate-react';
 import getBackgroundColor from './getBackgroundColor';
-import { SlateNode, BaseElementProps, BaseLeafProps, ASCIIColor } from './SlateNode';
+import { ASCIIColor } from './SlateTypes';
+import { SlateNode, BaseElementProps, BaseLeafProps } from './SlateNode';
 import AsyncFileLoad from './AsyncFileLoad';
 
 const DEFAULT_EM_SIZE = 16;
@@ -179,7 +180,9 @@ const SlateElement = ({
           <View style={{ width: '100%', height: '100%' }}>
             <AsyncFileLoad onFileLoad={onFileLoad} nodeData={element}>
               {({ url }) => (
-                <Image style={{ width: '50vw', objectFit: 'cover' }} src={url} />
+                <>
+                  <Image style={{ width: '100vw', objectFit: 'contain' }} src={url} />
+                </>
               )}
             </AsyncFileLoad>
           </View>
