@@ -3,6 +3,7 @@ import SlateRTE, { extractText, deserializeHTMLString, parseAsHTML, getBackgroun
 import { Card } from 'react-bootstrap';
 import uuid from 'uuid/v4';
 import swal from 'sweetalert';
+import _ from 'lodash';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PDFPreview from './PDFPreview';
 
@@ -158,7 +159,7 @@ const [value, setValue] = useState([
                 id: saveFileData(fileData),
               };
           }} 
-          value={value} 
+          value={_.cloneDeep(value)} 
           setValue={setValue} 
         />
       </Card>
@@ -166,13 +167,13 @@ const [value, setValue] = useState([
         Read Only
       </div>
       <Card className="m-3 shadow-sm">
-        <SlateRTE onFileLoad={onFileLoad} mode="Read-Only" value={value} setValue={setValue} />
+        <SlateRTE onFileLoad={onFileLoad} mode="Read-Only" value={value} />
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
         Editable with Adjusted Font Size
       </div>
       <Card className="m-3 shadow-sm">
-        <SlateRTE onFileLoad={onFileLoad} options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={setValue} />
+        <SlateRTE onFileLoad={onFileLoad} options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={_.cloneDeep(value)} />
       </Card>
       <div className="d-flex align-items-center w-100">
         <div className="w-100">
@@ -180,7 +181,7 @@ const [value, setValue] = useState([
             Minimal Read Only
           </div>
           <Card className="m-3 shadow-sm">
-            <SlateRTE onFileLoad={onFileLoad} mode="Minimal Read-Only" value={value} setValue={setValue} />
+            <SlateRTE onFileLoad={onFileLoad} mode="Minimal Read-Only" value={value} />
           </Card>
         </div>
         <div className="w-100">
@@ -209,7 +210,7 @@ const [value, setValue] = useState([
       </div>
       <code className="m-3 card p-4 shadow-sm">{htmlValue}</code>
       <Card className="m-3 shadow-sm">
-        <SlateRTE onFileLoad={onFileLoad} mode="Read-Only" value={deserializedValue} setValue={setValue} />
+        <SlateRTE onFileLoad={onFileLoad} mode="Read-Only" value={deserializedValue} />
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
         Slate Compared
