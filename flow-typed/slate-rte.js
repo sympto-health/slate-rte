@@ -104,6 +104,7 @@ declare module 'slate-rte' {
       // optional, defaults 1em = 16px
       defaultFontSizePx: number,
     },
+    variables: { [variableName: string]: string },
   };
 
   declare export function getBackgroundColor(
@@ -124,6 +125,7 @@ declare module 'slate-rte' {
 
   declare export function parseAsHTML(
     slateContent: Array<SlateNode>,
+    variables: { [variableName: string]: string },
   ): string;
 
   declare export default class SlateRTE extends React$Component<{|

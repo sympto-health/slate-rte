@@ -9,8 +9,8 @@ import './index.css';
 
 export { getBackgroundColor };
 
-export const parseAsHTML = (slateContent: SlateNode[]): string => (renderToStaticMarkup(
-    <SlateRTE mode="Read-Only" value={slateContent} setValue={() => {}} />
+export const parseAsHTML = (slateContent: SlateNode[], variables: { [variableName: string]: string }): string => (renderToStaticMarkup(
+    <SlateRTE variables={variables} mode="Read-Only" value={slateContent} setValue={() => {}} />
   ).replace(/data\-slate\-[^"]*="[^"]*"/g, ""));
 
 export const deserializeHTMLString = (htmlString: string) => {

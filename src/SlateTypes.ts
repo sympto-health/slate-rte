@@ -81,6 +81,11 @@ export type BackgroundColorNode<T> = ({
   color: string,
 } & T);
 
+export type VariableNode<T> = ({
+  type: 'variable',
+  variableName: string,
+} & T);
+
 export type SlateElementNode<T> = (
   {
     type: 'block-quote' 
@@ -97,6 +102,7 @@ export type SlateElementNode<T> = (
   | LinkNode<T>
   | ImageVideoNode<T> 
   | BackgroundColorNode<T>
+  | VariableNode<T>
   | ({
     noPadding?: boolean;
     type: undefined,

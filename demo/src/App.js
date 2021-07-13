@@ -96,6 +96,11 @@ const [value, setValue] = useState([
     }
   })();
   const onFileLoad = async ({ id }) => ({ url: fileMapping[id] });
+  const variables = {
+    'variableA': '2',
+    'foo': '3',
+    'bar': '4',
+  };
   return (
     <div className="bg-light h-100 p-4 pb-5">
       <div 
@@ -112,6 +117,7 @@ const [value, setValue] = useState([
         <SlateRTE 
           mode="Edit"
           onFileLoad={onFileLoad}
+          variables={variables}
           toolbarClassName="w-50"
           uploadFile={async (file, progress) => {
 
@@ -167,13 +173,13 @@ const [value, setValue] = useState([
         Read Only
       </div>
       <Card className="m-3 shadow-sm">
-        <SlateRTE onFileLoad={onFileLoad} mode="Read-Only" value={value} />
+        <SlateRTE variables={variables} onFileLoad={onFileLoad} mode="Read-Only" value={value} />
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
         Editable with Adjusted Font Size
       </div>
       <Card className="m-3 shadow-sm">
-        <SlateRTE onFileLoad={onFileLoad} options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={_.cloneDeep(value)} />
+        <SlateRTE variables={variables} onFileLoad={onFileLoad} options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={_.cloneDeep(value)} />
       </Card>
       <div className="d-flex align-items-center w-100">
         <div className="w-100">
@@ -181,14 +187,14 @@ const [value, setValue] = useState([
             Minimal Read Only
           </div>
           <Card className="m-3 shadow-sm">
-            <SlateRTE onFileLoad={onFileLoad} mode="Minimal Read-Only" value={value} />
+            <SlateRTE variables={variables} onFileLoad={onFileLoad} mode="Minimal Read-Only" value={value} />
           </Card>
         </div>
         <div className="w-100">
           <div className="m-3 text-large text-center font-weight-light">
             Minimal PDF
           </div>
-          <PDFPreview onFileLoad={onFileLoad} value={value} mode="Minimal PDF" />
+          <PDFPreview variables={variables} onFileLoad={onFileLoad} value={value} mode="Minimal PDF" />
         </div>
       </div>
       <div className="d-flex align-items-center w-100">
@@ -196,13 +202,13 @@ const [value, setValue] = useState([
           <div className="m-3 text-large text-center font-weight-light">
             PDF
           </div>
-          <PDFPreview onFileLoad={onFileLoad} value={value} mode="PDF" />
+          <PDFPreview variables={variables} onFileLoad={onFileLoad} value={value} mode="PDF" />
         </div>
         <div className="w-100">
           <div className="m-3 text-large text-center font-weight-light">
             PDF (adjusted Font size)
           </div>
-          <PDFPreview onFileLoad={onFileLoad} defaultFontSize={30} value={value} mode="PDF" />
+          <PDFPreview variables={variables} onFileLoad={onFileLoad} defaultFontSize={30} value={value} mode="PDF" />
         </div>
       </div>
       <div className="m-3 text-large text-center font-weight-light">
@@ -210,7 +216,7 @@ const [value, setValue] = useState([
       </div>
       <code className="m-3 card p-4 shadow-sm">{htmlValue}</code>
       <Card className="m-3 shadow-sm">
-        <SlateRTE onFileLoad={onFileLoad} mode="Read-Only" value={deserializedValue} />
+        <SlateRTE variables={variables} onFileLoad={onFileLoad} mode="Read-Only" value={deserializedValue} />
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
         Slate Compared

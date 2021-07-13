@@ -38,14 +38,14 @@ Font.register({
 });
 
 const PDFPreview = ({ 
-  defaultFontSize, value, mode, onFileLoad,
+  defaultFontSize, value, mode, onFileLoad, variables,
 }) => (
   <Card className="m-3 shadow-sm">
     <PDFViewer>
       <Document>
         <Page style={{ fontFamily: 'Nunito' }}>
           <View style={{ padding: 10 }}> 
-            <SlateRTE onFileLoad={onFileLoad} options={{ defaultFontSizePx: defaultFontSize || 20 }} mode={mode} value={value} />
+            <SlateRTE variables={variables} onFileLoad={onFileLoad} options={{ defaultFontSizePx: defaultFontSize || 20 }} mode={mode} value={value} />
           </View>
         </Page>
       </Document>

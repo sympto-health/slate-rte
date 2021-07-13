@@ -191,6 +191,13 @@ const SlateElement = ({
       )
     case 'background-color':
       return (<View style={{ backgroundColor: element.color }} />);
+    case 'variable':
+      return (
+        <Text>
+          {`\{${element.variableName}\}`}
+          {children}
+        </Text>
+      );   
     default:
       return (
         <Text 

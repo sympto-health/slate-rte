@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useRef } from 'react'
 import { withHistory } from 'slate-history'
 import { 
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
@@ -17,6 +17,7 @@ import { withLinks, LinkButton } from './Links';
 import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
 import FormatButton from './FormatButton';
+import VariableSuggestions, { withVariables } from './Variables';
 import ImageAdd, { withImages } from './ImageAdd';
 import { FileT, SlateLeafNode } from './SlateTypes';
 import { SlateNode, BaseElementProps } from './SlateNode';
@@ -45,7 +46,7 @@ const DEFAULT_EM_SIZE = 16;
       no text colors (background color becomes text color if applicable)
  */
 const SlateRTE = ({ 
-  value, setValue, mode, uploadFile, toolbarClassName, className, inputClassName, options, onFileLoad,
+  value, setValue, mode, uploadFile, toolbarClassName, className, variables, inputClassName, options, onFileLoad,
 }: {
   value: SlateNode[],
   setValue:(value: SlateNode[]) => void,
@@ -55,6 +56,8 @@ const SlateRTE = ({
   onFileLoad?: (opts: { id: string }) => Promise<{ url: string }>,
   className?: string,
   inputClassName?: string,
+  // mapping of variable to variable value
+  variables: { [variableName: string]: string },
   options?: {
     // effectively specifies what 1em is equal to, based on the font-size
     // optional, defaults 1em = 16px
@@ -62,7 +65,7 @@ const SlateRTE = ({
   },
 }) => {
   // @ts-ignore
-  const editor: ReactEditor = useMemo(() => withImages(withLinks(withHistory(withReact(createEditor())))), [])
+  const editor: ReactEditor = useMemo(() => withVariables(withImages(withLinks(withHistory(withReact(createEditor()))))), [])
   const backgroundColor = getBackgroundColor(value);
   const calculateColorStyles = () => {
     if (backgroundColor == null) return {};
@@ -70,7 +73,6 @@ const SlateRTE = ({
     return { backgroundColor };
   };
   const [showAllOptions, setShowAllOptions] = useState(false);
-
   if (mode === 'PDF' || mode === 'Minimal PDF') {
     return (
       <SlatePDF 
@@ -81,16 +83,18 @@ const SlateRTE = ({
       />
     );
   }
+  const slateEditor = useRef<HTMLDivElement | null>(null)
   return (
     <div 
       className={cx(
-        'SlateRTE d-flex flex-column justify-content-start text-left',
+        'SlateRTE d-flex flex-column justify-content-start text-left position-relative',
         {
           'read-only': mode === 'Read-Only' || mode === 'Minimal Read-Only',
           'p-3': mode !== 'Minimal Read-Only',
         },
         className,
       )}
+      ref={slateEditor}
       style={{
         ...calculateColorStyles(),
         fontSize: options ? `${DEFAULT_EM_SIZE / options.defaultFontSizePx}em` : '1em',
@@ -121,6 +125,16 @@ const SlateRTE = ({
               onClick={() => {
                 setShowAllOptions((curOption) => !curOption);
               }}
+            />
+            <VariableSuggestions 
+              boundingBox={slateEditor.current 
+                ? { 
+                  top: slateEditor.current.getBoundingClientRect().top, 
+                  left: slateEditor.current.getBoundingClientRect().left,
+                } 
+                : { top: 0, left: 0 }} 
+              variables={_.keys(variables)}
+              value={value} 
             />
             { showAllOptions && (
               <>
@@ -163,7 +177,7 @@ const SlateRTE = ({
               {...(props as LeafProps)}
               minimalFormatting={mode === 'Minimal Read-Only'} 
             />
-           )}         
+           )}     
           placeholder="Enter some rich text…"
           spellCheck
           className={inputClassName}
@@ -220,6 +234,17 @@ const Element = ({
         <a target="_blank" {...attributes} href={element.url}>
           {children}
         </a>
+      );
+    case 'variable':
+      return (
+        <span
+          {...attributes}
+          contentEditable={false}
+          className={cx('border', {'shadow-sm': selected && focused })}
+        >
+          {`\{${element.variableName}\}`}
+          {children}
+        </span>
       );
     case 'image':
       return (
