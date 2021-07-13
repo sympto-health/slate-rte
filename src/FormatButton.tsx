@@ -4,36 +4,51 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
-import { Button } from 'react-bootstrap'
+import { Button, Dropdown } from 'react-bootstrap'
+import styled from 'styled-components'
 import './FormatButton.css'
 
-const FormatButton = ({ icon, isActive, onClick, className, itemColor }: {
+const StyledDropdownToggle = styled(Dropdown.Toggle)`
+  ::after {
+    display: none;
+  }
+`;
+
+const FormatButton = ({ icon, isActive, onClick, className, itemColor, type }: {
   icon: IconDefinition,
   isActive: boolean,
   className?: string,
   itemColor?: null | string, // color of item (overrides default colors)
-  onClick: () => void,
-}) => (
-  <Button 
-    variant="link"
-    style={itemColor ? { color: itemColor } : {}}
-    className={cx(className, 'SlateRTE-button mx-1', {
-      'text-dark': !isActive && itemColor == null,
-      'text-primary': isActive && itemColor == null,
-    })}
-    onMouseDown={event => {
-      event.preventDefault()
-      onClick();
-    }}
-  >
-    <FontAwesomeIcon icon={icon} />
-  </Button>
-);
+  onClick?: null | (() => void),
+  type: 'button' | 'dropdown',
+}) => {
+  const ComponentItem = type === 'button' ? Button : StyledDropdownToggle;
+  return (
+    // @ts-ignore
+    <ComponentItem 
+      style={itemColor ? { color: itemColor } : {}}
+      className={cx(className, 'SlateRTE-button mx-1', {
+        'text-dark': !isActive && itemColor == null,
+        'text-primary': isActive && itemColor == null,
+      })}
+      onClick={() => {
+        if (onClick) {
+          onClick();
+        }
+      }}
+      variant="link"
+    >
+      <FontAwesomeIcon icon={icon} />
+    </ComponentItem>
+  );
+};
 
 FormatButton.defaultProps = {
   className: '',
   style: {},
   itemColor: null,
+  type: 'button',
+  onClick: null,
 };
 
 export default FormatButton

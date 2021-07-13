@@ -47,7 +47,7 @@ const insertFile = (type: 'image' | 'video', editor: ReactEditor, fileData: File
   const file: ImageVideoNode<SlateNode> = {
     type,
     text: null,
-    children: [({ text: '' } as EmptySlateNode<SlateNode>)],
+    children: [({ text: ' ' } as EmptySlateNode<SlateNode>)],
     ...(fileData.type === 'URL' 
        ? {
          url: fileData.url,

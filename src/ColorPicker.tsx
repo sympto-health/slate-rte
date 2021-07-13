@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useSlate } from 'slate-react'
 import { Editor, Range, Transforms } from 'slate'
 import { TwitterPicker } from 'react-color';
+import { Dropdown } from 'react-bootstrap';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { BackgroundColorNode } from './SlateTypes';
 import { SlateEditorT, SlateNode, convertSlateEditor } from './SlateNode';
@@ -15,28 +16,48 @@ const ColorPicker = ({ type, icon }: {
   const [showColorPicker, setColorPicker] = useState(false);
   const [selectedText, setSelectedText] = useState<Range | null>(null);
   const currentColor = getActiveColor(editor, type);
+
   return (
-    <>
+    <Dropdown
+      show={showColorPicker}
+      onToggle={() => {
+        setColorPicker(!showColorPicker);
+      }}
+      className="d-flex"
+    >
       <FormatButton 
         isActive={currentColor != null}
         icon={icon}
+        type="dropdown"
         itemColor={currentColor}
         onClick={() => {
           setSelectedText(editor.selection);
           setColorPicker(true);
         }}
       />
-      {
-        showColorPicker && (
+      <Dropdown.Menu
+        className="bg-transparent border-0"
+        popperConfig={{
+          modifiers: [{
+            name: 'preventOverflow',
+          }, {
+            name: 'arrow',
+            options: {
+              padding: 5, // 5px from the edges of the popper
+            },
+          }],
+        }}
+      >
+        <Dropdown.Item className="bg-transparent border-0">
           <TwitterPicker 
             onChange={({ hex: newColor }) => { 
               toggleColor(editor, selectedText, newColor, type); 
               setColorPicker(false);
             }} 
           />
-        )
-      }
-    </>
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
   );
 }
 
