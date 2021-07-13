@@ -3,6 +3,7 @@ import { useSlate } from 'slate-react'
 import { Editor, Range, Transforms } from 'slate'
 import { TwitterPicker } from 'react-color';
 import { Dropdown } from 'react-bootstrap';
+import cx from 'classnames';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { BackgroundColorNode } from './SlateTypes';
 import { SlateEditorT, SlateNode, convertSlateEditor } from './SlateNode';
@@ -20,19 +21,17 @@ const ColorPicker = ({ type, icon }: {
   return (
     <Dropdown
       show={showColorPicker}
-      onToggle={() => {
-        setColorPicker(!showColorPicker);
-      }}
       className="d-flex"
     >
       <FormatButton 
         isActive={currentColor != null}
         icon={icon}
         type="dropdown"
+        className={cx({ 'border border-primary': showColorPicker })}
         itemColor={currentColor}
         onClick={() => {
           setSelectedText(editor.selection);
-          setColorPicker(true);
+          setColorPicker(!showColorPicker);
         }}
       />
       <Dropdown.Menu
