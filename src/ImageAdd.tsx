@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Transforms, Range } from 'slate'
+import { Transforms, Editor, Path, Node } from 'slate'
 import { useSlate,  ReactEditor } from 'slate-react'
 import { faImages, faVideo } from '@fortawesome/free-solid-svg-icons'
 import { ImageVideoNode, EmptySlateNode, FileT } from './SlateTypes';
-import { convertSlateEditor, SlateNode } from './SlateNode';
+import { SlateNode, SlateEditorT } from './SlateNode';
 import FormatButton from './FormatButton';
 import AttachmentModal from './AttachmentModal';
 
@@ -14,7 +14,48 @@ const ImageAdd = ({ uploadFile, type }: {
   // @ts-ignore
   const editor: ReactEditor = useSlate();
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
-  const [selection, setSelection] = useState<Range | null>(null);
+
+  const insertFile = (fileData: FileT) => {
+    const { selection } = editor;
+    const file: ImageVideoNode<SlateNode> = {
+      type,
+      text: null,
+      children: [({ text: ' ' } as EmptySlateNode<SlateNode>)],
+      ...(fileData.type === 'URL' 
+         ? {
+           url: fileData.url,
+         }
+         : { 
+           fileData,
+          })
+    };
+    ReactEditor.focus(editor);
+
+    if (!!selection) {
+      const [parentNode, parentPath] = Editor.parent(
+        editor,
+        selection.focus?.path
+      );
+
+      if (editor.isVoid(parentNode) || Node.string(parentNode).length) {
+        // Insert the new image node after the void node or a node with content
+        Transforms.insertNodes(editor, file, {
+          at: Path.next(parentPath),
+          select: true
+        });
+      } else {
+        // If the node is empty, replace it instead
+        Transforms.removeNodes(editor, { at: parentPath });
+        Transforms.insertNodes(editor, file, { at: parentPath, select: true });
+      }
+    } else {
+      // Insert the new image node at the bottom of the Editor when selection
+      // is falsey
+      Transforms.insertNodes(editor, file, { select: true });
+    }
+  };
+
+
   return (
     <>
       {
@@ -24,8 +65,7 @@ const ImageAdd = ({ uploadFile, type }: {
             onUpload={uploadFile}
             type={type}
             onFinish={(url) => { 
-              insertFile(type, editor, url, selection)
-              setSelection(null)
+              insertFile(url)
             }}
           />
         )
@@ -34,7 +74,6 @@ const ImageAdd = ({ uploadFile, type }: {
         isActive={false}
         icon={type === 'image' ? faImages : faVideo}
         onClick={async () => {
-          setSelection(editor.selection);
           setShowAttachmentModal(true);
         }}
       />
@@ -42,30 +81,17 @@ const ImageAdd = ({ uploadFile, type }: {
   );
 }
 
-const insertFile = (type: 'image' | 'video', editor: ReactEditor, fileData: FileT, selection: Range | null) => {
-  const isCollapsed = selection && Range.isCollapsed(selection)
-  const file: ImageVideoNode<SlateNode> = {
-    type,
-    text: null,
-    children: [({ text: ' ' } as EmptySlateNode<SlateNode>)],
-    ...(fileData.type === 'URL' 
-       ? {
-         url: fileData.url,
-       }
-       : { 
-         fileData,
-        })
-  };
 
-  if (isCollapsed) {
+
+export const withImages = (editor: SlateEditorT) => {
+  const { isVoid } = editor;
+
+  // @ts-ignore
+  editor.isVoid = (element: SlateNode) =>
     // @ts-ignore
-    Transforms.insertNodes(convertSlateEditor(editor), file)
-  } else {
-    // @ts-ignore
-    Transforms.wrapNodes(convertSlateEditor(editor), file, { split: true })
-    // @ts-ignore
-    Transforms.collapse(convertSlateEditor(editor), { edge: 'end' })
-  }
+    element.type === "image" ? true : isVoid(element);
+
+  return editor;
 };
 
 export default ImageAdd

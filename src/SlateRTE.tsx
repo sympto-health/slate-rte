@@ -10,14 +10,14 @@ import cx from 'classnames';
 import { isSafari, isIOS } from 'react-device-detect';
 import { createEditor } from 'slate';
 import _ from 'lodash';
-import { Editable, ReactEditor, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react';
+import { useSelected, useFocused, Editable, ReactEditor, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react';
 import ColorPicker from './ColorPicker';
 import FontFormatter from './FontFormatter';
 import { withLinks, LinkButton } from './Links';
 import FormatMark, { MarkFormats, HotKeyHandler } from './FormatMark';
 import FormatBlock, { BlockFormats } from './FormatBlock';
 import FormatButton from './FormatButton';
-import ImageAdd from './ImageAdd';
+import ImageAdd, { withImages } from './ImageAdd';
 import { FileT, SlateLeafNode } from './SlateTypes';
 import { SlateNode, BaseElementProps } from './SlateNode';
 import getBackgroundColor from './getBackgroundColor';
@@ -62,7 +62,7 @@ const SlateRTE = ({
   },
 }) => {
   // @ts-ignore
-  const editor: ReactEditor = useMemo(() => withLinks(withHistory(withReact(createEditor()))), [])
+  const editor: ReactEditor = useMemo(() => withImages(withLinks(withHistory(withReact(createEditor())))), [])
   const backgroundColor = getBackgroundColor(value);
   const calculateColorStyles = () => {
     if (backgroundColor == null) return {};
@@ -179,6 +179,8 @@ const SlateRTE = ({
 const Element = ({ 
   attributes, children, element, minimalFormatting, onFileLoad,
 }: ElementProps) => {
+  const selected = useSelected();
+  const focused = useFocused();
   switch (element.type) {
     case 'block-quote': 
       return (<blockquote {...attributes}>{children}</blockquote>);
@@ -221,11 +223,14 @@ const Element = ({
       );
     case 'image':
       return (
-        <div className="d-inline-block" {...attributes}>
-          <div className="d-inline-block" contentEditable={false}>
+        <div
+          {...attributes}
+          className={cx('d-inline-block', { 'shadow-sm': selected && focused })}
+        >
+          <div contentEditable={false}>
             <AsyncFileLoad nodeData={element} onFileLoad={onFileLoad}> 
               {({ url }) => (
-                <img alt="Uploaded Image" src={url} className="image-item" />
+                <img alt="Uploaded Image" src={url} className="image-item d-inline-block" />
               )}
             </AsyncFileLoad>
           </div>
