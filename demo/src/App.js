@@ -78,9 +78,14 @@ const [value, setValue] = useState([
     }
   ]);
   const [fileMapping, setFileMapping] = useState({});
+  const variables = {
+    'variableA': '2',
+    'foo': '3',
+    'bar': '4',
+  };
   const htmlValue = (() => {
     try {
-      return parseAsHTML(value)
+      return parseAsHTML(value, variables)
     } catch (e) {
       console.log(e);
       return '';
@@ -96,11 +101,6 @@ const [value, setValue] = useState([
     }
   })();
   const onFileLoad = async ({ id }) => ({ url: fileMapping[id] });
-  const variables = {
-    'variableA': '2',
-    'foo': '3',
-    'bar': '4',
-  };
   return (
     <div className="bg-light h-100 p-4 pb-5">
       <div 
@@ -109,7 +109,7 @@ const [value, setValue] = useState([
           backgroundColor: getBackgroundColor(value),
         }} 
       />
-      <div>{extractText(value)}</div>
+      <div>{extractText(value, variables)}</div>
       <div className="m-3 text-large text-center font-weight-light">
         Editable
       </div>

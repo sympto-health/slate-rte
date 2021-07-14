@@ -1,41 +1,64 @@
-import React, { useState, useEffect } from 'react'
-import { Transforms, Range, Editor } from 'slate'
-import { useSlate, ReactEditor } from 'slate-react'
-import { SlateNode, SlateEditorT } from './SlateNode';
+import React, { useState, useEffect } from 'react';
+import { Transforms, Range, Editor } from 'slate';
+import { useSlate, ReactEditor } from 'slate-react';
+import { Button } from 'react-bootstrap';
+import { SlateNode, SlateEditorT, convertSlateEditor } from './SlateNode';
 import { VariableNode } from './SlateTypes';
 
-export const withVariables = (editor: SlateEditorT) => {
-  const { isInline, isVoid } = editor
-
-  // @ts-ignore
-  editor.isInline = (element: SlateNode) => {
-    // @ts-ignore
-    return element.type === 'variable' ? true : isInline(element)
+export const withVariables = (isReadOnly: boolean) => ((editor: SlateEditorT) => {
+  if (isReadOnly) {
+    // if read only, then show variable children, sicne variable element contains 
+    // a child containing a leaf with a variableName
+    return editor;
   }
-
-  // @ts-ignore
-  editor.isVoid = (element: SlateNode) => {
+  const { isInline, isVoid } = editor;
+    
+  if (!isReadOnly) {
     // @ts-ignore
-    return element.type === 'variable' ? true : isVoid(element)
+    editor.isInline = (element: SlateNode) => {
+      // @ts-ignore
+      return element.type === 'variable' ? true : isInline(element)
+    }
+    // @ts-ignore
+    editor.isVoid = (element: SlateNode) => {
+      // @ts-ignore
+      return element.type === 'variable' ? true : isVoid(element)
+    };
   }
-
+   
   return editor
-}
+});
 
 
-// TEMPORARY export
-export const insertVariable = (editor: SlateEditorT, variableName: string) => {
+const insertVariable = (editor: SlateEditorT, variableName: string, target: Range) => {
+  // leaf node being replaced 
+  const [node] = Editor.node(editor, target);
+
+  const { selection } = editor
+  const isCollapsed = selection && Range.isCollapsed(selection)
   // @ts-ignore
-  const mention: VariableNode = {
+  const children: SlateNode[] = [{ ...node, text: '', variable: { variableName }, children: undefined }];
+
+  const mention: VariableNode<SlateNode> = {
     type: 'variable',
     variableName,
-    children: [{ text: '' }],
-  }
-  Transforms.insertNodes(editor, mention)
-  Transforms.move(editor)
-}
+    children,
+    text: null,
+  };
 
-const chars = ['omg'];
+  Transforms.select(editor, target);
+
+  if (isCollapsed) {
+    // @ts-ignore
+    Transforms.insertNodes(convertSlateEditor(editor), mention)
+  } else {
+    // @ts-ignore
+    Transforms.wrapNodes(convertSlateEditor(editor), mention, { split: true })
+    Transforms.collapse(convertSlateEditor(editor), { edge: 'end' })
+  }
+  Transforms.move(editor);
+};
+
 
 // https://github.com/ianstormtaylor/slate/blob/main/site/examples/mentions.tsx
 const VariableSuggestions = ({
@@ -55,9 +78,8 @@ const VariableSuggestions = ({
 
   const { selection } = editor;
   const [suggestionsDivStyle, setSuggestionsDivStyle] = useState({});
-
   useEffect(() => {
-    if (target && chars.length > 0) {
+    if (target) {
       const domRange = ReactEditor.toDOMRange(editor, target);
       const rect = domRange.getBoundingClientRect();
       setSuggestionsDivStyle({
@@ -65,7 +87,7 @@ const VariableSuggestions = ({
         left: `${rect.left - boundingBox.left}px`,
       });    
     }
-  }, [chars.length, editor, index, search, target])
+  }, [editor, index, search, target])
 
   useEffect(() => {
     if (selection && Range.isCollapsed(selection)) {
@@ -81,10 +103,10 @@ const VariableSuggestions = ({
       const afterMatch = afterText.match(/^(\s|$)/)
 
       if (beforeMatch && afterMatch) {
-        setTarget(beforeRange)
-        setSearch(beforeMatch[1])
-        setIndex(0)
-        return
+        setTarget(beforeRange);
+        setSearch(beforeMatch[1]);
+        setIndex(0);
+        return;
       } 
     }
 
@@ -106,17 +128,21 @@ const VariableSuggestions = ({
             boxShadow: '0 1px 5px rgba(0,0,0,.2)',
             ...suggestionsDivStyle,
           }}
+          className="d-flex flex-column"
         >
           {variables.map(variable => (
-            <div
+            <Button
               key={variable}
               style={{
                 padding: '1px 3px',
                 borderRadius: '3px',
               }}
+              variant="link"
+              className="py-2 border-bottom"
+              onClick={() => { insertVariable(editor, variable, target); }}
             >
               {variable}
-            </div>
+            </Button>
           ))}
         </div>
       )}

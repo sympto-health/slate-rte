@@ -64,9 +64,7 @@ const ImageAdd = ({ uploadFile, type }: {
             closeModal={() => { setShowAttachmentModal(false); }}
             onUpload={uploadFile}
             type={type}
-            onFinish={(url) => { 
-              insertFile(url)
-            }}
+            onFinish={insertFile}
           />
         )
       }

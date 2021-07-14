@@ -27,6 +27,8 @@ import AsyncFileLoad from './AsyncFileLoad';
 
 type ElementProps = { 
   attributes: RenderElementProps['attributes'], 
+  isReadOnly: boolean,
+  variables: { [variableName: string]: string },
 } & BaseElementProps;
 
 type LeafProps = {
@@ -34,6 +36,7 @@ type LeafProps = {
   children: JSX.Element,
   minimalFormatting: boolean,
   leaf: SlateLeafNode<SlateNode>,
+  variables: { [variableName: string]: string },
 };
 
 // default size in px for font-size of 1em
@@ -64,8 +67,9 @@ const SlateRTE = ({
     defaultFontSizePx: number, 
   },
 }) => {
+  const readOnlyMode = mode === 'Read-Only' || mode === 'Minimal Read-Only';
   // @ts-ignore
-  const editor: ReactEditor = useMemo(() => withVariables(withImages(withLinks(withHistory(withReact(createEditor()))))), [])
+  const editor: ReactEditor = useMemo(() => withVariables(readOnlyMode)(withImages(withLinks(withHistory(withReact(createEditor()))))), [])
   const backgroundColor = getBackgroundColor(value);
   const calculateColorStyles = () => {
     if (backgroundColor == null) return {};
@@ -79,6 +83,7 @@ const SlateRTE = ({
         options={options} 
         minimalFormatting={mode === 'Minimal PDF'} 
         value={value} 
+        variables={variables}
         onFileLoad={onFileLoad}
       />
     );
@@ -169,12 +174,14 @@ const SlateRTE = ({
             <Element 
               {...(props as ElementProps)}
               onFileLoad={onFileLoad}
+              isReadOnly={mode === 'Read-Only' || mode === 'Minimal Read-Only'}
               minimalFormatting={mode === 'Minimal Read-Only'}
             />
           )}
           renderLeaf={(props: any) => (
             <Leaf 
               {...(props as LeafProps)}
+              variables={variables}
               minimalFormatting={mode === 'Minimal Read-Only'} 
             />
            )}     
@@ -190,9 +197,10 @@ const SlateRTE = ({
 }
 
 
-const Element = ({ 
-  attributes, children, element, minimalFormatting, onFileLoad,
-}: ElementProps) => {
+const Element = (props: ElementProps) => {
+  const { 
+    attributes, children, element, minimalFormatting, onFileLoad, isReadOnly, 
+  } = props;
   const selected = useSelected();
   const focused = useFocused();
   switch (element.type) {
@@ -234,17 +242,6 @@ const Element = ({
         <a target="_blank" {...attributes} href={element.url}>
           {children}
         </a>
-      );
-    case 'variable':
-      return (
-        <span
-          {...attributes}
-          contentEditable={false}
-          className={cx('border', {'shadow-sm': selected && focused })}
-        >
-          {`\{${element.variableName}\}`}
-          {children}
-        </span>
       );
     case 'image':
       return (
@@ -294,49 +291,68 @@ const Element = ({
       );
     case 'background-color':
       return (<div style={{ backgroundColor: String(element.color) }} />);
+    case 'variable':
+      return isReadOnly
+        ? (
+          <span
+            {...attributes}
+            className="d-inline-block"
+            contentEditable={false}
+          >
+            {children}
+          </span>
+        )
+        : (
+          <span
+            {...attributes}
+            contentEditable={false}
+            className={cx('border', {'shadow-sm': selected && focused })}
+          >
+            {`\{${element.variableName}\}`}
+            {children}
+          </span>
+        );
     default: 
-      return <div style={element.noPadding ? { paddingBottom: '0.01rem' } : { paddingBottom: '1rem' }} {...attributes}>{children}</div>
-  }
+      return <div style={element.noPadding ? { paddingBottom: '0.01rem' } : { paddingBottom: '1rem' }} {...attributes}>{children}</div>  }
 }
 
 const Leaf = ({ 
-  attributes, children, leaf, minimalFormatting,
+  attributes, children, leaf, minimalFormatting, variables
 }: LeafProps) => {
-  if (leaf.bold) {
-    children = <span style= {{ fontWeight: 700 }}>{children}</span>
-  }
+    // if variable type leaf, then child must include variable name
+  const baseChild: JSX.Element = (
+    <>
+      {_.compact([
+        leaf.variable ? variables[leaf.variable.variableName] : null,
+        children,
+      ])}
+    </>
+  );
 
-  if (leaf.code) {
-    children = <code>{children}</code>
-  }
+  const styleFuncs = [
+    (child: JSX.Element): JSX.Element => (leaf.bold ? <span style= {{ fontWeight: 700 }}>{child}</span> : child),
+    (child: JSX.Element): JSX.Element => (leaf.code ? <code>{child}</code> : child),
+    (child: JSX.Element): JSX.Element => (leaf.italic ? <em>{child}</em> : child),
+    (child: JSX.Element): JSX.Element => (leaf.underline ? <u>{child}</u> : child),
+    (child: JSX.Element): JSX.Element => (leaf['font-size'] 
+      // note that em is relative, so base em size will still be relevant here
+      ? <span style={{ fontSize: `${leaf['font-size'].value / DEFAULT_EM_SIZE}em` }} >{child}</span>
+      : child),
+    (child: JSX.Element): JSX.Element => (leaf['font-weight'] 
+      ?  <span style={{ fontWeight: leaf['font-weight'].value }} >{child}</span>
+      : child),
+    (child: JSX.Element): JSX.Element => (leaf['text-color'] && !minimalFormatting
+      ?  <span style={{ color: leaf['text-color'].color }} >{child}</span>
+      // if text color not set, or minimial formatting (dont include font color), just return child ofc
+      : child),
+    (child: JSX.Element): JSX.Element => (leaf['highlight-color'] 
+      ?  <span style={{ backgroundColor: leaf['highlight-color'].color }} >{child}</span>
+      : child),
+  ];
 
-  if (leaf.italic) {
-    children = <em>{children}</em>
-  }
+  const finalChildComponent = styleFuncs.reduce((finalChild, styleFunc) => (styleFunc(finalChild)), baseChild)
 
-  if (leaf.underline) {
-    children = <u>{children}</u>
-  }
-  if (leaf['font-size']) {
-    const { value: fontSize } = leaf['font-size'];
-    // note that em is relative, so base em size will still be relevant here
-    children = <span style={{ fontSize: `${fontSize / DEFAULT_EM_SIZE}em` }} >{children}</span>
-  }
-  if (leaf['font-weight']) {
-    const { value: fontWeight } = leaf['font-weight'];
-    children = <span style={{ fontWeight }} >{children}</span>
-  }
-  if (leaf['text-color']) {
-    const { color } = leaf['text-color'];
-    children = minimalFormatting ? children : (<span style={{ color }} >{children}</span>)
-  }
-  if (leaf['highlight-color']) {
-    const highlightBackgroundColor = leaf['highlight-color'].color;
-    children = <span style={{ backgroundColor: highlightBackgroundColor }} >{children}</span>
-  }
-
-
-  return <span {...attributes}>{children}</span>
+  return <span {...attributes}>{finalChildComponent}</span>
 }
 
 export default SlateRTE;

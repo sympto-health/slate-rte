@@ -26,6 +26,9 @@ declare module 'slate-rte' {
     'highlight-color': {
       color: ASCIIColor,
     },
+    variable: {
+      variableName: string,
+    },
   };
 
 
@@ -39,6 +42,7 @@ declare module 'slate-rte' {
     'font-weight'?: $PropertyType<LeafStyles, 'font-weight'>,
     'text-color'?: $PropertyType<LeafStyles, 'text-color'>,
     'highlight-color'?: $PropertyType<LeafStyles, 'highlight-color'>,
+    variable?: $PropertyType<LeafStyles, 'variableName'>,
     ...BaseNode,
   };
 
@@ -113,10 +117,12 @@ declare module 'slate-rte' {
 
   declare export function isEmpty(
     null | Array<SlateNode>,
+    variables: { [variableName: string]: string },
   ): boolean;
 
   declare export function extractText(
     null | Array<SlateNode>,
+    variables: { [variableName: string]: string },
   ): string;
 
   declare export function deserializeHTMLString(

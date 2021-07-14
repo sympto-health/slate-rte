@@ -25,7 +25,7 @@ const FormatButton = ({ icon, isActive, onClick, className, itemColor, type }: {
   const ComponentItem = type === 'button' ? Button : StyledDropdownToggle;
   return (
     // @ts-ignore
-    <ComponentItem 
+    <ComponentItem
       style={itemColor ? { color: itemColor } : {}}
       className={cx(className, 'SlateRTE-button mx-1', {
         'text-dark': !isActive && itemColor == null,

@@ -18,6 +18,10 @@ type LeafStyles = {
   'highlight-color': {
     color: ASCIIColor,
   },
+  // only a leaf as a child for a variable item
+  variable: {
+    variableName: string,
+  },
 };
 
 
@@ -31,6 +35,7 @@ type BaseLeafNode<T> = {
   'font-weight': undefined,
   'text-color': undefined,
   'highlight-color': undefined,
+  'variable': undefined,
 } & T;
 
 export type FileT = { type: 'URL', url: string } | { type: 'Image ID', id: string };
@@ -58,6 +63,9 @@ export type SlateLeafNode<T> = (
   | ({
     'text-color': LeafStyles['text-color'],
   } & Omit<BaseLeafNode<T>, 'text-color'>)
+  | ({
+    variable: LeafStyles['variable'],
+  } & Omit<BaseLeafNode<T>, 'variable'>)
   | ({
     'highlight-color': LeafStyles['highlight-color'],
   } & Omit<BaseLeafNode<T>, 'highlight-color'>)

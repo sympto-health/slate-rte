@@ -51,7 +51,7 @@ const FileUpload = ({
       <div className={cx('file-children', { 'd-none': isDragActive })}>
         <div className="border p-4 attachment-upload-modal text-center text-large font-weight-light">
           {`Drag or click here to upload an ${type}.`}
-        </div>     
+        </div>
       </div>
       {
         rejectFiles.length === 0 && isDragActive && (

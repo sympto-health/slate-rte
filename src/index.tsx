@@ -20,12 +20,13 @@ export const deserializeHTMLString = (htmlString: string) => {
 
 // iterates through every single slate item and children and stringifies everything by extracting
 // all teh text
-export const extractText = (slateContent: null | SlateNode[]): string => (_.compact(_.flatten((slateContent || [])
+export const extractText = (slateContent: null | SlateNode[], variables: { [variableName: string]: string }): string => (_.compact(_.flatten((slateContent || [])
   .map((contentItem: SlateNode) => ([
     (contentItem.text ? String(contentItem.text) : ' '),
-    ...(contentItem.children ? extractText((contentItem.children as null | SlateNode[])) : []),
+    (contentItem.type === 'variable' ? variables[contentItem.variableName] : ''),
+    ...(contentItem.children ? extractText((contentItem.children as null | SlateNode[]), variables) : []),
   ]))))).join('');
 
-export const isEmpty = (slateContent: null | SlateNode[]): boolean => (extractText(slateContent).trim().length === 0);
+export const isEmpty = (slateContent: null | SlateNode[], variables: { [variableName: string]: string }): boolean => (extractText(slateContent, variables).trim().length === 0);
 
 export default SlateRTE

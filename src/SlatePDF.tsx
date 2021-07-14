@@ -28,10 +28,11 @@ type LeafProps = {
   attributes: RenderLeafProps['attributes'], 
   styles: ParentStyles,
   children: (curStyles: ParentStyles) => (JSX.Element),
+  variables: { [variableName: string]: string },
 } & Omit<BaseLeafProps, 'children'>;
 
 const SlatePDF = ({ 
-  value, options, minimalFormatting, onFileLoad,
+  value, options, minimalFormatting, onFileLoad, variables,
 }: {
   value: SlateNode[],
   minimalFormatting: boolean,
@@ -41,6 +42,7 @@ const SlatePDF = ({
     // optional, defaults 1em = 16px
     defaultFontSizePx: number, 
   },
+  variables: { [variableName: string]: string },
 }) => {
   const fontRatio = options ?  DEFAULT_EM_SIZE / options.defaultFontSizePx : 1;
   const backgroundColor = getBackgroundColor(value);
@@ -71,6 +73,7 @@ const SlatePDF = ({
             leaf={metadata} 
             minimalFormatting={minimalFormatting}
             styles={styles} 
+            variables={variables}
           >
             {(curStyles: ParentStyles) => (
               <>
@@ -192,12 +195,8 @@ const SlateElement = ({
     case 'background-color':
       return (<View style={{ backgroundColor: element.color }} />);
     case 'variable':
-      return (
-        <Text>
-          {`\{${element.variableName}\}`}
-          {children}
-        </Text>
-      );   
+      // variable handled by leaf
+      return <Text>{childComponents(styles)}</Text>;
     default:
       return (
         <Text 
@@ -211,7 +210,7 @@ const SlateElement = ({
 
 
 const SlateLeaf = ({ 
-  children, leaf, minimalFormatting, styles, 
+  children, leaf, minimalFormatting, styles,  variables,
 }: LeafProps): JSX.Element => {
   const newStyles = _.compact([
     // bold
@@ -249,6 +248,11 @@ const SlateLeaf = ({
     styles.backgroundColor,
   );
 
+  // if variable type leaf, then child must include variable name
+  const baseChild = _.compact([
+    leaf.variable ? variables[leaf.variable.variableName] : null,
+    children({ backgroundColor: finalBackgroundColor, fontSize: finalFontSize }),
+  ]);
   const baseChildComponents = (
     <>
       {_.compact([
@@ -266,7 +270,7 @@ const SlateLeaf = ({
           style={{ backgroundColor: finalBackgroundColor }} 
           key={uuidv4()}
         >
-          {children({ backgroundColor: finalBackgroundColor, fontSize: finalFontSize })}
+          {baseChild}
         </Text>,
       ])}
     </>
