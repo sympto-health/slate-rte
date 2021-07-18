@@ -10,12 +10,14 @@ const AsyncFileLoad = ({
   children: (urlData: { url: string }) => (JSX.Element),
 }) => {
   const [loadedFileURL, setLoadedFileURL] = useState<{ url: string } | null>(null);
+  const [error, setError] = useState<null | string>(null);
   useEffect(() => {
     const loadFile = async (): Promise<{ url: string }> => {
       if ('url' in nodeData) {
         return { url: nodeData.url };
       } else if (onFileLoad == null) {
-        throw new Error('Invalid file');
+        setError('Invalid File');
+        throw new Error('Invalid File');
       } else {
         return onFileLoad({ id: nodeData.fileData.id });
       }
@@ -30,6 +32,9 @@ const AsyncFileLoad = ({
     <>
       {loadedFileURL && (
         children(loadedFileURL)
+      )}
+      {error && (
+        <div>{error}</div>
       )}
     </>
   );

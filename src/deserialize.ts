@@ -1,7 +1,6 @@
 // @ts-nocheck
-// TODO: Unit tests for this file
-import { Descendant } from 'slate'
 import _ from 'lodash';
+import { SlateNode } from './SlateNode';
 import { jsx } from 'slate-hyperscript'
 
 // https://github.com/ianstormtaylor/slate/blob/master/site/examples/paste-html.tsx#L42-L80
@@ -63,10 +62,10 @@ const parseLeaf = (el: HTMLElement) => {
 const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeType === 3) {
     return el.textContent
-  } 
+  }
   if (el.nodeType !== 1) {
-    return null 
-  }  
+    return null
+  }
   if (el.nodeName === 'BR') {
     return ''
   }
@@ -117,7 +116,7 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'DIV' && matchFirstChildNode(el, { nodeName: 'HR' })) {
     return jsx('element', { type: 'horizontal-line' }, parseChildren(_.tail(el.childNodes)) );
   }
-  
+
   if (el.nodeName === 'DIV' && el.className === 'd-inline-block'
     && matchFirstChildNode(el, { nodeName: 'DIV', className: 'd-inline-block' })
     && matchFirstChildNode(el.childNodes[0], { nodeName: 'IMG' })) {
@@ -129,9 +128,9 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   return jsx('element', { type: 'paragraph' }, children);
 }
 
-const deserializeBody = (el: HTMLElement): Descendant[] => {
+const deserializeBody = (el: HTMLElement): SlateNode[] => {
   const deserializedHTML = deserialize(el);
-  return deserializedHTML.length === 0 || deserializedHTML[0].type == null 
+  return deserializedHTML.length === 0 || deserializedHTML[0].type == null
     ? [{ type: 'paragraph', noPadding: true, children: deserializedHTML }]
     : deserializedHTML;
 };
