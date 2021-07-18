@@ -12,49 +12,51 @@ import AsyncFileLoad from './AsyncFileLoad';
 
 const DEFAULT_EM_SIZE = 16;
 
-type ParentStyles = { 
-  fontSize: number, 
+type ParentStyles = {
+  fontSize: number,
   backgroundColor?: ASCIIColor,
 };
 
-type ElementProps = { 
-  attributes: RenderElementProps['attributes'], 
+type ElementProps = {
+  attributes: RenderElementProps['attributes'],
   styles: ParentStyles,
   fontRatio: number,
   children: (curStyles: ParentStyles) => (JSX.Element),
 } & Omit<BaseElementProps, 'children'>;
 
 type LeafProps = {
-  attributes: RenderLeafProps['attributes'], 
+  attributes: RenderLeafProps['attributes'],
   styles: ParentStyles,
   children: (curStyles: ParentStyles) => (JSX.Element),
   variables: { [variableName: string]: string },
 } & Omit<BaseLeafProps, 'children'>;
 
-const SlatePDF = ({ 
-  value, options, minimalFormatting, onFileLoad, variables,
-}: {
+type Props = {
   value: SlateNode[],
   minimalFormatting: boolean,
   onFileLoad?: (opts: { id: string }) => Promise<{ url: string }>,
   options?: {
     // effectively specifies what 1em is equal to, based on the font-size
     // optional, defaults 1em = 16px
-    defaultFontSizePx: number, 
+    defaultFontSizePx: number,
   },
   variables: { [variableName: string]: string },
-}) => {
+};
+
+const SlatePDF = ({
+  value, options, minimalFormatting, onFileLoad, variables,
+}: Props): JSX.Element => {
   const fontRatio = options ?  DEFAULT_EM_SIZE / options.defaultFontSizePx : 1;
   const backgroundColor = getBackgroundColor(value);
   const renderSlateItems = (slateContent: SlateNode[], styles: ParentStyles) => (slateContent
     .map((metadata) => (
-      metadata.type 
+      metadata.type
         ? (
           // @ts-ignore
-          <SlateElement 
-            key={uuidv4()} 
-            styles={styles} 
-            minimalFormatting={minimalFormatting} 
+          <SlateElement
+            key={uuidv4()}
+            styles={styles}
+            minimalFormatting={minimalFormatting}
             element={metadata}
             fontRatio={fontRatio}
             onFileLoad={onFileLoad}
@@ -67,12 +69,12 @@ const SlatePDF = ({
           </SlateElement>
         )
         : (
-          <SlateLeaf 
-            key={uuidv4()} 
+          <SlateLeaf
+            key={uuidv4()}
             // @ts-ignore
-            leaf={metadata} 
+            leaf={metadata}
             minimalFormatting={minimalFormatting}
-            styles={styles} 
+            styles={styles}
             variables={variables}
           >
             {(curStyles: ParentStyles) => (
@@ -85,25 +87,25 @@ const SlatePDF = ({
     )));
 
   return (
-    <View 
+    <View
       style={{
         backgroundColor: backgroundColor && !minimalFormatting ? backgroundColor : undefined,
         fontWeight: 400,
         color: backgroundColor && minimalFormatting ? backgroundColor : undefined,
-        fontSize: fontRatio * DEFAULT_EM_SIZE, 
+        fontSize: fontRatio * DEFAULT_EM_SIZE,
       }}
     >
       {renderSlateItems(
-        value, 
-        { 
-          fontSize: fontRatio * DEFAULT_EM_SIZE, 
+        value,
+        {
+          fontSize: fontRatio * DEFAULT_EM_SIZE,
         },
-      )} 
+      )}
     </View>
   );
 }
 
-const SlateElement = ({ 
+const SlateElement = ({
   minimalFormatting, children, element, styles, fontRatio, onFileLoad,
 }: ElementProps): JSX.Element => {
   const childComponents = (curStyles: ParentStyles) => (_.compact([
@@ -157,13 +159,13 @@ const SlateElement = ({
           {childComponents(styles)}
         </Text>
       );
-    case 'horizontal-line': 
+    case 'horizontal-line':
       return minimalFormatting
         ? <>{childComponents(styles)}</>
         : (
           <View>
-            <View 
-              style={{ 
+            <View
+              style={{
                 marginVertical: 10,
                 borderTop: '1px solid rgba(0,0,0,.1)',
               }}
@@ -199,8 +201,8 @@ const SlateElement = ({
       return <Text>{childComponents(styles)}</Text>;
     default:
       return (
-        <Text 
-          style={element.noPadding ? { paddingBottom: 1 } : { paddingBottom: 10 }} 
+        <Text
+          style={element.noPadding ? { paddingBottom: 1 } : { paddingBottom: 10 }}
         >
           {childComponents(styles)}
         </Text>
@@ -209,7 +211,7 @@ const SlateElement = ({
 }
 
 
-const SlateLeaf = ({ 
+const SlateLeaf = ({
   children, leaf, minimalFormatting, styles,  variables,
 }: LeafProps): JSX.Element => {
   const newStyles = _.compact([
@@ -217,7 +219,7 @@ const SlateLeaf = ({
     leaf.bold ? { fontWeight: 700, type: 'Text' } : null,
 
     // code
-    leaf.code ? {  
+    leaf.code ? {
       color: '#e83e8c', fontFamily: 'monospace', fontSize: styles.fontSize * 0.875, type: 'Text'
     } : null,
 
@@ -240,11 +242,11 @@ const SlateLeaf = ({
     leaf['highlight-color'] ? { type: 'View', backgroundColor: leaf['highlight-color'].color } : null,
   ]);
   const finalFontSize: number = newStyles.reduce(
-    (fontSize, currentStyle) => (currentStyle.fontSize != null ? currentStyle.fontSize : fontSize), 
+    (fontSize, currentStyle) => (currentStyle.fontSize != null ? currentStyle.fontSize : fontSize),
     styles.fontSize,
   );
   const finalBackgroundColor: undefined | string = newStyles.reduce(
-    (backgroundColor, currentStyle) => (currentStyle.backgroundColor != null ? currentStyle.backgroundColor : backgroundColor), 
+    (backgroundColor, currentStyle) => (currentStyle.backgroundColor != null ? currentStyle.backgroundColor : backgroundColor),
     styles.backgroundColor,
   );
 
@@ -256,18 +258,18 @@ const SlateLeaf = ({
   const baseChildComponents = (
     <>
       {_.compact([
-        leaf.text 
+        leaf.text
         ? (
-          <Text 
-            style={{ backgroundColor: finalBackgroundColor }} 
+          <Text
+            style={{ backgroundColor: finalBackgroundColor }}
             key={uuidv4()}
           >
             {leaf.text}
-          </Text> 
+          </Text>
         )
         : null,
-        <Text 
-          style={{ backgroundColor: finalBackgroundColor }} 
+        <Text
+          style={{ backgroundColor: finalBackgroundColor }}
           key={uuidv4()}
         >
           {baseChild}
@@ -277,7 +279,7 @@ const SlateLeaf = ({
   );
 
   const styledContent: JSX.Element = newStyles.reduce((currentChild: JSX.Element, { type, ...currentStyle }) => (
-    type === 'Text' 
+    type === 'Text'
       ? <Text style={currentStyle}>{currentChild}</Text>
       : <View style={currentStyle}>{currentChild}</View>
   ), baseChildComponents);

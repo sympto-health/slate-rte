@@ -1,6 +1,6 @@
 {
   "name": "slate-rte",
-  "version": "1.0.53",
+  "version": "1.0.55",
   "description": "Rich text editor for slatejs editor",
   "main": "build/index.js",
   "module": "build/index.es.js",
@@ -27,11 +27,17 @@
     "react-dom": "^16.13.1",
     "react-bootstrap": "^1.2.2"
   },
+  "peerDependenciesMeta": {
+    "react-bootstrap": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@react-pdf/renderer": "^2.0.13",
     "@types/classnames": "^2.3.1",
     "@types/escape-html": "^1.0.0",
     "@types/is-url": "^1.2.28",
+    "@types/loadable__component": "^5.13.4",
     "@types/lodash": "^4.14.159",
     "@types/react": "^16.9.43",
     "@types/react-color": "^3.0.4",
@@ -61,6 +67,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
     "@fortawesome/react-fontawesome": "^0.1.11",
+    "@loadable/component": "^5.15.0",
     "classnames": "^2.3.1",
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.4",

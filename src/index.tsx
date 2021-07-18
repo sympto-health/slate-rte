@@ -9,11 +9,15 @@ import './index.css';
 
 export { getBackgroundColor };
 
-export const parseAsHTML = (slateContent: SlateNode[], variables: { [variableName: string]: string }): string => (renderToStaticMarkup(
-    <SlateRTE variables={variables} mode="Read-Only" value={slateContent} setValue={() => {}} />
+export const parseAsHTML = (
+  slateContent: SlateNode[],
+  variables: { [variableName: string]: string },
+  onFileLoad: (opts: { id: string }) => Promise<{ url: string }>,
+): string => (renderToStaticMarkup(
+    <SlateRTE onFileLoad={onFileLoad} variables={variables} mode="Read-Only" value={slateContent} />
   ).replace(/data\-slate\-[^"]*="[^"]*"/g, ""));
 
-export const deserializeHTMLString = (htmlString: string) => {
+export const deserializeHTMLString = (htmlString: string): SlateNode[] => {
   const domData = new DOMParser().parseFromString(htmlString, 'text/html')
   return deserialize(domData.body);
 };

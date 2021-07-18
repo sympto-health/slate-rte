@@ -99,7 +99,6 @@ declare module 'slate-rte' {
 
   declare type BaseSlateRTEProps = {
     value: Array<SlateNode>,
-    toolbarClassName?: string,
     onFileLoad: (opts: { id: string }) => Promise<{ url: string }>,
     className?: string,
     inputClassName?: string,
@@ -132,6 +131,7 @@ declare module 'slate-rte' {
   declare export function parseAsHTML(
     slateContent: Array<SlateNode>,
     variables: { [variableName: string]: string },
+    onFileLoad: (opts: { id: string }) => Promise<{ url: string }>
   ): string;
 
   declare export default class SlateRTE extends React$Component<{|
@@ -140,6 +140,7 @@ declare module 'slate-rte' {
       file: File, progressCallBack: (progress: number) => void,
     ) => Promise<null | FileT>,
     setValue: (value: Array<SlateNode>) => void,
+    toolbarClassName?: string,
     mode: 'Edit',
   |} | {|
     ...BaseSlateRTEProps,
