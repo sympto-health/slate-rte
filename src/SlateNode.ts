@@ -15,11 +15,11 @@ export type SlateEditorT = Omit<ReactEditor, 'children'> & {
 
 export const convertSlateEditor = (slateEditor: SlateEditorT): BaseEditor => (slateEditor as any);
 
-export type BaseElementProps = { 
+export type BaseElementProps = {
   children: Array<JSX.Element>,
   minimalFormatting: boolean,
   element: SlateElementNode<SlateNode>,
-  onFileLoad?: (opts: { id: string }) => Promise<{ url: string }>,
+  onFileLoad: (opts: { id: string }) => Promise<{ url: string }>,
 };
 
 export type BaseLeafProps = {

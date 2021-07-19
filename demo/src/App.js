@@ -1,5 +1,5 @@
 /* @flow */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { SlateNode } from 'slate-rte';
 import SlateRTE, { extractText, deserializeHTMLString, parseAsHTML, getBackgroundColor }  from "slate-rte";
 import { Card } from 'react-bootstrap';
@@ -88,18 +88,19 @@ const [value, setValue] = useState<Array<SlateNode>>([
     'bar': '4',
   };
   const onFileLoad = async ({ id }) => ({ url: fileMapping[id] });
-  const htmlValue = (() => {
-    try {
-      return parseAsHTML(value, variables, onFileLoad);
-    } catch (e) {
-      console.log(e);
-      return '';
-    }
-  })();
+
+
+  const [htmlValue, setHTMLValue] = useState(null);
+  useEffect(() => {
+    const fetchHTML = (async () => {
+      setHTMLValue(await parseAsHTML(value, variables, onFileLoad));
+    });
+    fetchHTML();
+  }, [JSON.stringify(value), value, variables, onFileLoad]);
 
   const deserializedValue = (() => {
     try {
-      return deserializeHTMLString(htmlValue);
+      return htmlValue ? deserializeHTMLString(htmlValue) : null;
     } catch (e) {
       console.log(e);
       return [];
@@ -221,7 +222,8 @@ const [value, setValue] = useState<Array<SlateNode>>([
       </div>
       <code className="m-3 card p-4 shadow-sm">{htmlValue}</code>
       <Card className="m-3 shadow-sm">
-        <SlateRTE variables={variables} onFileLoad={onFileLoad} mode="Read-Only" value={deserializedValue} />
+        {deserializedValue && (<SlateRTE variables={variables} onFileLoad={onFileLoad} mode="Read-Only" value={deserializedValue} />)}
+        {deserializedValue == null && (<div>Loading...</div>)}
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
         Slate Compared

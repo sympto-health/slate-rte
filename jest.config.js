@@ -1,10 +1,10 @@
 module.exports = {
   // Automatically clear mock calls and instances between every test
   clearMocks: true,
-  // The directory where Jest should output its coverage files
-  modulePaths: ['node_modules'],
+  modulePaths: ['src', 'node_modules'],
   testEnvironment: 'jsdom',
   testURL: 'http://localhost',
+  rootDir: 'src',
   transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\](?!(@capacitor)/)'],
   verbose: true,
   transform: {

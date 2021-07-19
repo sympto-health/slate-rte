@@ -25,5 +25,5 @@
     "src/**/*.tsx",
     "src/**/*.flow"
   ],
-  "exclude": ["node_modules", "build", "flow-typed"]
+  "exclude": ["node_modules", "build", "flow-typed", "**/*.test.ts",]
 }

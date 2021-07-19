@@ -17,7 +17,7 @@ import FormatBlock, { BlockFormats } from './FormatBlock';
 import FormatButton from './FormatButton';
 import VariableSuggestions, { withVariables } from './Variables';
 import ImageAdd, { withImages } from './ImageAdd';
-import { SlateLeafNode } from './SlateTypes';
+import { SlateLeafNode, FileT } from './SlateTypes';
 import { SlateNode, BaseElementProps } from './SlateNode';
 import { Leaf, Element } from './SlateElements';
 import { BaseProps } from './SlateProps';

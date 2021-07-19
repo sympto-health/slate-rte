@@ -22,5 +22,8 @@ export type SlateProps = ({
   uploadFile: (file: File, progressCallBack: (progress: number) => void) => Promise<null | FileT>,
   toolbarClassName?: string,
 } & BaseProps) | ({
-  mode: 'Read-Only' | 'Minimal Read-Only' | 'PDF' | 'Minimal PDF',
+  mode: 'PDF' | 'Minimal PDF',
+} & BaseProps) | ({
+  mode: 'Read-Only' | 'Minimal Read-Only',
+  loadedImages?: { [fileId: string]: string }, // mapping of file id to url
 } & BaseProps);

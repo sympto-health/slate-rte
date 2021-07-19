@@ -135,7 +135,7 @@ declare export function parseAsHTML(
   slateContent: Array<SlateNode>,
   variables: { [variableName: string]: string },
   onFileLoad: (opts: { id: string }) => Promise<{ url: string }>
-): string;
+): Promise<string>;
 
 declare export default class SlateRTE extends React$Component<{|
   ...BaseSlateRTEProps,

@@ -1,21 +1,31 @@
 import React from 'react'
 import _ from 'lodash';
 import { renderToStaticMarkup } from 'react-dom/server'
-import SlateRTE from './SlateRTE';
 import getBackgroundColor from './getBackgroundColor';
 import deserialize from './deserialize';
+import loadImages from './AsyncFileLoadStore';
 import { SlateNode } from './SlateNode';
+import SlateController from './SlateController';
 import './index.css';
 
 export { getBackgroundColor };
 
-export const parseAsHTML = (
+export const parseAsHTML = async (
   slateContent: SlateNode[],
   variables: { [variableName: string]: string },
   onFileLoad: (opts: { id: string }) => Promise<{ url: string }>,
-): string => (renderToStaticMarkup(
-    <SlateRTE onFileLoad={onFileLoad} variables={variables} mode="Read-Only" value={slateContent} />
-  ).replace(/data-slate-[^"]*="[^"]*"/g, ""));
+): Promise<string> => {
+  const loadedImages = await loadImages(slateContent, onFileLoad);
+  return renderToStaticMarkup(
+    <SlateController
+      loadedImages={loadedImages}
+      variables={variables}
+      mode="Read-Only"
+      onFileLoad={onFileLoad}
+      value={slateContent}
+    />
+  ).replace(/data-slate-[^"]*="[^"]*"/g, "");
+};
 
 export const deserializeHTMLString = (htmlString: string): SlateNode[] => {
   const domData = new DOMParser().parseFromString(htmlString, 'text/html')
@@ -33,4 +43,4 @@ export const extractText = (slateContent: null | SlateNode[], variables: { [vari
 
 export const isEmpty = (slateContent: null | SlateNode[], variables: { [variableName: string]: string }): boolean => (extractText(slateContent, variables).trim().length === 0);
 
-export default SlateRTE
+export default SlateController

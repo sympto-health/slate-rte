@@ -12,6 +12,7 @@ export type ElementProps = {
   attributes: RenderElementProps['attributes'],
   isReadOnly: boolean,
   variables: { [variableName: string]: string },
+  loadedImages?: { [fileId: string]: string }, // mapping of file id to url
 } & BaseElementProps;
 
 export type LeafProps = {
@@ -27,7 +28,7 @@ const DEFAULT_EM_SIZE = 16;
 
 export const Element = (props: ElementProps): JSX.Element => {
   const {
-    attributes, children, element, minimalFormatting, onFileLoad, isReadOnly,
+    attributes, children, element, minimalFormatting, onFileLoad, isReadOnly, loadedImages,
   } = props;
   const selected = useSelected();
   const focused = useFocused();
@@ -78,7 +79,7 @@ export const Element = (props: ElementProps): JSX.Element => {
           className={cx('d-inline-block', { 'shadow-sm': selected && focused })}
         >
           <div contentEditable={false}>
-            <AsyncFileLoad nodeData={element} onFileLoad={onFileLoad}>
+            <AsyncFileLoad loadedImages={loadedImages} nodeData={element} onFileLoad={onFileLoad}>
               {({ url }) => (
                 <img alt="Uploaded Image" src={url} className="image-item d-inline-block" />
               )}

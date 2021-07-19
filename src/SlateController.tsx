@@ -88,6 +88,7 @@ const SlateController = ({
                       {...(props as ElementProps)}
                       onFileLoad={onFileLoad}
                       isReadOnly
+                      loadedImages={opts.loadedImages}
                       minimalFormatting={opts.mode === 'Minimal Read-Only'}
                     />
                   )}

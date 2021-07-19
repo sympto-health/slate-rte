@@ -34,11 +34,11 @@ export default {
         { src: 'src/index.js.flow', dest: 'build/' },
       ]
     }),
-    external(),
+    external({ includeDependencies: true }),
     resolve(),
     typescript({
       rollupCommonJSResolveHack: true,
-      exclude: "**/__tests__/**",
+      exclude: "**/tests/**",
       clean: true
     }),
     postcss({
