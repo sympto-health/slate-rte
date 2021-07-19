@@ -1,7 +1,15 @@
 module.exports = {
   plugins: [
   ],
-  presets: ['@babel/preset-react', '@babel/preset-env', '@babel/preset-typescript','jest'],
+  presets: [
+    [
+      '@babel/preset-env',
+      { targets: { node: 'current' } },
+    ],
+    '@babel/preset-react',
+    '@babel/preset-typescript',
+    'jest',
+  ],
   only: [
     './**/*.ts',
     './**/*.tsx',

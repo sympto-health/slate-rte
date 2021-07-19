@@ -2,7 +2,6 @@ import React, { useMemo, useRef } from 'react'
 import { withHistory } from 'slate-history'
 import cx from 'classnames';
 import { createEditor } from 'slate';
-import _ from 'lodash';
 import { Editable, ReactEditor, withReact, Slate } from 'slate-react';
 import { withLinks } from './Links';
 import { HotKeyHandler } from './FormatMark';
@@ -11,12 +10,8 @@ import { withImages } from './ImageAdd';
 import { SlateProps } from './SlateProps';
 import getBackgroundColor from './getBackgroundColor';
 import SlatePDF from './SlatePDF';
-import loadable from '@loadable/component'
+import SlateEditable from './SlateEditable'
 import { Leaf, Element, ElementProps, LeafProps } from './SlateElements';
-
-// lazy load so that slate-rte works on server side in read only mode
-const SlateEditable = loadable(() => import('./SlateEditable'))
-
 
 // default size in px for font-size of 1em
 const DEFAULT_EM_SIZE = 16;
@@ -73,7 +68,7 @@ const SlateController = ({
               <SlateEditable
                 value={value}
                 uploadFile={opts.uploadFile}
-                variable={variables}
+                variables={variables}
                 inputClassName={inputClassName}
                 onFileLoad={onFileLoad}
                 setValue={opts.setValue}

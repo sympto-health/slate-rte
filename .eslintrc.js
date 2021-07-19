@@ -4,6 +4,7 @@ module.exports = {
   plugins: [
     '@typescript-eslint',
     'react-hooks',
+    'plugin:react/recommended',
   ],
   extends: [
     'eslint:recommended',
