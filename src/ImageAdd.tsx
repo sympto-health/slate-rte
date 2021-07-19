@@ -21,11 +21,11 @@ const ImageAdd = ({ uploadFile, type }: {
       type,
       text: null,
       children: [({ text: ' ' } as EmptySlateNode<SlateNode>)],
-      ...(fileData.type === 'URL' 
+      ...(fileData.type === 'URL'
          ? {
            url: fileData.url,
          }
-         : { 
+         : {
            fileData,
           })
     };
@@ -60,7 +60,7 @@ const ImageAdd = ({ uploadFile, type }: {
     <>
       {
         showAttachmentModal && (
-          <AttachmentModal 
+          <AttachmentModal
             closeModal={() => { setShowAttachmentModal(false); }}
             onUpload={uploadFile}
             type={type}
@@ -68,7 +68,7 @@ const ImageAdd = ({ uploadFile, type }: {
           />
         )
       }
-      <FormatButton 
+      <FormatButton
         isActive={false}
         icon={type === 'image' ? faImages : faVideo}
         onClick={async () => {

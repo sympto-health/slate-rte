@@ -47,6 +47,9 @@ const parseLeaf = (el: HTMLElement) => {
         : style.color;
       return { 'highlight-color': { color: targetColor } };
     }
+    if (el.nodeName === 'SPAN' && el.getAttribute('data-variable-leaf')) {
+      return { text: '', variable: { variableName: el.getAttribute('data-variable-leaf') } };
+    }
     if (el.nodeName === 'SPAN') {
       return {};
     }
@@ -66,7 +69,6 @@ const parseLeaf = (el: HTMLElement) => {
   };
   const attrs = fetchAttr();
   return attrs ? children.map(child => jsx('text', attrs, child)) : null;
-
 };
 
 const deserialize = (el: HTMLElement): Descendant[] => {
@@ -85,11 +87,13 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'BODY' || el.className.includes('SlateRTE') || el.getAttribute('data-gramm') != null) {
     return jsx('fragment', {}, children)
   }
-  const leafParse = parseLeaf(el);
-  if (leafParse) {
-    return leafParse;
+  if (el.nodeName === 'SPAN' && el.getAttribute('data-variable') != null) {
+    return jsx('element', { type: 'variable', variableName: el.getAttribute('data-variable'), text: null }, children);
   }
-
+  const leafData = parseLeaf(el);
+  if (leafData) {
+    return leafData;
+  }
   if (BLOCK_TYPES[el.nodeName]) {
     return jsx('element', { type: BLOCK_TYPES[el.nodeName] }, children);
   }
@@ -108,11 +112,25 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'DIV' && el.style.paddingBottom === '0.01rem') {
     return jsx('element', { type: 'paragraph', noPadding: true }, children);
   }
+  if (el.nodeName === 'DIV' && el.className === 'd-inline-block'
+    && el.getAttribute('data-type') === 'image') {
+    const imgCont = el.childNodes[0];
+    const img = el.childNodes[0].childNodes[0];
+    const imgData = img.getAttribute('data-image-id') != null
+      ? {
+        fileData: {
+          type: 'Image ID',
+          id: img.getAttribute('data-image-id'),
+        },
+      }
+      : { url: img.src };
+    return jsx('element', { ...imgData, type: 'image', text: null }, [{ text: ' '}]);
+  }
   if (el.nodeName === 'DIV' && el.className.length === 0 && el.childNodes.length === 0) {
     const targetColor = el.getAttribute('data-color')
       ? el.getAttribute('data-color')
       : el.style.backgroundColor;
-    return jsx('element', { type: 'background-color', color: targetColor }, children);
+    return jsx('element', { type: 'background-color', text: null, color: targetColor }, children);
   }
   if (el.nodeName === 'A') {
     return jsx('element', { type: 'link', url: el.getAttribute('href') }, children);
@@ -129,15 +147,6 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'DIV' && matchFirstChildNode(el, { nodeName: 'HR' })) {
     return jsx('element', { type: 'horizontal-line' }, parseChildren(_.tail(el.childNodes)) );
   }
-
-  if (el.nodeName === 'DIV' && el.className === 'd-inline-block'
-    && matchFirstChildNode(el, { nodeName: 'DIV', className: 'd-inline-block' })
-    && matchFirstChildNode(el.childNodes[0], { nodeName: 'IMG' })) {
-    const imgCont = el.childNodes[0];
-    const img = el.childNodes[0].childNodes[0];
-    return jsx('element', { type: 'image', url: img.src }, parseChildren(_.tail(imgCont)) );
-  }
-
   return jsx('element', { type: 'paragraph' }, children);
 }
 

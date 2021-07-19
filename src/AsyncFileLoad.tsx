@@ -7,10 +7,10 @@ const extractImageURL = (
   loadedImages?: { [fileId: string]: string }, // mapping of file id to url
 ) => {
   if ('url' in nodeData) {
-    return { url: nodeData.url };
+    return { url: nodeData.url, id: null };
   }
   if (loadedImages && loadedImages[nodeData.fileData.id]) {
-    return { url: loadedImages[nodeData.fileData.id] };
+    return { url: loadedImages[nodeData.fileData.id], id: nodeData.fileData.id };
   }
   return null;
 }
@@ -20,20 +20,20 @@ const AsyncFileLoad = ({
 }: {
   onFileLoad: (fileData: { id: string }) => Promise<{ url: string }>,
   nodeData: ImageVideoNode<SlateNode>,
-  children: (urlData: { url: string }) => (JSX.Element),
+  children: (urlData: { url: string, id: string | null }) => (JSX.Element),
   loadedImages?: { [fileId: string]: string }, // mapping of file id to url
 }): JSX.Element => {
-  const [loadedFileURL, setLoadedFileURL] = useState<{ url: string } | null>(
+  const [loadedFileURL, setLoadedFileURL] = useState<{ url: string, id: null | string } | null>(
     extractImageURL(nodeData, loadedImages));
   useEffect(() => {
-    const loadFile = async (): Promise<{ url: string }> => {
+    const loadFile = async () => {
       if ('url' in nodeData) {
-        return { url: nodeData.url };
+        return { url: nodeData.url, id: null };
       }
       if (loadedImages && loadedImages[nodeData.fileData.id]) {
-        return { url: loadedImages[nodeData.fileData.id] };
+        return { url: loadedImages[nodeData.fileData.id], id: nodeData.fileData.id };
       }
-      return onFileLoad({ id: nodeData.fileData.id });
+      return { ...(await onFileLoad({ id: nodeData.fileData.id })), id: nodeData.fileData.id };
     };
     const setURL = async () => {
       const urlData = await loadFile();

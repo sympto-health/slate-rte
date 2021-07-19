@@ -76,12 +76,13 @@ export const Element = (props: ElementProps): JSX.Element => {
       return (
         <div
           {...attributes}
+          data-type="image"
           className={cx('d-inline-block', { 'shadow-sm': selected && focused })}
         >
           <div contentEditable={false}>
             <AsyncFileLoad loadedImages={loadedImages} nodeData={element} onFileLoad={onFileLoad}>
-              {({ url }) => (
-                <img alt="Uploaded Image" src={url} className="image-item d-inline-block" />
+              {({ url, id }) => (
+                <img data-image-id={id} alt="Uploaded Image" src={url} className="image-item d-inline-block" />
               )}
             </AsyncFileLoad>
           </div>
@@ -125,6 +126,7 @@ export const Element = (props: ElementProps): JSX.Element => {
         ? (
           <span
             {...attributes}
+            data-variable={element.variableName}
             className="d-inline-block"
             contentEditable={false}
           >
@@ -135,6 +137,7 @@ export const Element = (props: ElementProps): JSX.Element => {
           <span
             {...attributes}
             contentEditable={false}
+            data-variable={element.variableName}
             className={cx('border', {'shadow-sm': selected && focused })}
           >
             {`{${element.variableName}}`}
@@ -146,15 +149,15 @@ export const Element = (props: ElementProps): JSX.Element => {
 }
 
 export const Leaf = ({
-  attributes, children, leaf, minimalFormatting, variables
+  attributes, children, leaf, minimalFormatting, variables,
 }: LeafProps): JSX.Element => {
     // if variable type leaf, then child must include variable name
   const baseChild: JSX.Element = (
     <>
-      {_.compact([
-        leaf.variable ? variables[leaf.variable.variableName] : null,
-        children,
-      ])}
+      {leaf.variable
+        ? (<span data-variable-leaf={leaf.variable.variableName}>{variables[leaf.variable.variableName]}</span> )
+        : null}
+      {leaf.text ? leaf.text : children}
     </>
   );
 
@@ -163,19 +166,19 @@ export const Leaf = ({
     (child: JSX.Element): JSX.Element => (leaf.code ? <code>{child}</code> : child),
     (child: JSX.Element): JSX.Element => (leaf.italic ? <em>{child}</em> : child),
     (child: JSX.Element): JSX.Element => (leaf.underline ? <u>{child}</u> : child),
-    (child: JSX.Element): JSX.Element => (leaf['font-size']
+    (child: JSX.Element): JSX.Element => (leaf['font-size'] != null
       // note that em is relative, so base em size will still be relevant here
-      ? <span style={{ fontSize: `${leaf['font-size'].value / DEFAULT_EM_SIZE}em` }} >{child}</span>
+      ? (<span style={{ fontSize: `${leaf['font-size'].value / DEFAULT_EM_SIZE}em` }} >{child}</span>)
       : child),
-    (child: JSX.Element): JSX.Element => (leaf['font-weight']
-      ?  <span style={{ fontWeight: leaf['font-weight'].value }} >{child}</span>
+    (child: JSX.Element): JSX.Element => (leaf['font-weight'] != null
+      ? (<span style={{ fontWeight: leaf['font-weight'].value }} >{child}</span>)
       : child),
-    (child: JSX.Element): JSX.Element => (leaf['text-color'] && !minimalFormatting
-      ?  <span data-color={leaf['text-color'].color} style={{ color: leaf['text-color'].color }} >{child}</span>
+    (child: JSX.Element): JSX.Element => (leaf['text-color'] != null && !minimalFormatting
+      ? (<span data-color={leaf['text-color'].color} style={{ color: leaf['text-color'].color }}>{child}</span>)
       // if text color not set, or minimial formatting (dont include font color), just return child ofc
       : child),
-    (child: JSX.Element): JSX.Element => (leaf['highlight-color']
-      ?  <span data-color={leaf['highlight-color'].color} style={{ backgroundColor: leaf['highlight-color'].color }} >{child}</span>
+    (child: JSX.Element): JSX.Element => (leaf['highlight-color'] != null
+      ? (<span data-color={leaf['highlight-color'].color} style={{ backgroundColor: leaf['highlight-color'].color }}>{child}</span>)
       : child),
   ];
 
