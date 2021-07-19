@@ -15,7 +15,7 @@ export const parseAsHTML = (
   onFileLoad: (opts: { id: string }) => Promise<{ url: string }>,
 ): string => (renderToStaticMarkup(
     <SlateRTE onFileLoad={onFileLoad} variables={variables} mode="Read-Only" value={slateContent} />
-  ).replace(/data\-slate\-[^"]*="[^"]*"/g, ""));
+  ).replace(/data-slate-[^"]*="[^"]*"/g, ""));
 
 export const deserializeHTMLString = (htmlString: string): SlateNode[] => {
   const domData = new DOMParser().parseFromString(htmlString, 'text/html')
