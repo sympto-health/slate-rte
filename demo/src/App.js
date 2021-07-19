@@ -1,26 +1,30 @@
+/* @flow */
 import React, { useState } from "react";
+import type { SlateNode } from 'slate-rte';
 import SlateRTE, { extractText, deserializeHTMLString, parseAsHTML, getBackgroundColor }  from "slate-rte";
 import { Card } from 'react-bootstrap';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import swal from 'sweetalert';
 import _ from 'lodash';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import PDFPreview from './PDFPreview';
+// $FlowFixMe
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const fileToBase64 = (file) => (
   new Promise(resolve => {
     const reader = new FileReader();
     // Read file content on file loaded event
     reader.onload = (event) => {
+      // $FlowFixMe
       resolve(event.target.result);
     };
-    
-    // Convert data to base64 
+
+    // Convert data to base64
     reader.readAsDataURL(file);
   }));
 
 const App = () => {
-const [value, setValue] = useState([
+const [value, setValue] = useState<Array<SlateNode>>([
     {
       "type": "background-color",
       "color": "#ecf0f1",
@@ -83,9 +87,10 @@ const [value, setValue] = useState([
     'foo': '3',
     'bar': '4',
   };
+  const onFileLoad = async ({ id }) => ({ url: fileMapping[id] });
   const htmlValue = (() => {
     try {
-      return parseAsHTML(value, variables)
+      return parseAsHTML(value, variables, onFileLoad);
     } catch (e) {
       console.log(e);
       return '';
@@ -100,21 +105,20 @@ const [value, setValue] = useState([
       return [];
     }
   })();
-  const onFileLoad = async ({ id }) => ({ url: fileMapping[id] });
   return (
     <div className="bg-light h-100 p-4 pb-5">
-      <div 
-        className="pt-1 mx-4 rounded-pill w-25" 
+      <div
+        className="pt-1 mx-4 rounded-pill w-25"
         style={{
           backgroundColor: getBackgroundColor(value),
-        }} 
+        }}
       />
       <div>{extractText(value, variables)}</div>
       <div className="m-3 text-large text-center font-weight-light">
         Editable
       </div>
       <Card className="m-3 shadow-sm">
-        <SlateRTE 
+        <SlateRTE
           mode="Edit"
           onFileLoad={onFileLoad}
           variables={variables}
@@ -133,8 +137,9 @@ const [value, setValue] = useState([
             await new Promise(r => setTimeout(r, 100));
             await progress(70);
             await new Promise(r => setTimeout(r, 100));
-            
-            const [extension] = file.name.match(/\.[0-9a-z]+$/i);
+
+            // $FlowFixMe
+            const [extension]: [string] = file.name.match(/\.[0-9a-z]+$/i);
             if (extension === '.mp4') {
               return {
                 type: 'URL',
@@ -162,11 +167,11 @@ const [value, setValue] = useState([
                 url: fileData,
               } : {
                 type: 'Image ID',
-                id: saveFileData(fileData),
+                id: saveFileData(),
               };
-          }} 
-          value={_.cloneDeep(value)} 
-          setValue={setValue} 
+          }}
+          value={_.cloneDeep(value)}
+          setValue={setValue}
         />
       </Card>
       <div className="m-3 text-large text-center font-weight-light">
@@ -179,7 +184,7 @@ const [value, setValue] = useState([
         Editable with Adjusted Font Size
       </div>
       <Card className="m-3 shadow-sm">
-        <SlateRTE variables={variables} onFileLoad={onFileLoad} options={{ defaultFontSizePx: 30 }} mode="Edit" value={value} setValue={_.cloneDeep(value)} />
+        <SlateRTE variables={variables} onFileLoad={onFileLoad} options={{ defaultFontSizePx: 30 }} mode="Edit" value={_.cloneDeep(value)} setValue={setValue} />
       </Card>
       <div className="d-flex align-items-center w-100">
         <div className="w-100">
@@ -225,7 +230,7 @@ const [value, setValue] = useState([
       <div className="mt-3">{JSON.stringify(value)}</div>
     </div>
   );
-}  
+}
 
 
 export default App;

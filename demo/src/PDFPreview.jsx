@@ -1,8 +1,10 @@
+/* @flow */
 import React from "react";
-import SlateRTE  from "slate-rte";
+import SlateRTE from 'slate-rte';
+import type { SlateNode } from 'slate-rte';
 import { Card } from 'react-bootstrap';
-import { 
-  Document, Page, PDFViewer, Font, View, 
+import {
+  Document, Page, PDFViewer, Font, View,
 } from '@react-pdf/renderer';
 import Nunito300 from './fonts/NunitoSans_300.ttf';
 import Nunito300Italic from './fonts/NunitoSans_300_italic.ttf';
@@ -37,15 +39,27 @@ Font.register({
   src: RobotoMono,
 });
 
-const PDFPreview = ({ 
+const PDFPreview = ({
   defaultFontSize, value, mode, onFileLoad, variables,
+}: {
+  defaultFontSize?: ?number,
+  value: Array<SlateNode>,
+  mode: 'PDF' | 'Minimal PDF',
+  onFileLoad: (opts: { id: string }) => Promise<{ url: string }>,
+  variables: { [variableName: string]: string },
 }) => (
   <Card className="m-3 shadow-sm">
     <PDFViewer>
       <Document>
         <Page style={{ fontFamily: 'Nunito' }}>
-          <View style={{ padding: 10 }}> 
-            <SlateRTE variables={variables} onFileLoad={onFileLoad} options={{ defaultFontSizePx: defaultFontSize || 20 }} mode={mode} value={value} />
+          <View style={{ padding: 10 }}>
+            <SlateRTE
+              variables={variables}
+              onFileLoad={onFileLoad}
+              options={defaultFontSize ? { defaultFontSizePx: defaultFontSize || 20 } : null}
+              mode={mode}
+              value={value}
+            />
           </View>
         </Page>
       </Document>
@@ -53,5 +67,8 @@ const PDFPreview = ({
   </Card>
 );
 
+PDFPreview.defaultProps = {
+  defaultFontSize: null,
+};
 
 export default PDFPreview;

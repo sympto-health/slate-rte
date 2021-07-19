@@ -4,6 +4,7 @@ import external from "rollup-plugin-peer-deps-external";
 import resolve from "rollup-plugin-node-resolve";
 import postcss from 'rollup-plugin-postcss'
 import { uglify } from "rollup-plugin-uglify";
+import copy from 'rollup-plugin-copy'
 
 import pkg from "./package.json";
 
@@ -28,6 +29,11 @@ export default {
     }
   ],
   plugins: [
+    copy({
+      targets: [
+        { src: 'src/index.js.flow', dest: 'build/' },
+      ]
+    }),
     external(),
     resolve(),
     typescript({

@@ -1,0 +1,26 @@
+[ignore]
+<PROJECT_ROOT>/.*?/.*\.test\.jsx
+<PROJECT_ROOT>/node_modules
+
+[include]
+
+[libs]
+flow-typed
+
+[lints]
+
+[options]
+exact_by_default=true
+include_warnings=true
+module.system.node.resolve_dirname=node_modules
+server.max_workers=1
+module.file_ext=.js
+module.file_ext=.mjs
+module.file_ext=.jsx
+module.file_ext=.json
+
+module.file_ext=.scss
+module.file_ext=.css
+module.name_mapper.extension='css' -> '<PROJECT_ROOT>/src/utils/CSSFlowStub.js'
+
+[strict]

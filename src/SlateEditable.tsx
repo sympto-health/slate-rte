@@ -47,6 +47,7 @@ const SlateEditable = ({
 }: ({
   setValue:(value: SlateNode[]) => void,
   toolbarClassName?: string,
+  uploadFile: (file: File, progressCallBack: (progress: number) => void) => Promise<null | FileT>,
 } & BaseProps)): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore

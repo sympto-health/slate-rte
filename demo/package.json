@@ -10,11 +10,14 @@
     "react-bootstrap": "^1.3.0",
     "react-dom": "^16.8.1",
     "react-scripts": "3.4.1",
+    "uuid": "^8.3.2",
     "slate-rte": "file:.."
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "flow": "flow",
+    "flow-typed-install": "flow-typed install"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -30,5 +33,9 @@
       "not dead",
       "not op_mini all"
     ]
+  },
+  "devDependencies": {
+    "flow-bin": "^0.127.0",
+    "flow-typed": "^2.5.1"
   }
 }
