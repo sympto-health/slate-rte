@@ -15,9 +15,9 @@ const BLOCK_TYPES = {
 };
 
 const parseChildren = (childNodes: Array<HTMLElement>) => {
-  const childNodes = _.flatten(Array.from(childNodes)
+  const deserializedNodes = _.flatten(Array.from(childNodes)
     .map(deserialize));
-  return childNodes.length === 0 ? [''] : childNodes;
+  return deserializedNodes.length === 0 ? [''] : deserializedNodes;
 };
 
 const parseLeaf = (el: HTMLElement) => {
@@ -29,13 +29,23 @@ const parseLeaf = (el: HTMLElement) => {
       return { 'font-size': { value: fontSizePx } };
     }
     if (el.nodeName === 'SPAN' && style.fontWeight) {
-      return { 'font-weight': { value: style.fontWeight } };
+      const fontWeight = Number(style.fontWeight);
+      const isBold = el.getAttribute('data-type') === 'bold';
+      return isBold
+        ? { bold: true }
+        : { 'font-weight': { value: fontWeight } };
     }
     if (el.nodeName === 'SPAN' && style.color) {
-      return { 'text-color': { color: style.color } };
+      const targetColor = el.getAttribute('data-color')
+        ? el.getAttribute('data-color')
+        : style.color;
+      return { 'text-color': { color: targetColor } };
     }
     if (el.nodeName === 'SPAN' && style.backgroundColor) {
-      return { 'highlight-color': { color: style.backgroundColor } };
+      const targetColor = el.getAttribute('data-color')
+        ? el.getAttribute('data-color')
+        : style.color;
+      return { 'highlight-color': { color: targetColor } };
     }
     if (el.nodeName === 'SPAN') {
       return {};
@@ -99,7 +109,10 @@ const deserialize = (el: HTMLElement): Descendant[] => {
     return jsx('element', { type: 'paragraph', noPadding: true }, children);
   }
   if (el.nodeName === 'DIV' && el.className.length === 0 && el.childNodes.length === 0) {
-    return jsx('element', { type: 'background-color', color: el.style.backgroundColor }, children);
+    const targetColor = el.getAttribute('data-color')
+      ? el.getAttribute('data-color')
+      : el.style.backgroundColor;
+    return jsx('element', { type: 'background-color', color: targetColor }, children);
   }
   if (el.nodeName === 'A') {
     return jsx('element', { type: 'link', url: el.getAttribute('href') }, children);

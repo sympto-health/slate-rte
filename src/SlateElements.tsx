@@ -118,7 +118,7 @@ export const Element = (props: ElementProps): JSX.Element => {
         </div>
       );
     case 'background-color':
-      return (<div style={{ backgroundColor: String(element.color) }} />);
+      return (<div data-color={String(element.color)} style={{ backgroundColor: String(element.color) }} />);
     case 'variable':
       return isReadOnly
         ? (
@@ -158,7 +158,7 @@ export const Leaf = ({
   );
 
   const styleFuncs = [
-    (child: JSX.Element): JSX.Element => (leaf.bold ? <span style= {{ fontWeight: 700 }}>{child}</span> : child),
+    (child: JSX.Element): JSX.Element => (leaf.bold ? <span data-type="bold" style= {{ fontWeight: 700 }}>{child}</span> : child),
     (child: JSX.Element): JSX.Element => (leaf.code ? <code>{child}</code> : child),
     (child: JSX.Element): JSX.Element => (leaf.italic ? <em>{child}</em> : child),
     (child: JSX.Element): JSX.Element => (leaf.underline ? <u>{child}</u> : child),
@@ -170,11 +170,11 @@ export const Leaf = ({
       ?  <span style={{ fontWeight: leaf['font-weight'].value }} >{child}</span>
       : child),
     (child: JSX.Element): JSX.Element => (leaf['text-color'] && !minimalFormatting
-      ?  <span style={{ color: leaf['text-color'].color }} >{child}</span>
+      ?  <span data-color={leaf['text-color'].color} style={{ color: leaf['text-color'].color }} >{child}</span>
       // if text color not set, or minimial formatting (dont include font color), just return child ofc
       : child),
     (child: JSX.Element): JSX.Element => (leaf['highlight-color']
-      ?  <span style={{ backgroundColor: leaf['highlight-color'].color }} >{child}</span>
+      ?  <span data-color={leaf['highlight-color'].color} style={{ backgroundColor: leaf['highlight-color'].color }} >{child}</span>
       : child),
   ];
 

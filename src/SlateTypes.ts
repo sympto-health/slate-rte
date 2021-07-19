@@ -41,35 +41,20 @@ type BaseLeafNode<T> = {
 export type FileT = { type: 'URL', url: string } | { type: 'Image ID', id: string };
 
 export type EmptySlateNode<T> = ({ text: string, children?: T[] } & BaseLeafNode<T>);
-export type SlateLeafNode<T> = (
-  {
-    'font-size': LeafStyles['font-size'],
-  } & Omit<BaseLeafNode<T>, 'font-size'>) 
-  | ({
-    bold: LeafStyles['bold'],
-  } & Omit<BaseLeafNode<T>, 'bold'>) 
-  | ({
-    code: LeafStyles['code'],
-  } & Omit<BaseLeafNode<T>, 'code'>) 
-  | ({
-    italic: LeafStyles['italic'],
-  } & Omit<BaseLeafNode<T>, 'italic'>) 
-  | ({
-    underline: LeafStyles['underline'],
-  } & Omit<BaseLeafNode<T>, 'underline'>) 
-  | ({
-    'font-weight': LeafStyles['font-weight'],
-  } & Omit<BaseLeafNode<T>, 'font-weight'>)
-  | ({
-    'text-color': LeafStyles['text-color'],
-  } & Omit<BaseLeafNode<T>, 'text-color'>)
-  | ({
-    variable: LeafStyles['variable'],
-  } & Omit<BaseLeafNode<T>, 'variable'>)
-  | ({
-    'highlight-color': LeafStyles['highlight-color'],
-  } & Omit<BaseLeafNode<T>, 'highlight-color'>)
-  | EmptySlateNode<T>;
+export type SlateLeafNode<T> = {
+  type?: null,
+  bold?: unknown | null | LeafStyles['bold'],
+  'font-size'?: unknown | null | LeafStyles['font-size'],
+  code?: unknown | null | LeafStyles['code'],
+  italic?: unknown | null | LeafStyles['italic'],
+  underline?: unknown | null | LeafStyles['underline'],
+  'font-weight'?: unknown | null | LeafStyles['font-weight'],
+  'text-color'?: unknown | null | LeafStyles['text-color'],
+  'highlight-color'?: unknown | null | LeafStyles['highlight-color'],
+  variable?: unknown | null | LeafStyles['variable'],
+  text?: null | unknown | string,
+  children?: T[],
+} & T;
 
 export type LinkNode<T> = ({
   type: 'link',
@@ -96,19 +81,19 @@ export type VariableNode<T> = ({
 
 export type SlateElementNode<T> = (
   {
-    type: 'block-quote' 
-     | 'bulleted-list' 
-     | 'heading-one' 
-     | 'heading-two' 
-     | 'list-item' 
-     | 'numbered-list' 
-     | 'left-align' 
-     | 'right-align' 
+    type: 'block-quote'
+     | 'bulleted-list'
+     | 'heading-one'
+     | 'heading-two'
+     | 'list-item'
+     | 'numbered-list'
+     | 'left-align'
+     | 'right-align'
      | 'center-align'
      | 'horizontal-line',
-  } & T) 
+  } & T)
   | LinkNode<T>
-  | ImageVideoNode<T> 
+  | ImageVideoNode<T>
   | BackgroundColorNode<T>
   | VariableNode<T>
   | ({
