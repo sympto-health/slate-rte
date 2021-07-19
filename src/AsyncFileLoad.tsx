@@ -25,7 +25,6 @@ const AsyncFileLoad = ({
 }): JSX.Element => {
   const [loadedFileURL, setLoadedFileURL] = useState<{ url: string } | null>(
     extractImageURL(nodeData, loadedImages));
-  console.log({ loadedFileURL });
   useEffect(() => {
     const loadFile = async (): Promise<{ url: string }> => {
       if ('url' in nodeData) {

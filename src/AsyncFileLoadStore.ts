@@ -24,7 +24,6 @@ const loadImages = async (
   [fileId: string]: string,
 }> => {
  const fileIds = fetchFileIds(slateContent);
-  console.log(fileIds);
   const hydratedFileData = await Promise.all(_.uniq(fileIds).map(async fileId => ({
     fileId,
     fileData: await onFileLoad({ id: fileId }),
@@ -34,7 +33,6 @@ const loadImages = async (
     .map(([fileId, { fileData }]) => (
       [fileId, fileData.url]
     ));
-  console.log(simplifiedFileMapping);
   return _.fromPairs(simplifiedFileMapping);
 };
 

@@ -24,8 +24,8 @@
   "license": "ISC",
   "peerDependencies": {
     "@react-pdf/renderer": "^2.0.13",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
+    "react": "^16.8.0",
+    "react-dom": "^16.8.0",
     "react-bootstrap": "^1.2.2"
   },
   "peerDependenciesMeta": {
@@ -73,7 +73,9 @@
     "rollup-plugin-postcss": "^3.1.3",
     "rollup-plugin-typescript2": "^0.27.1",
     "rollup-plugin-uglify": "^6.0.4",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.30",
