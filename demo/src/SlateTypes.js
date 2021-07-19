@@ -1,9 +1,5 @@
-// @flow
-
-import type {
-  Node, Element, Component, ComponentType, Ref,
-} from 'react';
-
+/* @flow */
+// ensure these types are equivalent to the module flow types
 declare type ASCIIColor = string;
 
 declare type BaseNode = {
@@ -103,57 +99,6 @@ declare type SlateElementNode = (ParagraphNode
   | NoTypeNode
   | VariableNode);
 
-export type SlateNode = (SlateElementNode | SlateLeafNode);
+type SlateNode = (SlateElementNode | SlateLeafNode);
 
-declare type BaseSlateRTEProps = {|
-  value: Array<SlateNode>,
-  onFileLoad: (opts: { id: string }) => Promise<{ url: string }>,
-  className?: string,
-  inputClassName?: string,
-  options?: ?{
-    // effectively specifies what 1em is equal to, based on the font-size
-    // optional, defaults 1em = 16px
-    defaultFontSizePx: number,
-  },
-  variables: { [variableName: string]: string },
-|};
-
-declare type FileT = { type: 'URL', url: string } | { type: 'Image ID', id: string };
-
-declare export function getBackgroundColor(
-  Array<SlateNode>,
-): string | null;
-
-declare export function isEmpty(
-  null | Array<SlateNode>,
-  variables: { [variableName: string]: string },
-): boolean;
-
-declare export function extractText(
-  null | Array<SlateNode>,
-  variables: { [variableName: string]: string },
-): string;
-
-declare export function deserializeHTMLString(
-  htmlString: string,
-): Array<SlateNode>;
-
-declare export function parseAsHTML(
-  slateContent: Array<SlateNode>,
-  variables: { [variableName: string]: string },
-  onFileLoad: (opts: { id: string }) => Promise<{ url: string }>
-): Promise<string>;
-
-declare export default class SlateRTE extends React$Component<{|
-  ...BaseSlateRTEProps,
-  uploadFile?: (
-    file: File, progressCallBack: (progress: number) => void,
-  ) => Promise<null | FileT>,
-  setValue: (value: Array<SlateNode>) => void,
-  toolbarClassName?: string,
-  mode: 'Edit',
-|} | {|
-  ...BaseSlateRTEProps,
-  mode: 'Read-Only' | 'Minimal Read-Only' | 'PDF' | 'Minimal PDF',
-|}> {}
-
+export type SlateContentItem = SlateNode;

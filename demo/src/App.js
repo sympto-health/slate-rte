@@ -1,5 +1,5 @@
 /* @flow */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import type { SlateNode } from 'slate-rte';
 import SlateRTE, { extractText, deserializeHTMLString, parseAsHTML, getBackgroundColor }  from "slate-rte";
 import { Card } from 'react-bootstrap';
@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 import swal from 'sweetalert';
 import _ from 'lodash';
 import PDFPreview from './PDFPreview';
+import type { SlateContentItem } from './SlateTypes';
 // $FlowFixMe
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -24,13 +25,13 @@ const fileToBase64 = (file) => (
   }));
 
 const App = () => {
-const [value, setValue] = useState<Array<SlateNode>>([
+const [value, setValue] = useState<Array<SlateContentItem>>([
     {
       "type": "background-color",
       "color": "#ecf0f1",
       "children": [
         {
-          "text": ""
+          "text": "",
         }
       ]
     },
