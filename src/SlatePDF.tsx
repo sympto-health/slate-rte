@@ -4,7 +4,6 @@ import {
   View, Text, Image, Link,
 } from '@react-pdf/renderer';
 import _ from 'lodash';
-import { RenderLeafProps, RenderElementProps } from 'slate-react';
 import getBackgroundColor from './getBackgroundColor';
 import { ASCIIColor } from './SlateTypes';
 import { SlateNode, BaseElementProps, BaseLeafProps } from './SlateNode';
@@ -18,14 +17,12 @@ type ParentStyles = {
 };
 
 type ElementProps = {
-  attributes: RenderElementProps['attributes'],
   styles: ParentStyles,
   fontRatio: number,
   children: (curStyles: ParentStyles) => (JSX.Element),
 } & Omit<BaseElementProps, 'children'>;
 
 type LeafProps = {
-  attributes: RenderLeafProps['attributes'],
   styles: ParentStyles,
   children: (curStyles: ParentStyles) => (JSX.Element),
   variables: { [variableName: string]: string },
@@ -34,7 +31,7 @@ type LeafProps = {
 type Props = {
   value: SlateNode[],
   minimalFormatting: boolean,
-  onFileLoad?: (opts: { id: string }) => Promise<{ url: string }>,
+  onFileLoad: (opts: { id: string }) => Promise<{ url: string }>,
   options?: {
     // effectively specifies what 1em is equal to, based on the font-size
     // optional, defaults 1em = 16px
@@ -52,7 +49,6 @@ const SlatePDF = ({
     .map((metadata) => (
       metadata.type
         ? (
-          // @ts-ignore
           <SlateElement
             key={uuidv4()}
             styles={styles}
@@ -71,7 +67,6 @@ const SlatePDF = ({
         : (
           <SlateLeaf
             key={uuidv4()}
-            // @ts-ignore
             leaf={metadata}
             minimalFormatting={minimalFormatting}
             styles={styles}
