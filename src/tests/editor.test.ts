@@ -11,14 +11,6 @@ jest.mock('react', () => ({
 describe('slate editor', () => {
   it('text background with data attributes', async () => {
     let counter = 0;
-    console.log(await parseAsHTML(
-      textBackgroundSnapshots.initialSlate,
-      {},
-      async () => {
-        counter += 1;
-        return { url: 'a' };
-      },
-    ));
     expect(await parseAsHTML(
       textBackgroundSnapshots.initialSlate,
       {},
