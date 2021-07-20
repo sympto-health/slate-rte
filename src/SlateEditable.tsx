@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from 'react'
+import React, { useMemo, useState } from 'react'
 import { withHistory } from 'slate-history'
 import {
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
@@ -43,17 +43,17 @@ type LeafProps = {
       no text colors (background color becomes text color if applicable)
  */
 const SlateEditable = ({
-  value, uploadFile, variables, inputClassName, onFileLoad, setValue, toolbarClassName,
+  value, uploadFile, variables, inputClassName, onFileLoad, setValue, toolbarClassName, boundingBox,
 }: ({
   setValue:(value: SlateNode[]) => void,
   toolbarClassName?: string,
   uploadFile: (file: File, progressCallBack: (progress: number) => void) => Promise<null | FileT>,
+  boundingBox: { top: number, left: number },
 } & BaseProps)): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const editor: ReactEditor = useMemo(() => withVariables(false)(withImages(withLinks(withHistory(withReact(createEditor()))))), [])
   const [showAllOptions, setShowAllOptions] = useState(false);
-  const slateEditor = useRef<HTMLDivElement | null>(null)
   return (
     <Slate
       editor={editor}
@@ -61,7 +61,7 @@ const SlateEditable = ({
       onChange={(value) => {
         setValue(value as SlateNode[])
       }}
-      >
+    >
       <Card
         className={cx('toolbar-item d-flex flex-row flex-wrap shadow-sm px-2 py-1 card mb-3 w-auto', toolbarClassName)}
       >
@@ -87,12 +87,7 @@ const SlateEditable = ({
           }}
         />
         <VariableSuggestions
-          boundingBox={slateEditor.current
-            ? {
-              top: slateEditor.current.getBoundingClientRect().top,
-              left: slateEditor.current.getBoundingClientRect().left,
-            }
-            : { top: 0, left: 0 }}
+          boundingBox={boundingBox}
           variables={_.keys(variables)}
           value={value}
         />

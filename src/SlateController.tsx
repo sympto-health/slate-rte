@@ -67,6 +67,12 @@ const SlateController = ({
             {opts.mode === 'Edit' && (
               <SlateEditable
                 value={value}
+                boundingBox={slateEditor.current
+                  ? {
+                    top: slateEditor.current.getBoundingClientRect().top,
+                    left: slateEditor.current.getBoundingClientRect().left,
+                  }
+                  : { top: 0, left: 0 }}
                 uploadFile={opts.uploadFile}
                 variables={variables}
                 inputClassName={inputClassName}

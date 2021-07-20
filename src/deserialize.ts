@@ -22,53 +22,67 @@ const parseChildren = (childNodes: Array<HTMLElement>) => {
 
 const parseLeaf = (el: HTMLElement) => {
   const { style } = el;
-  const children = parseChildren(el.childNodes);
-  const fetchAttr = () => {
-    if (el.nodeName === 'SPAN' && style.fontSize) {
-      const fontSizePx = Number(style.fontSize.replace('em', '')) * 16.00;
-      return { 'font-size': { value: fontSizePx } };
-    }
-    if (el.nodeName === 'SPAN' && style.fontWeight) {
-      const fontWeight = Number(style.fontWeight);
-      const isBold = el.getAttribute('data-type') === 'bold';
-      return isBold
-        ? { bold: true }
-        : { 'font-weight': { value: fontWeight } };
-    }
-    if (el.nodeName === 'SPAN' && style.color) {
-      const targetColor = el.getAttribute('data-color')
-        ? el.getAttribute('data-color')
-        : style.color;
-      return { 'text-color': { color: targetColor } };
-    }
-    if (el.nodeName === 'SPAN' && style.backgroundColor) {
-      const targetColor = el.getAttribute('data-color')
-        ? el.getAttribute('data-color')
-        : style.color;
-      return { 'highlight-color': { color: targetColor } };
-    }
-    if (el.nodeName === 'SPAN' && el.getAttribute('data-variable-leaf')) {
-      return { text: '', variable: { variableName: el.getAttribute('data-variable-leaf') } };
-    }
-    if (el.nodeName === 'SPAN') {
-      return {};
-    }
-    if (el.nodeName === 'STRONG') {
-      return { bold: true };
-    }
-    if (el.nodeName === 'CODE') {
-      return { code: true };
-    }
-    if (el.nodeName === 'EM') {
-      return { italic: true };
-    }
-    if (el.nodeName === 'U') {
-      return { underline: true };
-    }
-    return null;
-  };
-  const attrs = fetchAttr();
-  return attrs ? children.map(child => jsx('text', attrs, child)) : null;
+  const appliedStyleFuncs = [
+    () => {
+      if (el.nodeName === 'SPAN' && style.fontSize) {
+        const fontSizePx = Number(style.fontSize.replace('em', '')) * 16.00;
+        return { 'font-size': { value: fontSizePx } };
+      }
+      return null;
+    },
+    () => {
+      if (el.nodeName === 'SPAN' && style.fontWeight) {
+        const fontWeight = Number(style.fontWeight);
+        const isBold = el.getAttribute('data-type') === 'bold';
+        return isBold
+          ? { bold: true }
+          : { 'font-weight': { value: fontWeight } };
+      }
+      return null;
+    },
+    () => {
+      if (el.nodeName === 'SPAN' && style.color) {
+        const targetColor = el.getAttribute('data-color')
+          ? el.getAttribute('data-color')
+          : style.color;
+        return { 'text-color': { color: targetColor } };
+      }
+      return null;
+    },
+    () => {
+      if (el.nodeName === 'SPAN' && style.backgroundColor) {
+        const targetColor = el.getAttribute('data-color')
+          ? el.getAttribute('data-color')
+          : style.color;
+        return { 'highlight-color': { color: targetColor } };
+      }
+      return null;
+    },
+    () => {
+      if (el.nodeName === 'SPAN' && el.getAttribute('data-variable-leaf')) {
+        return { text: '', variable: { variableName: el.getAttribute('data-variable-leaf') } };
+      }
+      return null;
+    },
+    () => (el.nodeName === 'STRONG' ? { bold: true } : null),
+    () => (el.nodeName === 'CODE' ? { code: true } : null),
+    () => (el.nodeName === 'EM' ? { italic: true } : null),
+    () => (el.nodeName === 'U' ? { underline: true } : null),
+    () => (el.nodeName === 'SPAN' ? {} : null),
+  ];
+  const attrs = appliedStyleFuncs.reduce((allStyles: ?{ [string]: string }, appliedStyleFunc) => (
+    appliedStyleFunc() != null
+      ? {
+        ...(allStyles || {}),
+        ...appliedStyleFunc(),
+      }
+      : allStyles
+  ), null);
+
+  const nodeData = attrs
+    ? parseChildren(el.childNodes).map((child) => jsx('text', attrs, child))
+    : null;
+  return nodeData;
 };
 
 const deserialize = (el: HTMLElement): Descendant[] => {
@@ -130,7 +144,7 @@ const deserialize = (el: HTMLElement): Descendant[] => {
     const targetColor = el.getAttribute('data-color')
       ? el.getAttribute('data-color')
       : el.style.backgroundColor;
-    return jsx('element', { type: 'background-color', text: null, color: targetColor }, children);
+    return jsx('element', { type: 'background-color', color: targetColor }, children);
   }
   if (el.nodeName === 'A') {
     return jsx('element', { type: 'link', url: el.getAttribute('href') }, children);

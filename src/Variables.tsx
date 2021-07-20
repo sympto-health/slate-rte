@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Transforms, Range, Editor } from 'slate';
 import { useSlate, ReactEditor } from 'slate-react';
 import { Button } from 'react-bootstrap';
+import cx from 'classnames';
 import { SlateNode, SlateEditorT, convertSlateEditor } from './SlateNode';
 import { VariableNode } from './SlateTypes';
 
 export const withVariables = (isReadOnly: boolean) => ((editor: SlateEditorT) => {
   if (isReadOnly) {
-    // if read only, then show variable children, sicne variable element contains 
+    // if read only, then show variable children, sicne variable element contains
     // a child containing a leaf with a variableName
     return editor;
   }
   const { isInline, isVoid } = editor;
-    
+
   if (!isReadOnly) {
     // @ts-ignore
     editor.isInline = (element: SlateNode) => {
@@ -25,19 +26,19 @@ export const withVariables = (isReadOnly: boolean) => ((editor: SlateEditorT) =>
       return element.type === 'variable' ? true : isVoid(element)
     };
   }
-   
+
   return editor
 });
 
 
 const insertVariable = (editor: SlateEditorT, variableName: string, target: Range) => {
-  // leaf node being replaced 
+  // leaf node being replaced
   const [node] = Editor.node(editor, target);
 
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
   // @ts-ignore
-  const children: SlateNode[] = [{ ...node, text: '', variable: { variableName }, children: undefined }];
+  const children: SlateNode[] = [{ ...node, text: ' ', variable: { variableName }, children: undefined }];
 
   const mention: VariableNode<SlateNode> = {
     type: 'variable',
@@ -85,7 +86,7 @@ const VariableSuggestions = ({
       setSuggestionsDivStyle({
         top: `${rect.top - boundingBox.top + 24}px`,
         left: `${rect.left - boundingBox.left}px`,
-      });    
+      });
     }
   }, [editor, index, search, target])
 
@@ -107,7 +108,7 @@ const VariableSuggestions = ({
         setSearch(beforeMatch[1]);
         setIndex(0);
         return;
-      } 
+      }
     }
 
     setTarget(null);
@@ -130,7 +131,7 @@ const VariableSuggestions = ({
           }}
           className="d-flex flex-column"
         >
-          {variables.map(variable => (
+          {variables.map((variable, index) => (
             <Button
               key={variable}
               style={{
@@ -138,7 +139,7 @@ const VariableSuggestions = ({
                 borderRadius: '3px',
               }}
               variant="link"
-              className="py-2 border-bottom"
+              className={cx('py-2', { 'border-bottom': index !== variables.length - 1})}
               onClick={() => { insertVariable(editor, variable, target); }}
             >
               {variable}

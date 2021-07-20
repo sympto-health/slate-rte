@@ -153,12 +153,7 @@ export const Leaf = ({
 }: LeafProps): JSX.Element => {
     // if variable type leaf, then child must include variable name
   const baseChild: JSX.Element = (
-    <>
-      {_.compact([
-        leaf.variable ? variables[leaf.variable.variableName] : null,
-        children,
-      ])}
-    </>
+    <>{_.compact([leaf.variable ? variables[leaf.variable.variableName] : children])}</>
   );
 
   const styleFuncs = [
@@ -184,5 +179,7 @@ export const Leaf = ({
 
   const finalChildComponent = styleFuncs.reduce((finalChild, styleFunc) => (styleFunc(finalChild)), baseChild)
 
-  return <span {...attributes}>{finalChildComponent}</span>
+  return leaf.variable
+    ? <span data-variable-leaf={leaf.variable.variableName} {...attributes}>{finalChildComponent}</span>
+    : <span {...attributes}>{finalChildComponent}</span>
 }

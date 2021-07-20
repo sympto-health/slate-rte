@@ -28,7 +28,9 @@ export const parseAsHTML = async (
 };
 
 export const deserializeHTMLString = (htmlString: string): SlateNode[] => {
-  const domData = new DOMParser().parseFromString(htmlString, 'text/html')
+  // remove all 0 width spaces
+  const formattedHTMLString = htmlString.replace(/\uFEFF/g,'');
+  const domData = new DOMParser().parseFromString(formattedHTMLString, 'text/html');
   return deserialize(domData.body);
 };
 
