@@ -154,10 +154,10 @@ export const Leaf = ({
     // if variable type leaf, then child must include variable name
   const baseChild: JSX.Element = (
     <>
-      {leaf.variable
-        ? (<span data-variable-leaf={leaf.variable.variableName}>{variables[leaf.variable.variableName]}</span> )
-        : null}
-      {leaf.text ? leaf.text : children}
+      {_.compact([
+        leaf.variable ? variables[leaf.variable.variableName] : null,
+        children,
+      ])}
     </>
   );
 
