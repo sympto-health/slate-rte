@@ -38,7 +38,7 @@ const insertVariable = (editor: SlateEditorT, variableName: string, target: Rang
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
   // @ts-ignore
-  const children: SlateNode[] = [{ ...node, text: ' ', variable: { variableName }, children: undefined }];
+  const children: SlateNode[] = [{ ...node, text: '', variable: { variableName }, children: undefined }];
 
   const mention: VariableNode<SlateNode> = {
     type: 'variable',
