@@ -8,6 +8,7 @@ import getBackgroundColor from './getBackgroundColor';
 import { ASCIIColor } from './SlateTypes';
 import { SlateNode, BaseElementProps, BaseLeafProps } from './SlateNode';
 import AsyncFileLoad from './AsyncFileLoad';
+import ImageSizeRender from './ImageSizeRender';
 
 const DEFAULT_EM_SIZE = 16;
 
@@ -100,59 +101,68 @@ const SlatePDF = ({
   );
 }
 
+const INLINE_STYLE: { display: 'flex', flexDirection: 'row', flexWrap: 'wrap' } = {
+  display: 'flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+};
+
 const SlateElement = ({
   minimalFormatting, children, element, styles, fontRatio, onFileLoad,
 }: ElementProps): JSX.Element => {
   const childComponents = (curStyles: ParentStyles) => (_.compact([
     element.text ? <Text key={uuidv4()}>{element.text}</Text> : null,
-    <Text key={uuidv4()}>{children(curStyles)}</Text>,
+    <View style={INLINE_STYLE} key={uuidv4()}>{children(curStyles)}</View>,
   ]));
 
   switch (element.type) {
     case 'block-quote':
       return (
-        <Text
+        <View
           style={{
+            ...INLINE_STYLE,
             borderLeft: '2px solid #ddd',
             marginLeft: 0,
             marginRight: 0,
             paddingLeft: 10,
             marginBottom: 10,
-            color: '#aaa'
+            color: '#aaa',
           }}
         >
           {childComponents(styles)}
-        </Text>
+        </View>
       );
     case 'bulleted-list':
       return <View style={{ flexDirection: 'column', alignItems: 'flex-start' }}>{childComponents}</View>
     case 'heading-one':
-      return <Text style={{ fontSize: 40 * fontRatio }}>{childComponents({ ...styles, fontSize: 40 * fontRatio })}</Text>;
+      return <View style={{ ...INLINE_STYLE, fontSize: 40 * fontRatio }}>{childComponents({ ...styles, fontSize: 40 * fontRatio })}</View>;
     case 'heading-two':
-      return <Text style={{ fontSize: 28 * fontRatio }}>{childComponents({ ...styles, fontSize: 28 * fontRatio })}</Text>;
+      return <View style={{ ...INLINE_STYLE, fontSize: 28 * fontRatio }}>{childComponents({ ...styles, fontSize: 28 * fontRatio })}</View>;
     case 'list-item': case 'numbered-list':
       return (
-        <Text style={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+        <View
+          style={INLINE_STYLE}
+        >
           {[<Text key={uuidv4()}> • </Text>, ...childComponents(styles)]}
-        </Text>
+        </View>
       );
     case 'left-align':
       return (
-        <Text style={{ textAlign: !minimalFormatting ? 'left' : undefined }}>
+        <View style={{ ...INLINE_STYLE, textAlign: !minimalFormatting ? 'left' : undefined }}>
           {childComponents(styles)}
-        </Text>
+        </View>
       );
     case 'right-align':
       return (
-        <Text style={{ textAlign: !minimalFormatting ? 'right' : undefined }}>
+        <View style={{ textAlign: !minimalFormatting ? 'right' : undefined, ...INLINE_STYLE }}>
           {childComponents(styles)}
-        </Text>
+        </View>
       );
     case 'center-align':
       return (
-        <Text style={{ textAlign: !minimalFormatting ? 'center' : undefined }}>
+        <View style={{ textAlign: !minimalFormatting ? 'center' : undefined, ...INLINE_STYLE }}>
           {childComponents(styles)}
-        </Text>
+        </View>
       );
     case 'horizontal-line':
       return minimalFormatting
@@ -176,13 +186,15 @@ const SlateElement = ({
       )
     case 'image': case 'video':
       return (
-        <View>
-          <View style={{ width: '100%', height: '100%' }}>
+        <View style={INLINE_STYLE}>
+          <View style={INLINE_STYLE}>
             <AsyncFileLoad onFileLoad={onFileLoad} nodeData={element}>
               {({ url }) => (
-                <>
-                  <Image style={{ width: '100vw', objectFit: 'contain' }} src={url} />
-                </>
+                <ImageSizeRender imageURL={url}>
+                  {({ width, height }) => (
+                    <Image cache style={{ ...INLINE_STYLE, width, height, objectFit: 'contain' }} src={url} />
+                  )}
+                </ImageSizeRender>
               )}
             </AsyncFileLoad>
           </View>
@@ -193,21 +205,23 @@ const SlateElement = ({
       return (<View style={{ backgroundColor: element.color }} />);
     case 'variable':
       // variable handled by leaf
-      return <Text>{childComponents(styles)}</Text>;
+      return (
+        <View style={INLINE_STYLE}>
+          {childComponents(styles)}
+        </View>
+      );
     default:
       return (
-        <Text
-          style={element.noPadding ? { paddingBottom: 1 } : { paddingBottom: 10 }}
-        >
+        <View style={element.noPadding ? { ...INLINE_STYLE, paddingBottom: 1 } : { ...INLINE_STYLE, paddingBottom: 10 }}>
           {childComponents(styles)}
-        </Text>
+        </View>
       );
   }
 }
 
 
 const SlateLeaf = ({
-  children, leaf, minimalFormatting, styles,  variables,
+  children, leaf, minimalFormatting, styles, variables,
 }: LeafProps): JSX.Element => {
   const newStyles = _.compact([
     // bold
