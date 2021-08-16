@@ -1,3 +1,6 @@
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import 'get-root-node-polyfill/implement';
 import React from 'react'
 import _ from 'lodash';
 import { renderToStaticMarkup } from 'react-dom/server'
