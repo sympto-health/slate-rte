@@ -134,6 +134,10 @@ declare export function extractText(
   variables: { [variableName: string]: string },
 ): string;
 
+declare export function extractVariables(
+  Array<SlateNode>,
+): Array<string>;
+
 declare export function deserializeHTMLString(
   htmlString: string,
 ): Array<SlateNode>;
