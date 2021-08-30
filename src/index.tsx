@@ -37,6 +37,13 @@ export const deserializeHTMLString = (htmlString: string): SlateNode[] => {
   return deserialize(domData.body);
 };
 
+export const extractVariables = (slateContent: SlateNode[]): Array<string> => (_.compact(_.flatten(
+  (slateContent || [])
+    .map((contentItem: SlateNode) => ([
+      (contentItem.type === 'variable' ? contentItem.variableName : null),
+      ...(contentItem.children ? extractVariables((contentItem.children as SlateNode[])) : []),
+    ])))));
+
 // iterates through every single slate item and children and stringifies everything by extracting
 // all teh text
 export const extractText = (slateContent: null | SlateNode[], variables: { [variableName: string]: string }): string => (_.compact(_.flatten((slateContent || [])

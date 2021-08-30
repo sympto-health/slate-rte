@@ -1,6 +1,6 @@
 {
   "name": "slate-rte",
-  "version": "1.0.65",
+  "version": "1.0.66",
   "description": "Rich text editor for slatejs editor",
   "main": "build/index.js",
   "module": "build/index.es.js",
@@ -60,7 +60,7 @@
     "@typescript-eslint/parser": "^3.6.1",
     "core-js": "^3.16.1",
     "csstype": "^2.6.11",
-    "eslint": "^7.11.0",  
+    "eslint": "^7.11.0",
     "eslint-plugin-react-hooks": "^4.0.8",
     "react-bootstrap": "^1.2.2",
     "regenerator-runtime": "^0.13.1",
