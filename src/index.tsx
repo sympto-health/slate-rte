@@ -1,6 +1,18 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
-import 'get-root-node-polyfill/implement';
+// @ts-ignore
+import rootNode from 'get-root-node-polyfill';
+// @ts-ignore
+import isImplemented from 'get-root-node-polyfill/is-implemented';
+
+if (!isImplemented() && Node) {
+  Object.defineProperty(Node.prototype, 'getRootNode', {
+    enumerable: false,
+    configurable: false,
+    value: rootNode,
+  });
+}
+
 import React from 'react'
 import _ from 'lodash';
 import { renderToStaticMarkup } from 'react-dom/server'
