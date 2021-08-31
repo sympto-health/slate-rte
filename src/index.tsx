@@ -4,10 +4,8 @@ import 'get-root-node-polyfill/implement';
 
 import React from 'react'
 import _ from 'lodash';
+import { getBackgroundColor, extractVariables, extractText } from './utils';
 import { renderToStaticMarkup } from 'react-dom/server'
-import getBackgroundColor from './getBackgroundColor';
-import extractVariables from './extractVariables';
-import extractText from './extractText';
 import deserialize from './deserialize';
 import loadImages from './AsyncFileLoadStore';
 import { SlateNode } from './SlateNode';

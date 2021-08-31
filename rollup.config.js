@@ -61,19 +61,19 @@ export default [{
     uglify()
   ]
 }, {
-  input: "src/extractVariables.tsx",
+  input: "src/utils.tsx",
   external: ["styled-components"],
   output: [
     {
-      file: pkg.mainExtractText,
+      file: pkg.mainUtils,
       format: "umd",
       exports: "named",
       compact: true,
-      name: "extractVariables",
+      name: "utils",
       sourcemap: false
     },
     {
-      file: pkg.moduleExtractText,
+      file: pkg.moduleUtils,
       format: "esm",
       exports: "named",
       sourcemap: false,
