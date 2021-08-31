@@ -1,21 +1,20 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
-
-if (Node) {
-  require('get-root-node-polyfill/implement');
-}
+import 'get-root-node-polyfill/implement';
 
 import React from 'react'
 import _ from 'lodash';
 import { renderToStaticMarkup } from 'react-dom/server'
 import getBackgroundColor from './getBackgroundColor';
+import extractVariables from './extractVariables';
+import extractText from './extractText';
 import deserialize from './deserialize';
 import loadImages from './AsyncFileLoadStore';
 import { SlateNode } from './SlateNode';
 import SlateController from './SlateController';
 import './index.css';
 
-export { getBackgroundColor };
+export { getBackgroundColor, extractVariables, extractText };
 
 export const parseAsHTML = async (
   slateContent: SlateNode[],
@@ -40,22 +39,6 @@ export const deserializeHTMLString = (htmlString: string): SlateNode[] => {
   const domData = new DOMParser().parseFromString(formattedHTMLString, 'text/html');
   return deserialize(domData.body);
 };
-
-export const extractVariables = (slateContent: SlateNode[]): Array<string> => (_.compact(_.flatten(
-  (slateContent || [])
-    .map((contentItem: SlateNode) => ([
-      (contentItem.type === 'variable' ? contentItem.variableName : null),
-      ...(contentItem.children ? extractVariables((contentItem.children as SlateNode[])) : []),
-    ])))));
-
-// iterates through every single slate item and children and stringifies everything by extracting
-// all teh text
-export const extractText = (slateContent: null | SlateNode[], variables: { [variableName: string]: string }): string => (_.compact(_.flatten((slateContent || [])
-  .map((contentItem: SlateNode) => ([
-    (contentItem.text ? String(contentItem.text) : ' '),
-    (contentItem.type === 'variable' ? variables[contentItem.variableName] : ''),
-    ...(contentItem.children ? extractText((contentItem.children as null | SlateNode[]), variables) : []),
-  ]))))).join('');
 
 export const isEmpty = (slateContent: null | SlateNode[], variables: { [variableName: string]: string }): boolean => (extractText(slateContent, variables).trim().length === 0);
 

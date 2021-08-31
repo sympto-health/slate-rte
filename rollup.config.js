@@ -5,10 +5,9 @@ import resolve from "rollup-plugin-node-resolve";
 import postcss from 'rollup-plugin-postcss'
 import { uglify } from "rollup-plugin-uglify";
 import copy from 'rollup-plugin-copy'
+import pkg from './package.json';
 
-import pkg from "./package.json";
-
-export default {
+export default [{
   input: "src/index.tsx",
   external: ["styled-components"],
   output: [
@@ -61,4 +60,37 @@ export default {
     }),
     uglify()
   ]
-};
+}, {
+  input: "src/extractVariables.tsx",
+  external: ["styled-components"],
+  output: [
+    {
+      file: pkg.mainExtractText,
+      format: "umd",
+      exports: "named",
+      compact: true,
+      name: "extractVariables",
+      sourcemap: false
+    },
+    {
+      file: pkg.moduleExtractText,
+      format: "esm",
+      exports: "named",
+      sourcemap: false,
+      compact: true
+    }
+  ],
+  plugins: [
+    external({ includeDependencies: true }),
+    resolve(),
+    typescript({
+      rollupCommonJSResolveHack: true,
+      exclude: "**/tests/**",
+      clean: true
+    }),    
+    commonjs({
+      include: ["node_modules/**"],
+    }),
+    uglify()
+  ],
+}];
