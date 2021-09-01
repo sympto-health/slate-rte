@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Transforms, Range, Editor } from 'slate';
 import { useSlate, ReactEditor } from 'slate-react';
 import { Button } from 'react-bootstrap';
+import _ from 'lodash';
 import cx from 'classnames';
 import { SlateNode, SlateEditorT, convertSlateEditor } from './SlateNode';
 import { VariableNode } from './SlateTypes';
@@ -114,6 +115,15 @@ const VariableSuggestions = ({
     setTarget(null);
   }, [value, selection]);
 
+  const targetText = target ? Editor.string(editor, target) : null;
+  const suggestedVariables = useMemo(() => {
+    if (targetText == null || !targetText.startsWith('{')) {
+      return variables;
+    } 
+    const targetTextWithoutPrefix = _.tail(targetText).join('');
+
+    return variables.filter((variableName) => variableName.startsWith(targetTextWithoutPrefix));
+  }, [targetText, variables])
   return (
     <>
       {target && variables.length > 0 && (
@@ -131,7 +141,10 @@ const VariableSuggestions = ({
           }}
           className="d-flex flex-column"
         >
-          {variables.map((variable, index) => (
+          {suggestedVariables.length === 0 && (
+            <div className="py-2 border-bottom">No Matches Found</div>
+          )}
+          {suggestedVariables.map((variable, index) => (
             <Button
               key={variable}
               style={{
