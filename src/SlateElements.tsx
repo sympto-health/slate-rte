@@ -5,6 +5,7 @@ import { isSafari, isIOS } from 'react-device-detect';
 import _ from 'lodash';
 import { useSelected, useFocused, RenderLeafProps, RenderElementProps } from 'slate-react';
 import { SlateLeafNode } from './SlateTypes';
+import ImageRender from './ImageRender';
 import { SlateNode, BaseElementProps } from './SlateNode';
 import AsyncFileLoad from './AsyncFileLoad';
 
@@ -74,45 +75,46 @@ export const Element = (props: ElementProps): JSX.Element => {
       );
     case 'image':
       return (
-        <div
-          {...attributes}
-          data-type="image"
-          className={cx('d-inline-block', { 'shadow-sm': selected && focused })}
+        <ImageRender 
+          isReadOnly={isReadOnly} 
+          loadedImages={loadedImages} 
+          isSelected={selected && focused}
+          className="image-item d-inline-block"
+          nodeData={element} 
+          onFileLoad={onFileLoad}
+          attributes={attributes}
         >
-          <div contentEditable={false}>
-            <AsyncFileLoad loadedImages={loadedImages} nodeData={element} onFileLoad={onFileLoad}>
-              {({ url, id }) => (
-                <img data-image-id={id} alt="Uploaded Image" src={url} className="image-item d-inline-block" />
-              )}
-            </AsyncFileLoad>
-          </div>
           {children}
-        </div>
+        </ImageRender>
       );
     case 'video':
       return (
         <div className="d-inline-block video-item-cont" {...attributes}>
           <div className="d-inline" contentEditable={false}>
             <AsyncFileLoad nodeData={element} onFileLoad={onFileLoad}>
-              {({ url }) => (
-                <ReactPlayer
-                  url={String(url)}
-                  playing
-                  config={String(url).includes('.m3u8') ? {
-                    file: {
-                      forceHLS: !isSafari && !isIOS,
-                      hlsOptions: {
-                        xhrSetup: (xhr: any) => {
-                          // eslint-disable-next-line
-                          xhr.withCredentials = true; // send cookies
+              {(videoData) => (
+                <>
+                  {videoData && (
+                    <ReactPlayer
+                      url={String(videoData.url)}
+                      playing
+                      config={String(videoData.url).includes('.m3u8') ? {
+                        file: {
+                          forceHLS: !isSafari && !isIOS,
+                          hlsOptions: {
+                            xhrSetup: (xhr: any) => {
+                              // eslint-disable-next-line
+                              xhr.withCredentials = true; // send cookies
+                            },
+                          },
                         },
-                      },
-                    },
-                  } : {}}
-                  className="video-item"
-                  controls
-                  playsinline
-                />
+                      } : {}}
+                      className="video-item"
+                      controls
+                      playsinline
+                    />
+                  )}
+                </>
               )}
             </AsyncFileLoad>
           </div>

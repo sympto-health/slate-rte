@@ -189,12 +189,20 @@ const SlateElement = ({
         <View style={INLINE_STYLE}>
           <View style={INLINE_STYLE}>
             <AsyncFileLoad onFileLoad={onFileLoad} nodeData={element}>
-              {({ url }) => (
-                <ImageSizeRender imageURL={url}>
-                  {({ width, height }) => (
-                    <Image cache style={{ ...INLINE_STYLE, width, height, objectFit: 'contain' }} src={url} />
+              {(imageData) => (
+                <>
+                  {imageData && (
+                    <ImageSizeRender imageURL={imageData.url}>
+                      {({ width, height }) => (
+                        <Image 
+                          cache 
+                          style={{ ...INLINE_STYLE, width, height, objectFit: 'contain' }} 
+                          src={imageData.url} 
+                        />
+                      )}
+                    </ImageSizeRender>
                   )}
-                </ImageSizeRender>
+                </>
               )}
             </AsyncFileLoad>
           </View>

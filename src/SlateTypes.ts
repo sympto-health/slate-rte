@@ -64,9 +64,13 @@ export type LinkNode<T> = ({
 export type ImageVideoNode<T> = ({
   type: 'image' | 'video',
   url: string,
+  width?: number, // px
+  height?: number, // px
 } | {
   type: 'image' | 'video',
   fileData: { type: 'Image ID', id: string },
+  width?: number, // px
+  height?: number, // px
 }) & T;
 
 export type BackgroundColorNode<T> = ({

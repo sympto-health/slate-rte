@@ -15,14 +15,17 @@ const extractImageURL = (
   return null;
 }
 
-const AsyncFileLoad = ({
-  onFileLoad, nodeData, children, loadedImages,
-}: {
+export type AsyncFileLoadProps = {
   onFileLoad: (fileData: { id: string }) => Promise<{ url: string }>,
   nodeData: ImageVideoNode<SlateNode>,
-  children: (urlData: { url: string, id: string | null }) => (JSX.Element),
+  children: (urlData: null | { url: string, id: string | null }) => (JSX.Element | JSX.Element[]),
   loadedImages?: { [fileId: string]: string }, // mapping of file id to url
-}): JSX.Element => {
+  delaySeconds?: null | number, // seconds to delay image loading
+};
+
+const AsyncFileLoad = ({
+  onFileLoad, nodeData, children, loadedImages, delaySeconds, 
+}: AsyncFileLoadProps): JSX.Element => {
   const [loadedFileURL, setLoadedFileURL] = useState<{ url: string, id: null | string } | null>(
     extractImageURL(nodeData, loadedImages));
   useEffect(() => {
@@ -39,13 +42,21 @@ const AsyncFileLoad = ({
       const urlData = await loadFile();
       setLoadedFileURL(urlData);
     };
-    setURL();
-  }, [onFileLoad, nodeData, JSON.stringify(nodeData)]);
+    let delayTimeout: null | ReturnType<typeof setTimeout> = null;
+    if (delaySeconds) {
+      delayTimeout = setTimeout(setURL, delaySeconds * 1000);
+    } else {
+      setURL();
+    }
+    return () => {
+      if (delayTimeout) {
+        clearTimeout(delayTimeout);
+      }
+    };
+  }, [onFileLoad, delaySeconds, nodeData, JSON.stringify(nodeData)]);
   return (
     <>
-      {loadedFileURL && (
-        children(loadedFileURL)
-      )}
+      {children(loadedFileURL)}
     </>
   );
 };

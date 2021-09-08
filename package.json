@@ -84,6 +84,7 @@
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.4",
     "lodash": "^4.17.21",
+    "re-resizable": "^6.9.0",
     "react-color": "^2.18.1",
     "react-device-detect": "^1.17.0",
     "react-dropzone": "^11.0.2",
