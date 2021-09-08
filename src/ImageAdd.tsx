@@ -15,12 +15,13 @@ const ImageAdd = ({ uploadFile, type }: {
   const editor: ReactEditor = useSlate();
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
 
-  const insertFile = (fileData: FileT) => {
+  const insertFile = (fileData: FileT, fileOpts: null | { width: number, height: number }) => {
     const { selection } = editor;
     const file: ImageVideoNode<SlateNode> = {
       type,
       text: null,
       children: [({ text: ' ' } as EmptySlateNode<SlateNode>)],
+      ...(fileOpts || {}),
       ...(fileData.type === 'URL'
          ? {
            url: fileData.url,
@@ -59,12 +60,22 @@ const ImageAdd = ({ uploadFile, type }: {
   return (
     <>
       {
-        showAttachmentModal && (
+        showAttachmentModal && type === 'image' && (
           <AttachmentModal
             closeModal={() => { setShowAttachmentModal(false); }}
             onUpload={uploadFile}
             type={type}
             onFinish={insertFile}
+          />
+        )
+      }
+      {
+        showAttachmentModal && type === 'video' && (
+          <AttachmentModal
+            closeModal={() => { setShowAttachmentModal(false); }}
+            onUpload={uploadFile}
+            type={type}
+            onFinish={(fileData) => (insertFile(fileData, null))}
           />
         )
       }

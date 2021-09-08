@@ -3,7 +3,7 @@ import './Loading.css';
 
 const Loading = (): JSX.Element => {
   return (
-    <div className="SlateLoadingAnimation"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    <div className="SlateLoadingAnimation" />
   );
 };
 

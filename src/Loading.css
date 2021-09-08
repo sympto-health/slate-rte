@@ -1,67 +1,54 @@
+/**
+ * placeholder-loading v0.5.0
+ * Author: Zalog (https://www.zalog.ro/)
+ **/
+
 .SlateLoadingAnimation {
-  display: inline-block;
-  position: relative;
-  width: 80px;
-  height: 80px;
+  direction: ltr;
+  background-color: #ced4da;
+  height: 100%;
 }
-.SlateLoadingAnimation div {
+
+.SlateLoadingAnimation::before {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #ecf0f1;
-  animation: lds-grid 1.2s linear infinite;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 1;
+  width: 500%;
+  margin-left: -250%;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0) 46%, rgba(255, 255, 255, 0.35) 50%, rgba(255, 255, 255, 0) 54%) 50% 50%;
+  -webkit-animation: phAnimation 0.8s linear infinite;
+          animation: phAnimation 0.8s linear infinite;
+  content: " ";
+  pointer-events: none;
 }
-.SlateLoadingAnimation div:nth-child(1) {
-  top: 8px;
-  left: 8px;
-  animation-delay: 0s;
+.SlateLoadingAnimation > * {
+  display: flex;
+  flex: 1 1 auto;
+  flex-flow: column;
+  margin-bottom: 15px;
+  padding-right: 15px;
+  padding-left: 15px;
 }
-.SlateLoadingAnimation div:nth-child(2) {
-  top: 8px;
-  left: 32px;
-  animation-delay: -0.4s;
-}
-.SlateLoadingAnimation div:nth-child(3) {
-  top: 8px;
-  left: 56px;
-  animation-delay: -0.8s;
-}
-.SlateLoadingAnimation div:nth-child(4) {
-  top: 32px;
-  left: 8px;
-  animation-delay: -0.4s;
-}
-.SlateLoadingAnimation div:nth-child(5) {
-  top: 32px;
-  left: 32px;
-  animation-delay: -0.8s;
-}
-.SlateLoadingAnimation div:nth-child(6) {
-  top: 32px;
-  left: 56px;
-  animation-delay: -1.2s;
-}
-.SlateLoadingAnimation div:nth-child(7) {
-  top: 56px;
-  left: 8px;
-  animation-delay: -0.8s;
-}
-.SlateLoadingAnimation div:nth-child(8) {
-  top: 56px;
-  left: 32px;
-  animation-delay: -1.2s;
-}
-.SlateLoadingAnimation div:nth-child(9) {
-  top: 56px;
-  left: 56px;
-  animation-delay: -1.6s;
-}
-@keyframes lds-grid {
-  0%, 100% {
-    opacity: 1;
+
+
+@-webkit-keyframes phAnimation {
+  0% {
+    transform: translate3d(-30%, 0, 0);
   }
-  50% {
-    opacity: 0.5;
+  100% {
+    transform: translate3d(30%, 0, 0);
   }
 }
+
+@keyframes phAnimation {
+  0% {
+    transform: translate3d(-30%, 0, 0);
+  }
+  100% {
+    transform: translate3d(30%, 0, 0);
+  }
+}
+

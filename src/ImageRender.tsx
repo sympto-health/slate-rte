@@ -35,7 +35,7 @@ const enableProp = (shouldEnable: boolean) => ({
 const EDITABLE_RENDER_DELAY = 1; // 1 seconds delay between renders when in edit mode
 
 const ImageRender = ({ 
-  nodeData, onFileLoad, loadedImages, isReadOnly, children, className, attributes, isSelected,
+  nodeData, onFileLoad, loadedImages, isReadOnly, children, className, attributes, isSelected, 
 }: Props) => {
   // @ts-ignore
   const editor: SlateEditorT = useSlate()
@@ -57,18 +57,16 @@ const ImageRender = ({
      );
   };
 
-  const imageItem = ({ url, id }: { 
+  const imageItem = ({ url, id, height }: { 
     url: string, 
     id: string | null,
+    height: string,
   }) => (
     <img 
       data-image-id={id} 
       alt="Uploaded Image" 
       src={url} 
-      style={{
-        width: nodeData.width ? `${nodeData.width}px` : '100%',
-        height: nodeData.height ? `${nodeData.height}px` : 'auto',
-      }}
+      style={{ height }}
       className="d-inline-block w-100"   
     />
   );
@@ -77,7 +75,7 @@ const ImageRender = ({
     <div
       {...attributes}
       data-type="image"
-      className={className}
+      className={cx(className, { 'border border-secondary shadow-sm': !isReadOnly && isSelected })}
       style={nodeData.width && nodeData.height
         ? {
           width: `${nodeData.width}px`,
@@ -86,22 +84,24 @@ const ImageRender = ({
         : {}}
     >
       <AsyncFileLoad 
-        delaySeconds={isReadOnly ? null : EDITABLE_RENDER_DELAY} 
+        delaySeconds={(isReadOnly || isSelected) ? null : EDITABLE_RENDER_DELAY} 
         loadedImages={loadedImages} 
         nodeData={nodeData} 
         onFileLoad={onFileLoad}
       >
         {(imageData) => (
           <>
-            {imageData && isReadOnly && imageItem({ ...imageData })}
+            {imageData && isReadOnly && imageItem({ 
+              ...imageData,
+              height: nodeData.height ? '100%' : 'auto',
+            })}
             {!isReadOnly && (
               <div contentEditable={false}>
                 {imageData && (nodeData.width == null || nodeData.height == null) &&(
-                    <ImageSizeRender imageURL={imageData.url}>
+                  <ImageSizeRender imageURL={imageData.url}>
                     {({ width: imageWidth, height: imageHeight }) => (
                       <Resizable 
                         lockAspectRatio
-                        className={cx({ 'border border-secondary shadow-sm': isSelected })}
                         enable={enableProp(isSelected)}
                         onResizeStop={(...params) => {
                           const { width: widthDelta } = params[3];
@@ -110,7 +110,10 @@ const ImageRender = ({
                           onResizeFinish({ currentWidth, currentHeight, widthDelta })
                         }}
                       >
-                        {imageItem({ ...imageData })}
+                        {imageItem({ 
+                          ...imageData,
+                          height: nodeData.height ? '100%' : 'auto',
+                        })}
                       </Resizable>
                     )}
                   </ImageSizeRender>
@@ -118,15 +121,18 @@ const ImageRender = ({
                 {nodeData.width != null && nodeData.height != null && (
                   <Resizable 
                     lockAspectRatio
-                    className={cx({ 'border border-secondary shadow-sm': isSelected })}
                     enable={enableProp(isSelected)}
                     onResizeStop={(...params) => {
                       const { width: widthDelta } = params[3];
                       onResizeFinish({ currentWidth: nodeData.width || 1, currentHeight: nodeData.height || 1, widthDelta })
                     }}
                   >
-                    {imageData && imageItem({ ...imageData })}
-                    {imageData == null && (<Loading />)}
+                    {imageData && imageItem({ ...imageData, height: '100%' })}
+                    {imageData == null && (
+                      <div style={{ height: `${nodeData.height}px` }}>
+                        <Loading />
+                      </div>
+                    )}
                   </Resizable>
                 )}
               </div>
