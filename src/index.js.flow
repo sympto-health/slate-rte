@@ -138,9 +138,9 @@ declare export function extractText(
   variables: { [variableName: string]: string },
 ): string;
 
-declare export function extractMinimumFontSize(
+declare export function extractMinMaxFontSize(
   null | Array<SlateNode>,
-): number | null;
+): null | { minFontSize: number, maxFontSize: number };
 
 declare export function extractVariables(
   Array<SlateNode>,

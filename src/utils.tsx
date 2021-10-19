@@ -1,11 +1,11 @@
 import getBackgroundColor from './getBackgroundColor';
 import extractVariables from './extractVariables';
 import extractText from './extractText';
-import extractMinimumFontSize from './extractMinimumFontSize';
+import extractMinMaxFontSize from './extractMinMaxFontSize';
 
 export { 
   getBackgroundColor, 
-  extractMinimumFontSize, 
+  extractMinMaxFontSize, 
   extractVariables,
   extractText,
 };
