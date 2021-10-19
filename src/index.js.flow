@@ -138,6 +138,10 @@ declare export function extractText(
   variables: { [variableName: string]: string },
 ): string;
 
+declare export function extractMinimumFontSize(
+  null | Array<SlateNode>,
+): number | null;
+
 declare export function extractVariables(
   Array<SlateNode>,
 ): Array<string>;
