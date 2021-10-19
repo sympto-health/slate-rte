@@ -126,10 +126,11 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'DIV' && el.style.paddingBottom === '0.01rem') {
     return jsx('element', { type: 'paragraph', noPadding: true }, children);
   }
-  if (el.nodeName === 'DIV' && el.className === 'd-inline-block'
+  if (el.nodeName === 'DIV' 
+     && _.isEqual(_.sortBy(el.className.split(' ')), _.sortBy(['d-inline-block', 'image-item']))
     && el.getAttribute('data-type') === 'image') {
-    const imgCont = el.childNodes[0];
-    const img = el.childNodes[0].childNodes[0];
+     
+    const img = el.childNodes[0];
     const imgData = img.getAttribute('data-image-id') != null
       ? {
         fileData: {
