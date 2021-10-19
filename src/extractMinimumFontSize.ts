@@ -3,8 +3,9 @@ import { SlateNode } from './SlateNode'
 
 const DEFAULT_EM_SIZE = 16;
 
+// font size only counts if has text in it
 const fetchFontSize = (slateContent: SlateNode): number | null => {
-  if (slateContent.text != null) {
+  if (slateContent.text != null && slateContent.text.trim().length > 0) {
     return slateContent['font-size']  
       ? slateContent['font-size'].value
       : DEFAULT_EM_SIZE;
