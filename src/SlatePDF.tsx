@@ -272,7 +272,6 @@ const SlateLeaf = ({
     leaf.variable ? variables[leaf.variable.variableName] : null,
     children({ backgroundColor: finalBackgroundColor, fontSize: finalFontSize }),
   ]);
-  console.log(baseChild);
   const baseChildComponents = (
     <>
       {_.compact([
