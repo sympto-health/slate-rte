@@ -111,7 +111,7 @@ const SlateElement = ({
   minimalFormatting, children, element, styles, fontRatio, onFileLoad,
 }: ElementProps): JSX.Element => {
   const childComponents = (curStyles: ParentStyles) => (_.compact([
-    element.text ? <Text key={uuidv4()}>{element.text}</Text> : null,
+    element.text && element.text.length > 0 ? <Text key={uuidv4()}>{element.text}</Text> : null,
     <View style={INLINE_STYLE} key={uuidv4()}>{children(curStyles)}</View>,
   ]));
 
@@ -297,8 +297,8 @@ const SlateLeaf = ({
 
   const styledContent: JSX.Element = newStyles.reduce((currentChild: JSX.Element, { type, ...currentStyle }) => (
     type === 'Text'
-      ? <Text style={currentStyle}>{currentChild}</Text>
-      : <View style={currentStyle}>{currentChild}</View>
+      ? <Text key={uuidv4()} style={currentStyle}>{currentChild}</Text>
+      : <View key={uuidv4()} style={currentStyle}>{currentChild}</View>
   ), baseChildComponents);
 
   return styledContent;
