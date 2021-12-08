@@ -7,6 +7,7 @@ import {
 import { Card } from 'react-bootstrap'
 import cx from 'classnames';
 import { createEditor } from 'slate';
+import { v4 as uuidv4 } from 'uuid';
 import _ from 'lodash';
 import { Editable, ReactEditor, RenderLeafProps, RenderElementProps, withReact, Slate } from 'slate-react';
 import ColorPicker from './ColorPicker';
@@ -131,6 +132,7 @@ const SlateEditable = ({
           <Leaf
             {...(props as unknown as LeafProps)}
             variables={variables}
+            key={uuidv4()}
             minimalFormatting={false}
           />
         )}

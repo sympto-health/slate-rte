@@ -2,6 +2,7 @@ import React, { useMemo, useRef } from 'react'
 import { withHistory } from 'slate-history'
 import cx from 'classnames';
 import { createEditor } from 'slate';
+import { v4 as uuidv4 } from 'uuid';
 import { Editable, ReactEditor, withReact, Slate } from 'slate-react';
 import { withLinks } from './Links';
 import { HotKeyHandler } from './FormatMark';
@@ -102,6 +103,7 @@ const SlateController = ({
                     <Leaf
                       {...(props as unknown as LeafProps)}
                       variables={variables}
+                      key={uuidv4()}
                       minimalFormatting={opts.mode === 'Minimal Read-Only'}
                     />
                   )}

@@ -3,6 +3,7 @@ import ReactPlayer from 'react-player';
 import cx from 'classnames';
 import { isSafari, isIOS } from 'react-device-detect';
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 import { useSelected, useFocused, RenderLeafProps, RenderElementProps } from 'slate-react';
 import { SlateLeafNode } from './SlateTypes';
 import ImageRender from './ImageRender';
@@ -155,33 +156,35 @@ export const Leaf = ({
 }: LeafProps): JSX.Element => {
     // if variable type leaf, then child must include variable name
   const baseChild: JSX.Element = (
-    <>{_.compact([leaf.variable ? variables[leaf.variable.variableName] : children])}</>
+    <React.Fragment key={uuidv4()}>
+      {_.compact([leaf.variable ? variables[leaf.variable.variableName] : children])}
+    </React.Fragment>
   );
 
   const styleFuncs = [
-    (child: JSX.Element): JSX.Element => (leaf.bold ? <span data-type="bold" style= {{ fontWeight: 700 }}>{child}</span> : child),
-    (child: JSX.Element): JSX.Element => (leaf.code ? <code>{child}</code> : child),
-    (child: JSX.Element): JSX.Element => (leaf.italic ? <em>{child}</em> : child),
-    (child: JSX.Element): JSX.Element => (leaf.underline ? <u>{child}</u> : child),
+    (child: JSX.Element): JSX.Element => (leaf.bold ? <span key={uuidv4()} data-type="bold" style= {{ fontWeight: 700 }}>{child}</span> : child),
+    (child: JSX.Element): JSX.Element => (leaf.code ? <code key={uuidv4()}>{child}</code> : child),
+    (child: JSX.Element): JSX.Element => (leaf.italic ? <em key={uuidv4()}>{child}</em> : child),
+    (child: JSX.Element): JSX.Element => (leaf.underline ? <u key={uuidv4()}>{child}</u> : child),
     (child: JSX.Element): JSX.Element => (leaf['font-size'] != null
       // note that em is relative, so base em size will still be relevant here
-      ? (<span style={{ fontSize: `${leaf['font-size'].value / DEFAULT_EM_SIZE}em` }} >{child}</span>)
+      ? (<span key={uuidv4()} style={{ fontSize: `${leaf['font-size'].value / DEFAULT_EM_SIZE}em` }} >{child}</span>)
       : child),
     (child: JSX.Element): JSX.Element => (leaf['font-weight'] != null
-      ? (<span style={{ fontWeight: leaf['font-weight'].value }} >{child}</span>)
+      ? (<span key={uuidv4()}  style={{ fontWeight: leaf['font-weight'].value }} >{child}</span>)
       : child),
     (child: JSX.Element): JSX.Element => (leaf['text-color'] != null && !minimalFormatting
-      ? (<span data-color={leaf['text-color'].color} style={{ color: leaf['text-color'].color }}>{child}</span>)
+      ? (<span key={uuidv4()} data-color={leaf['text-color'].color} style={{ color: leaf['text-color'].color }}>{child}</span>)
       // if text color not set, or minimial formatting (dont include font color), just return child ofc
       : child),
     (child: JSX.Element): JSX.Element => (leaf['highlight-color'] != null
-      ? (<span data-color={leaf['highlight-color'].color} style={{ backgroundColor: leaf['highlight-color'].color }}>{child}</span>)
+      ? (<span key={uuidv4()} data-color={leaf['highlight-color'].color} style={{ backgroundColor: leaf['highlight-color'].color }}>{child}</span>)
       : child),
   ];
 
   const finalChildComponent = styleFuncs.reduce((finalChild, styleFunc) => (styleFunc(finalChild)), baseChild)
 
   return leaf.variable
-    ? <span data-variable-leaf={leaf.variable.variableName} {...attributes}>{finalChildComponent}</span>
-    : <span {...attributes}>{finalChildComponent}</span>
+    ? <span key={uuidv4()} data-variable-leaf={leaf.variable.variableName} {...attributes}>{finalChildComponent}</span>
+    : <span key={uuidv4()} {...attributes}>{finalChildComponent}</span>
 }
