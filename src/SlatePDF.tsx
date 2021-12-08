@@ -272,10 +272,11 @@ const SlateLeaf = ({
     leaf.variable ? variables[leaf.variable.variableName] : null,
     children({ backgroundColor: finalBackgroundColor, fontSize: finalFontSize }),
   ]);
+  console.log(baseChild);
   const baseChildComponents = (
     <>
       {_.compact([
-        leaf.text
+        leaf.text && leaf.text.length > 0 
         ? (
           <Text
             style={{ backgroundColor: finalBackgroundColor }}
@@ -289,8 +290,12 @@ const SlateLeaf = ({
           style={{ backgroundColor: finalBackgroundColor }}
           key={uuidv4()}
         >
-          {baseChild}
-        </Text>,
+          { // @ts-ignore
+            baseChild && baseChild.length === 1 && baseChild[0].props.children.length == 0 
+              ? ' '
+              : baseChild
+          }
+        </Text>
       ])}
     </>
   );
