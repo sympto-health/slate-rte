@@ -299,14 +299,14 @@ const SlateLeaf = ({
     ])
   );
 
-  if (baseChildComponents == null) {
-    return (<React.Fragment></React.Fragment>);
+  if (baseChildComponents.length === 0) {
+    return (<Text key={uuidv4()} style={{ display: 'none', width: 0, overflow: 'hidden' }}>{' '}</Text>);
   }
   const styledContent: JSX.Element = newStyles.reduce((currentChild: JSX.Element, { type, ...currentStyle }) => (
     type === 'Text'
       ? <Text key={uuidv4()} style={currentStyle}>{currentChild}</Text>
       : <View key={uuidv4()} style={currentStyle}>{currentChild}</View>
-  ), <>{baseChildComponents}</>);
+  ), <React.Fragment key={uuidv4()}>{baseChildComponents}</React.Fragment>);
 
   return styledContent;
 }
