@@ -272,38 +272,41 @@ const SlateLeaf = ({
     leaf.variable ? variables[leaf.variable.variableName] : null,
     children({ backgroundColor: finalBackgroundColor, fontSize: finalFontSize }),
   ]);
+  // @ts-ignore
+  const isBaseChildEmpty = baseChild && (baseChild.length === 1 && baseChild[0].props.children.length == 0);
   const baseChildComponents = (
-    <>
-      {_.compact([
-        leaf.text && leaf.text.length > 0 
+    _.compact([
+      leaf.text && leaf.text.length > 0 
+      ? (
+        <Text
+          style={{ backgroundColor: finalBackgroundColor }}
+          key={uuidv4()}
+        >
+          {leaf.text}
+        </Text>
+      )
+      : null,
+      baseChild != null && !isBaseChildEmpty
         ? (
           <Text
             style={{ backgroundColor: finalBackgroundColor }}
             key={uuidv4()}
           >
-            {leaf.text}
+            {baseChild}
           </Text>
         )
         : null,
-        <Text
-          style={{ backgroundColor: finalBackgroundColor }}
-          key={uuidv4()}
-        >
-          { // @ts-ignore
-            baseChild && baseChild.length === 1 && baseChild[0].props.children.length == 0 
-              ? ' '
-              : baseChild
-          }
-        </Text>
-      ])}
-    </>
+    ])
   );
 
+  if (baseChildComponents == null) {
+    return (<React.Fragment></React.Fragment>);
+  }
   const styledContent: JSX.Element = newStyles.reduce((currentChild: JSX.Element, { type, ...currentStyle }) => (
     type === 'Text'
       ? <Text key={uuidv4()} style={currentStyle}>{currentChild}</Text>
       : <View key={uuidv4()} style={currentStyle}>{currentChild}</View>
-  ), baseChildComponents);
+  ), <>{baseChildComponents}</>);
 
   return styledContent;
 }
