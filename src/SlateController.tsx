@@ -28,7 +28,7 @@ const SlateController = ({
   const readOnlyMode = opts.mode === 'Read-Only' || opts.mode === 'Minimal Read-Only';
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  const editor: ReactEditor = useMemo(() => withVariables(readOnlyMode)(withImages(withLinks(withHistory(withReact(createEditor()))))), [])
+  const editor: ReactEditor = useMemo(() => withVariables(readOnlyMode)(withImages(withLinks(withHistory(withReact(createEditor()))))), [readOnlyMode]);
   const backgroundColor = getBackgroundColor(value);
   const calculateColorStyles = () => {
     if (backgroundColor == null) return {};
