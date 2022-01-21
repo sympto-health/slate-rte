@@ -123,7 +123,15 @@ export const Element = (props: ElementProps): JSX.Element => {
         </div>
       );
     case 'background-color':
-      return (<div data-color={String(element.color)} style={{ backgroundColor: String(element.color) }} />);
+      return (
+        <div 
+          data-color={String(element.color)} 
+          className="d-none"
+          style={{ backgroundColor: String(element.color) }} 
+        >
+          {children}
+        </div>
+      );
     case 'variable':
       return isReadOnly
         ? (
@@ -183,7 +191,6 @@ export const Leaf = ({
   ];
 
   const finalChildComponent = styleFuncs.reduce((finalChild, styleFunc) => (styleFunc(finalChild)), baseChild)
-
   return leaf.variable
     ? <span key={uuidv4()} data-variable-leaf={leaf.variable.variableName} {...attributes}>{finalChildComponent}</span>
     : <span key={uuidv4()} {...attributes}>{finalChildComponent}</span>
