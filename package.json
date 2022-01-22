@@ -1,6 +1,6 @@
 {
   "name": "slate-rte",
-  "version": "1.0.82",
+  "version": "1.0.83",
   "description": "Rich text editor for slatejs editor",
   "main": "build/index.js",
   "module": "build/index.es.js",
@@ -88,6 +88,7 @@
     "react-color": "^2.18.1",
     "react-device-detect": "^1.17.0",
     "react-dropzone": "^11.0.2",
+    "react-error-boundary": "^3.1.4",
     "react-player": "^2.5.0",
     "slate": "^0.63.0",
     "slate-history": "^0.62.0",

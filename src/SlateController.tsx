@@ -2,6 +2,7 @@ import React, { useMemo, useRef } from 'react'
 import { withHistory } from 'slate-history'
 import cx from 'classnames';
 import { createEditor } from 'slate';
+import { ErrorBoundary } from 'react-error-boundary'
 import { v4 as uuidv4 } from 'uuid';
 import { Editable, ReactEditor, withReact, Slate } from 'slate-react';
 import { withLinks } from './Links';
@@ -36,9 +37,18 @@ const SlateController = ({
     if (opts.mode === 'Minimal Read-Only') return { color: backgroundColor };
     return { backgroundColor };
   };
-  const slateEditor = useRef<HTMLDivElement | null>(null)
+  const slateEditor = useRef<HTMLDivElement | null>(null);
   return (
-    <>
+    <ErrorBoundary
+      fallbackRender={({error, resetErrorBoundary }) => {
+        setTimeout(resetErrorBoundary, 500);
+        return (
+          <div className="text-danger text-center pt-2">
+            <pre>{error.message}</pre>
+          </div>
+        );
+      }}
+    >
       {(opts.mode === 'PDF' || opts.mode === 'Minimal PDF') && (
         <SlatePDF
           options={options}
@@ -118,7 +128,7 @@ const SlateController = ({
 
           </div>
         )}
-    </>
+    </ErrorBoundary>
   );
 }
 
