@@ -10,7 +10,7 @@ import deserialize from './deserialize';
 import loadImages from './AsyncFileLoadStore';
 import extractMinMaxFontSize from './extractMinMaxFontSize';
 import { SlateNode } from './SlateNode';
-import SlateController from './SlateController';
+import ManagedSlateController from './ManagedSlateController';
 import './index.css';
 
 export { 
@@ -24,7 +24,7 @@ export const parseAsHTML = async (
 ): Promise<string> => {
   const loadedImages = await loadImages(slateContent, onFileLoad);
   return renderToStaticMarkup(
-    <SlateController
+    <ManagedSlateController
       loadedImages={loadedImages}
       variables={variables}
       mode="Read-Only"
@@ -43,4 +43,4 @@ export const deserializeHTMLString = (htmlString: string): SlateNode[] => {
 
 export const isEmpty = (slateContent: null | SlateNode[], variables: { [variableName: string]: string }): boolean => (extractText(slateContent, variables).trim().length === 0);
 
-export default SlateController
+export default ManagedSlateController

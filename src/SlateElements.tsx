@@ -138,7 +138,6 @@ export const Element = (props: ElementProps): JSX.Element => {
           <span
             {...attributes}
             data-variable={element.variableName}
-            className="d-inline-block"
             contentEditable={false}
           >
             {children}
