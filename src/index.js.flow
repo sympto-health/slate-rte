@@ -136,6 +136,7 @@ declare export function isEmpty(
 declare export function extractText(
   null | Array<SlateNode>,
   variables: { [variableName: string]: string },
+  includeNewLines: undefined | boolean,
 ): string;
 
 declare export function extractMinMaxFontSize(
