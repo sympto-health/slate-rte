@@ -64,6 +64,7 @@ export type LinkNode<T> = ({
 export type ImageVideoNode<T> = ({
   type: 'image' | 'video',
   url: string,
+  fileData: null,
   width?: number, // px
   height?: number, // px
 } | {

@@ -63,7 +63,7 @@ declare type ImageVideoNode = ({
   type: 'image' | 'video',
   fileData: { type: 'Image ID', id: string },
   width?: number, // px
-  height?: number, // px  
+  height?: number, // px
   ...BaseNode,
 });
 
@@ -136,8 +136,12 @@ declare export function isEmpty(
 declare export function extractText(
   null | Array<SlateNode>,
   variables: { [variableName: string]: string },
-  includeNewLines: undefined | boolean,
+  includeNewLines?: null | boolean,
 ): string;
+
+declare export function extractImageIds(
+  null | Array<SlateNode>,
+): Array<string>;
 
 declare export function extractMinMaxFontSize(
   null | Array<SlateNode>,

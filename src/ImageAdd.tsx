@@ -25,6 +25,7 @@ const ImageAdd = ({ uploadFile, type }: {
       ...(fileData.type === 'URL'
          ? {
            url: fileData.url,
+           fileData: null,
          }
          : {
            fileData,

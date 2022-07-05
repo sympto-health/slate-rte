@@ -8,13 +8,14 @@ import { getBackgroundColor, extractVariables, extractText } from './utils';
 import { renderToStaticMarkup } from 'react-dom/server'
 import deserialize from './deserialize';
 import loadImages from './AsyncFileLoadStore';
+import extractImageIds from './extractImageIds';
 import extractMinMaxFontSize from './extractMinMaxFontSize';
 import { SlateNode } from './SlateNode';
 import ManagedSlateController from './ManagedSlateController';
 import './index.css';
 
-export { 
-  extractMinMaxFontSize, getBackgroundColor, extractVariables, extractText,
+export {
+  extractMinMaxFontSize, getBackgroundColor, extractVariables, extractText, extractImageIds,
 };
 
 export const parseAsHTML = async (
