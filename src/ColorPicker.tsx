@@ -5,6 +5,7 @@ import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { BackgroundColorNode } from './SlateTypes';
 import { SlateEditorT, SlateNode, convertSlateEditor } from './SlateNode';
 import ColorPickerPopup from './ColorPickerPopup';
+import getBackgroundColor, { getBorderColor } from './getBackgroundColor';
 
 const ColorPicker = ({ type, icon }: {
   icon: IconDefinition, type: 'text-color' | 'highlight-color' | 'background-color' | 'border-color',
@@ -18,8 +19,10 @@ const ColorPicker = ({ type, icon }: {
     <ColorPickerPopup
       currentColor={currentColor != null ? currentColor : DEFAULT_COLORS[type]}
       icon={icon}
-      setColor={(newColor: string) => {
+      onBeforeToggleColorPicker={() => {
         setSelectedText(editor.selection);
+      }}
+      setColor={(newColor: string) => {
         toggleColor(editor, selectedText, newColor, type);
       }}
       colorPickerId={type}
@@ -85,6 +88,12 @@ const toggleColor = (
 }
 
 export const getActiveColor = (editor: SlateEditorT, type: 'text-color' | 'highlight-color' | 'background-color' | 'border-color'): null | string => {
+  if (type === 'background-color') {
+    return getBackgroundColor(editor.children);
+  }
+  if (type === 'border-color') {
+    return getBorderColor(editor.children);
+  }
   const marks = Editor.marks(convertSlateEditor(editor));
   return marks && marks[type] ? marks[type].color : null;
 }

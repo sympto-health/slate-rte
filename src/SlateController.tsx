@@ -44,10 +44,6 @@ const SlateController = ({
     if (opts.mode === 'Minimal Read-Only') return { color: backgroundColor };
     return { backgroundColor, ...borderStyles };
   };
-  console.log({
-    a: calculateColorStyles(),
-    b: calculateBorderStyles(),
-  })
   const slateEditor = useRef<HTMLDivElement | null>(null);
   return (
     <>

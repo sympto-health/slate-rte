@@ -11,10 +11,11 @@ type Props = {
   currentColor: string,
   setColor: (newColor: string) => void,
   colorPickerId: string,
+  onBeforeToggleColorPicker: () => void,
   icon: IconDefinition,
 };
 
-const PopupColorPicker = ({ icon, currentColor, setColor, colorPickerId }: Props) => {
+const PopupColorPicker = ({ onBeforeToggleColorPicker, icon, currentColor, setColor, colorPickerId }: Props) => {
   const [shouldShowColorPicker, toggleColorPicker] = useState(false);
   const colorRef = useRef<any>();
   const [newColor, setNewColor] = useState<string>(currentColor);
@@ -24,6 +25,7 @@ const PopupColorPicker = ({ icon, currentColor, setColor, colorPickerId }: Props
         ref={colorRef}
         variant="link"
         onClick={() => {
+          onBeforeToggleColorPicker();
           toggleColorPicker(!shouldShowColorPicker);
         }}
         className={cx({
