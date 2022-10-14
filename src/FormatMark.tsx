@@ -4,6 +4,7 @@ import { Editor } from 'slate'
 import isHotkey from 'is-hotkey'
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import FormatButton from './FormatButton';
+import { IconProp } from '@fortawesome/fontawesome-svg-core'
 
 export type MarkFormats = 'bold' | 'italic' | 'underline' | 'code';
 
@@ -14,9 +15,9 @@ const FormatMark = ({ format, icon }: {
   // @ts-ignore
   const editor: ReactEditor = useSlate();
   return (
-    <FormatButton 
+    <FormatButton
       isActive={isMarkActive(editor, format)}
-      icon={icon}
+      icon={(icon as IconProp)}
       onClick={() => {
         toggleMark(editor, format)
       }}

@@ -6,16 +6,17 @@ import { faLink } from '@fortawesome/free-solid-svg-icons'
 import { LinkNode, EmptySlateNode } from './SlateTypes';
 import { SlateNode, SlateEditorT, convertSlateEditor } from './SlateNode';
 import FormatButton from './FormatButton';
+import { IconProp } from '@fortawesome/fontawesome-svg-core'
 
 export const withLinks = (editor: SlateEditorT) => {
   const { insertData, insertText, isInline } = editor
 
   // @ts-ignore
   editor.isInline = (element: SlateNode) => {
-    return (element.type === 'link' 
-      || element.type === 'video' 
+    return (element.type === 'link'
+      || element.type === 'video'
       || element.type === 'image')
-        ? true 
+        ? true
         // @ts-ignore
         : isInline(element)
   }
@@ -49,9 +50,9 @@ export const LinkButton = () => {
   // @ts-ignore
   const editor: SlateEditorT = useSlate()
   return (
-    <FormatButton 
+    <FormatButton
       isActive={isLinkActive(editor)}
-      icon={faLink}
+      icon={(faLink as IconProp)}
       onClick={() => {
         const url = window.prompt('Enter the URL of the link:')
         if (!url) return

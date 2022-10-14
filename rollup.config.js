@@ -34,7 +34,7 @@ export default [{
       ]
     }),
     external({ includeDependencies: true }),
-    resolve(),
+    resolve({ browser: true, alias: { react: require.resolve("react") }}),
     typescript({
       rollupCommonJSResolveHack: true,
       exclude: "**/tests/**",
@@ -82,12 +82,12 @@ export default [{
   ],
   plugins: [
     external({ includeDependencies: true }),
-    resolve(),
+    resolve({ browser: true, alias: { react: require.resolve("react") }}),
     typescript({
       rollupCommonJSResolveHack: true,
       exclude: "**/tests/**",
       clean: true
-    }),    
+    }),
     commonjs({
       include: ["node_modules/**"],
     }),

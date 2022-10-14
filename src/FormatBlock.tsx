@@ -2,6 +2,7 @@ import React from 'react'
 import { useSlate } from 'slate-react'
 import { Editor, Transforms } from 'slate'
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import FormatButton from './FormatButton';
 import { SlateEditorT, convertSlateEditor, SlateNode } from './SlateNode';
 import './index.css';
@@ -17,9 +18,9 @@ const FormatBlock = ({ format, icon }: {
   // @ts-ignore
   const editor: SlateEditorT = useSlate();
   return (
-    <FormatButton 
+    <FormatButton
       isActive={isBlockActive(editor, format)}
-      icon={icon}
+      icon={(icon as IconProp)}
       onClick={() => {
         toggleBlock(editor, format)
       }}

@@ -6,6 +6,7 @@ import swal from 'sweetalert';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 import './FileUpload.css';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const MAX_FILE_SIZE = 1048576 * 100; // 100 MBS
 
@@ -56,7 +57,7 @@ const FileUpload = ({
       {
         rejectFiles.length === 0 && isDragActive && (
           <div className="d-flex flex-column">
-            <FontAwesomeIcon icon={faCloudUploadAlt} className="upload-icon text-secondary" />
+            <FontAwesomeIcon icon={(faCloudUploadAlt as IconProp)} className="upload-icon text-secondary" />
             <div className="display-4 upload-text">
               Drop your file here to upload...
             </div>

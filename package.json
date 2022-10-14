@@ -1,6 +1,6 @@
 {
   "name": "slate-rte",
-  "version": "1.0.87",
+  "version": "1.0.88",
   "description": "Rich text editor for slatejs editor",
   "main": "build/index.js",
   "module": "build/index.es.js",
@@ -23,11 +23,15 @@
   "author": "Sympto Health",
   "license": "ISC",
   "peerDependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.28",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@fortawesome/react-fontawesome": "^0.1.9",
     "@react-pdf/renderer": "^2.0.13",
+    "color": "^3.1.2",
     "core-js": "^3.16.1",
-    "react": "^16.14.0 || ^17.0.1",
-    "react-bootstrap": "^1.2.2",
-    "react-dom": "^16.8.6 || ^17.0.1",
+    "react": "^17.0.2",
+    "react-bootstrap": "^1.6.4",
+    "react-dom": "^17.0.2",
     "regenerator-runtime": "^0.13.1"
   },
   "peerDependenciesMeta": {
@@ -45,6 +49,7 @@
     "@babel/preset-typescript": "^7.14.5",
     "@react-pdf/renderer": "^2.0.13",
     "@types/classnames": "^2.3.1",
+    "@types/color": "^3.0.3",
     "@types/escape-html": "^1.0.0",
     "@types/is-url": "^1.2.28",
     "@types/lodash": "^4.14.159",
@@ -76,9 +81,6 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.30",
-    "@fortawesome/free-solid-svg-icons": "^5.14.0",
-    "@fortawesome/react-fontawesome": "^0.1.11",
     "classnames": "^2.3.1",
     "get-root-node-polyfill": "^1.0.0",
     "is-hotkey": "^0.1.6",

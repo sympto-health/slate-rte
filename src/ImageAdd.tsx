@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Transforms, Editor, Path, Node } from 'slate'
 import { useSlate,  ReactEditor } from 'slate-react'
 import { faImages, faVideo } from '@fortawesome/free-solid-svg-icons'
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { ImageVideoNode, EmptySlateNode, FileT } from './SlateTypes';
 import { SlateNode, SlateEditorT } from './SlateNode';
 import FormatButton from './FormatButton';
@@ -57,7 +58,12 @@ const ImageAdd = ({ uploadFile, type }: {
     }
   };
 
-
+  const attachmentIcon: IconProp = useMemo(() => {
+    if (type === 'image') {
+      return (faImages as IconProp);
+    }
+    return (faVideo as IconProp);
+  }, [type]);
   return (
     <>
       {
@@ -82,7 +88,7 @@ const ImageAdd = ({ uploadFile, type }: {
       }
       <FormatButton
         isActive={false}
-        icon={type === 'image' ? faImages : faVideo}
+        icon={attachmentIcon}
         onClick={async () => {
           setShowAttachmentModal(true);
         }}

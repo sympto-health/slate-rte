@@ -4,6 +4,7 @@ import {
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
   faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter, faFillDrip, faEllipsisH,
 } from '@fortawesome/free-solid-svg-icons'
+import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import { Card } from 'react-bootstrap'
 import cx from 'classnames';
 import { createEditor } from 'slate';
@@ -81,7 +82,7 @@ const SlateEditable = ({
           />
         ))}
         <FormatButton
-          icon={faEllipsisH}
+          icon={(faEllipsisH as IconProp)}
           isActive={showAllOptions}
           onClick={() => {
             setShowAllOptions((curOption) => !curOption);
