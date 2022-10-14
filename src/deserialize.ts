@@ -126,10 +126,10 @@ const deserialize = (el: HTMLElement): Descendant[] => {
   if (el.nodeName === 'DIV' && el.style.paddingBottom === '0.01rem') {
     return jsx('element', { type: 'paragraph', noPadding: true }, children);
   }
-  if (el.nodeName === 'DIV' 
+  if (el.nodeName === 'DIV'
      && _.isEqual(_.sortBy(el.className.split(' ')), _.sortBy(['d-inline-block', 'image-item']))
     && el.getAttribute('data-type') === 'image') {
-     
+
     const img = el.childNodes[0];
     const imgData = img.getAttribute('data-image-id') != null
       ? {
@@ -145,7 +145,9 @@ const deserialize = (el: HTMLElement): Descendant[] => {
     const targetColor = el.getAttribute('data-color')
       ? el.getAttribute('data-color')
       : el.style.backgroundColor;
-    return jsx('element', { type: 'background-color', color: targetColor }, children);
+    return jsx('element', {
+      type: 'background-color', color: targetColor, borderColor: el.getAttribute('data-border-color')
+    }, children);
   }
   if (el.nodeName === 'A') {
     return jsx('element', { type: 'link', url: el.getAttribute('href') }, children);

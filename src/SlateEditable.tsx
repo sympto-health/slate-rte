@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react'
 import { withHistory } from 'slate-history'
 import {
   faBold, faItalic, faUnderline, faQuoteLeft, faCode, faHeading, faListOl, faListUl, faFont, IconDefinition,
-  faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter, faFillDrip, faEllipsisH,
+  faAlignLeft, faAlignRight, faAlignCenter, faGripLines, faTint, faHighlighter, faFillDrip, faEllipsisH, faBorderTopLeft,
 } from '@fortawesome/free-solid-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import { Card } from 'react-bootstrap'
@@ -112,6 +112,7 @@ const SlateEditable = ({
             <ColorPicker icon={faTint} type="text-color" />
             <ColorPicker icon={faHighlighter} type="highlight-color" />
             <ColorPicker icon={faFillDrip} type="background-color" />
+            <ColorPicker icon={faBorderTopLeft} type="border-color" />
             { uploadFile && (<ImageAdd type="image" uploadFile={uploadFile} />)}
             { uploadFile && (<ImageAdd type="video" uploadFile={uploadFile} />)}
             <FontFormatter options={[300, 400, 700, 800]} type="font-weight" defaultVal={400} />

@@ -77,6 +77,7 @@ export type ImageVideoNode<T> = ({
 export type BackgroundColorNode<T> = ({
   type: 'background-color',
   color: string,
+  borderColor: undefined | null | string,
 } & T);
 
 export type VariableNode<T> = ({

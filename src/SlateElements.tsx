@@ -76,12 +76,12 @@ export const Element = (props: ElementProps): JSX.Element => {
       );
     case 'image':
       return (
-        <ImageRender 
-          isReadOnly={isReadOnly} 
-          loadedImages={loadedImages} 
+        <ImageRender
+          isReadOnly={isReadOnly}
+          loadedImages={loadedImages}
           isSelected={selected && focused}
           className="image-item d-inline-block"
-          nodeData={element} 
+          nodeData={element}
           onFileLoad={onFileLoad}
           attributes={attributes}
         >
@@ -124,10 +124,15 @@ export const Element = (props: ElementProps): JSX.Element => {
       );
     case 'background-color':
       return (
-        <div 
-          data-color={String(element.color)} 
+        <div
+          data-color={String(element.color)}
           className="d-none"
-          style={{ backgroundColor: String(element.color) }} 
+          style={{
+            backgroundColor: String(element.color),
+            ...(element.borderColor != null ? {
+              border: `1px solid ${String(element.borderColor)}`,
+            } : {}),
+          }}
         >
           {children}
         </div>

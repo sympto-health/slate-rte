@@ -7,7 +7,7 @@ import { SlateEditorT, SlateNode, convertSlateEditor } from './SlateNode';
 import ColorPickerPopup from './ColorPickerPopup';
 
 const ColorPicker = ({ type, icon }: {
-  icon: IconDefinition, type: 'text-color' | 'highlight-color' | 'background-color',
+  icon: IconDefinition, type: 'text-color' | 'highlight-color' | 'background-color' | 'border-color',
 }) => {
   // @ts-ignore
   const editor: SlateEditorT = useSlate();
@@ -19,7 +19,6 @@ const ColorPicker = ({ type, icon }: {
       currentColor={currentColor}
       icon={icon}
       setColor={(newColor: string) => {
-        console.log({ newColor });
         setSelectedText(editor.selection);
         toggleColor(editor, selectedText, newColor, type);
       }}
@@ -33,16 +32,32 @@ const toggleColor = (
   editor: SlateEditorT,
   selectedText: Range | null,
   color: string,
-  type: 'text-color' | 'highlight-color' | 'background-color',
+  type: 'text-color' | 'highlight-color' | 'background-color' | 'border-color',
 ) => {
-  if (type === 'background-color') {
+  if (type === 'background-color' || type === 'border-color') {
     const point = Editor.start(convertSlateEditor(editor), [0, 0])
-    const node: BackgroundColorNode<SlateNode> = {
+    const existingNode = editor.children[0].type === 'background-color' ? editor.children[0] : null;
+    const baseNodeData: {
+      text: null,
       type: 'background-color',
-      color,
+      children: SlateNode[],
+    } = {
+      type: 'background-color',
       text: null,
       children: [],
     };
+
+    const node: BackgroundColorNode<SlateNode> = type === 'background-color'
+      ? {
+        ...baseNodeData,
+        color,
+        borderColor: existingNode != null ? existingNode.borderColor : null,
+      }
+      : {
+        ...baseNodeData,
+        color: existingNode != null ? existingNode.color : '#ffffff',
+        borderColor: color,
+      }
 
     if (editor.children[0].type !== 'background-color') {
       Transforms.insertNodes(convertSlateEditor(editor), (node as any), { at: point });
@@ -62,7 +77,7 @@ const toggleColor = (
   }
 }
 
-export const getActiveColor = (editor: SlateEditorT, type: 'text-color' | 'highlight-color' | 'background-color'): null | string => {
+export const getActiveColor = (editor: SlateEditorT, type: 'text-color' | 'highlight-color' | 'background-color' | 'border-color'): null | string => {
   const marks = Editor.marks(convertSlateEditor(editor));
   return marks && marks[type] ? marks[type].color : null;
 }

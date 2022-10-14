@@ -9,7 +9,7 @@ import { HotKeyHandler } from './FormatMark';
 import { withVariables } from './Variables';
 import { withImages } from './ImageAdd';
 import { SlateProps } from './SlateProps';
-import getBackgroundColor from './getBackgroundColor';
+import getBackgroundColor, { getBorderColor } from './getBackgroundColor';
 import SlatePDF from './SlatePDF';
 import SlateEditable from './SlateEditable'
 import { Leaf, Element, ElementProps, LeafProps } from './SlateElements';
@@ -31,11 +31,23 @@ const SlateController = ({
   // @ts-ignore
   const editor: ReactEditor = useMemo(() => withVariables(readOnlyMode)(withImages(withLinks(withHistory(withReact(createEditor()))))), [readOnlyMode]);
   const backgroundColor = getBackgroundColor(value);
+  const borderColor = getBorderColor(value);
+  const calculateBorderStyles = () => {
+    if (borderColor != null) {
+      return { border: `1px solid ${borderColor}` };
+    }
+    return {};
+  }
   const calculateColorStyles = () => {
-    if (backgroundColor == null) return {};
+    const borderStyles = calculateBorderStyles();
+    if (backgroundColor == null) return borderStyles;
     if (opts.mode === 'Minimal Read-Only') return { color: backgroundColor };
-    return { backgroundColor };
+    return { backgroundColor, ...borderStyles };
   };
+  console.log({
+    a: calculateColorStyles(),
+    b: calculateBorderStyles(),
+  })
   const slateEditor = useRef<HTMLDivElement | null>(null);
   return (
     <>

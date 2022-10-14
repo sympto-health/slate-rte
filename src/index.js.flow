@@ -70,6 +70,7 @@ declare type ImageVideoNode = ({
 declare type BackgroundColorNode = ({
   type: 'background-color',
   color: string,
+  borderColor: ?string,
   ...BaseNode,
 });
 

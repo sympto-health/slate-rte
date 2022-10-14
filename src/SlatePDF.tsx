@@ -194,10 +194,10 @@ const SlateElement = ({
                   {imageData && (
                     <ImageSizeRender imageURL={imageData.url}>
                       {({ width, height }) => (
-                        <Image 
-                          cache 
-                          style={{ ...INLINE_STYLE, width, height, objectFit: 'contain' }} 
-                          src={imageData.url} 
+                        <Image
+                          cache
+                          style={{ ...INLINE_STYLE, width, height, objectFit: 'contain' }}
+                          src={imageData.url}
                         />
                       )}
                     </ImageSizeRender>
@@ -210,7 +210,14 @@ const SlateElement = ({
         </View>
       )
     case 'background-color':
-      return (<View style={{ backgroundColor: element.color }} />);
+      return (
+        <View
+          style={{
+            backgroundColor: element.color,
+            ...(element.borderColor != null ? { border: `1px solid ${element.borderColor}` } : {}),
+          }}
+        />
+      );
     case 'variable':
       // variable handled by leaf
       return (
@@ -276,7 +283,7 @@ const SlateLeaf = ({
   const isBaseChildEmpty = baseChild && (baseChild.length === 1 && baseChild[0].props.children.length == 0);
   const baseChildComponents = (
     _.compact([
-      leaf.text && leaf.text.length > 0 
+      leaf.text && leaf.text.length > 0
       ? (
         <Text
           style={{ backgroundColor: finalBackgroundColor }}
