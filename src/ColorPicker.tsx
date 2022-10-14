@@ -16,7 +16,7 @@ const ColorPicker = ({ type, icon }: {
 
   return (
     <ColorPickerPopup
-      currentColor={currentColor}
+      currentColor={currentColor != null ? currentColor : DEFAULT_COLORS[type]}
       icon={icon}
       setColor={(newColor: string) => {
         setSelectedText(editor.selection);
@@ -26,6 +26,13 @@ const ColorPicker = ({ type, icon }: {
     />
   );
 }
+
+const DEFAULT_COLORS = {
+  'text-color': '#212529',
+  'border-color': '#FFFFFF',
+  'background-color': '#FFFFFF',
+  'highlight-color': '#f1c40f',
+};
 
 // color is a hexcode
 const toggleColor = (
@@ -55,7 +62,7 @@ const toggleColor = (
       }
       : {
         ...baseNodeData,
-        color: existingNode != null ? existingNode.color : '#ffffff',
+        color: existingNode != null ? existingNode.color : DEFAULT_COLORS[type],
         borderColor: color,
       }
 

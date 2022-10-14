@@ -8,7 +8,7 @@ import { Button, Overlay, Popover } from 'react-bootstrap';
 import { ChromePicker } from 'react-color';
 
 type Props = {
-  currentColor: null | string,
+  currentColor: string,
   setColor: (newColor: string) => void,
   colorPickerId: string,
   icon: IconDefinition,
@@ -17,7 +17,7 @@ type Props = {
 const PopupColorPicker = ({ icon, currentColor, setColor, colorPickerId }: Props) => {
   const [shouldShowColorPicker, toggleColorPicker] = useState(false);
   const colorRef = useRef<any>();
-  const [newColor, setNewColor] = useState<string | null>(null);
+  const [newColor, setNewColor] = useState<string>(currentColor);
   return (
     <>
       <Button
@@ -43,9 +43,7 @@ const PopupColorPicker = ({ icon, currentColor, setColor, colorPickerId }: Props
         placement="auto"
         onHide={() => {
           toggleColorPicker(false);
-          if (newColor) {
-            setColor(newColor);
-          }
+          setColor(newColor);
         }}
         show={shouldShowColorPicker}
         rootClose
@@ -53,7 +51,7 @@ const PopupColorPicker = ({ icon, currentColor, setColor, colorPickerId }: Props
       >
         <Popover id={colorPickerId}>
           <ChromePicker
-            color={newColor ? newColor : (currentColor || '#ffffff00')}
+            color={newColor != null ? newColor : currentColor}
             onChangeComplete={(newCol) => {
               setNewColor(Color(newCol.hex).alpha(newCol.rgb.a == null ? 1 : newCol.rgb.a).toString());
             }}
