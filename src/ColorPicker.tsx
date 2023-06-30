@@ -6,6 +6,7 @@ import { BackgroundColorNode } from './SlateTypes';
 import { SlateEditorT, SlateNode, convertSlateEditor } from './SlateNode';
 import ColorPickerPopup from './ColorPickerPopup';
 import getBackgroundColor, { getBorderColor } from './getBackgroundColor';
+import _ from 'lodash';
 
 const ColorPicker = ({ type, icon }: {
   icon: IconDefinition, type: 'text-color' | 'highlight-color' | 'background-color' | 'border-color',
@@ -45,34 +46,29 @@ const toggleColor = (
   type: 'text-color' | 'highlight-color' | 'background-color' | 'border-color',
 ) => {
   if (type === 'background-color' || type === 'border-color') {
-    const point = Editor.start(convertSlateEditor(editor), [0, 0])
-    const existingNode = editor.children[0].type === 'background-color' ? editor.children[0] : null;
-    const baseNodeData: {
-      text: null,
-      type: 'background-color',
-      children: SlateNode[],
-    } = {
-      type: 'background-color',
-      text: null,
-      children: [],
-    };
-
-    const node: BackgroundColorNode<SlateNode> = type === 'background-color'
+    const targetNode = _.head(editor.children)?.type === 'background-color'
+      ? _.head(editor.children) as BackgroundColorNode<SlateNode>
+      : null;
+    const newNode: BackgroundColorNode<SlateNode> = type === 'background-color'
       ? {
-        ...baseNodeData,
+        type: 'background-color',
+        children: [{ text: '' }],
+        text: null,
         color,
-        borderColor: existingNode != null ? existingNode.borderColor : null,
+        borderColor: targetNode != null ? targetNode.borderColor : null,
       }
       : {
-        ...baseNodeData,
-        color: existingNode != null ? existingNode.color : DEFAULT_COLORS[type],
+        type: 'background-color',
+        children: [{ text: '' }],
+        color: targetNode != null ? targetNode.color : DEFAULT_COLORS[type],
         borderColor: color,
+        text: null,
       }
 
-    if (editor.children[0].type !== 'background-color') {
-      Transforms.insertNodes(convertSlateEditor(editor), (node as any), { at: point });
+    if (targetNode == null) {
+      Transforms.insertNodes(convertSlateEditor(editor), (newNode as any), { at: [0]});
     } else {
-      Transforms.setNodes(convertSlateEditor(editor), (node as any), { at: point });
+      Transforms.setNodes(convertSlateEditor(editor), (newNode as any), { at: [0]});
     }
     return;
   }
